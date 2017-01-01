@@ -31,6 +31,7 @@ spec:
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.agent | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
         - name: contrail-agent-init-kernel
