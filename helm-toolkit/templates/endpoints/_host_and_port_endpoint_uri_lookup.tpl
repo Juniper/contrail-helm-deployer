@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This function returns the endpoint uri for a service, it takes an tuple
-# input in the form: service-type, endpoint-class, port-name. eg:
-# { tuple "orchestration" "public" "api" . | include "helm-toolkit.endpoints.keystone_endpoint_uri_lookup" }
-# will return the appropriate URI.
+# This function returns hostnames from endpoint definitions for use cases
+# where the uri style return is not appropriate, and only the hostname
+# portion is used or relevant in the template:
+# { tuple "memcache" "internal" "portName" . | include "helm-toolkit.endpoints.host_and_port_endpoint_uri_lookup" }
+# returns: internal_host:port
+#
+# Output that requires the port aspect striped could simply split the output based on ':'
 
-{{- define "helm-toolkit.endpoints.keystone_endpoint_uri_lookup" -}}
+{{- define "helm-toolkit.endpoints.host_and_port_endpoint_uri_lookup" -}}
 {{- $type := index . 0 -}}
 {{- $endpoint := index . 1 -}}
 {{- $port := index . 2 -}}
@@ -28,11 +31,10 @@
 {{- $fqdn := $context.Values.endpoints.fqdn -}}
 {{- end -}}
 {{- with $endpointMap -}}
-{{- $endpointScheme :=  index .scheme $endpoint | default .scheme.default }}
+{{- $endpointScheme := .scheme }}
 {{- $endpointHost := index .hosts $endpoint | default .hosts.default }}
 {{- $endpointPortMAP := index .port $port }}
 {{- $endpointPort := index $endpointPortMAP $endpoint | default (index $endpointPortMAP "default") }}
-{{- $endpointPath := index .path $endpoint | default .path.default | default "/" }}
-{{- printf "%s://%s.%s:%1.f%s" $endpointScheme $endpointHost $fqdn $endpointPort $endpointPath -}}
+{{- printf "%s.%s:%1.f" $endpointHost $fqdn $endpointPort -}}
 {{- end -}}
 {{- end -}}
