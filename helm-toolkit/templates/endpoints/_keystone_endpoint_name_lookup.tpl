@@ -22,7 +22,8 @@ limitations under the License.
 {{- define "helm-toolkit.endpoints.keystone_endpoint_name_lookup" -}}
 {{- $type := index . 0 -}}
 {{- $context := index . 1 -}}
-{{- $endpointMap := index $context.Values.endpoints $type }}
+{{- $typeYamlSafe := $type | replace "-" "_" }}
+{{- $endpointMap := index $context.Values.endpoints $typeYamlSafe }}
 {{- $endpointName := index $endpointMap "name" }}
 {{- $endpointName | quote -}}
 {{- end -}}
