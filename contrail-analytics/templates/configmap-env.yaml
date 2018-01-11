@@ -9,10 +9,9 @@ kind: ConfigMap
 metadata:
   name: configmap-analytics
 data:
-  CONTROLLER_NODES: {{ .Values.conf.controller_nodes }}
-  LOG_LEVEL: {{ .Values.conf.log_level }}
-  ZOOKEEPER_ANALYTICS_PORT: "2181"
-  ZOOKEEPER_ANALYTICS_SERVERS: "10.87.65.248:2181"
+  CONTROLLER_NODES: {{ .Values.conf.controller_nodes | quote }}
+  LOG_LEVEL: {{ .Values.conf.log_level | quote }}
+  ZOOKEEPER_ANALYTICS_PORT: {{ .Values.conf.analytics_zookeeper.port | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap
