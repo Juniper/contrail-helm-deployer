@@ -1,0 +1,16 @@
+---
+conf:
+  # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
+  host_os: ubuntu
+  controller_nodes:
+  log_level: SYS_NOTICE
+
+  cloud_orchestrator: openstack
+  aaa_mode: cloud-admin
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  # TO-DO
+  default: null

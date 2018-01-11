@@ -1,0 +1,74 @@
+images:
+  tags:
+    registry: "10.87.65.243:5000"
+    contrail_version: "5.0.0-139-newton"
+    nodemgr: "contrail-nodemgr"
+    analytics_api: "contrail-analytics-api"
+    analytics_collector: "contrail-analytics-collector"
+    analytics_alarm_gen: "contrail-analytics-alarm-gen"
+    analytics_query_engine: "contrail-analytics-query-engine"
+    analytics_snmp_collector: "contrail-analytics-snmp-collector"
+    analytics_topology: "contrail-analytics-topology"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+  imagePullPolicy: "IfNotPresent"
+
+labels:
+  analytics:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+
+dependencies:
+  analytics:
+    daemonset:
+    - contrail-analyticsdb
+
+conf:
+  # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
+  host_os: ubuntu
+  controller_nodes: 10.87.65.248
+  log_level: SYS_NOTICE
+
+  cloud_orchestrator: openstack
+  aaa_mode: cloud-admin
+
+  rabbitmq:
+    use_ssl: False
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  # TO-DO
+  cluster_domain: svc.cluster.local
+  rabbitmq:
+    auth:
+      admin:
+        username: admin
+        password: password
+      user:
+        username: rabbitmq
+        password: password
+    path: /
+    host: rabbit
+    port:
+      amqp: 5672
+    namespace: openstack
+    domain_override: null
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+    host: keystone-api
+    namespace: openstack
+    path: /v3
+    port:
+      admin: 35357
+      api: 80
+    protocol: http
+
+manifests:
+  configmap_env: true
+  daemonset_analytics: true

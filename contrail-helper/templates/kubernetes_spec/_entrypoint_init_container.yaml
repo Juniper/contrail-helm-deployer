@@ -1,0 +1,46 @@
+{{/*
+Name: contrail-helper.kubernetes_spec.get_entrypoint_init_container
+Description: Template for entrypoint init container to check the dependency
+Arguements:
+  1. context
+  2. dependencies
+*/}}
+
+{{- define "contrail-helper.kubernetes_spec.get_entrypoint_init_container" -}}
+{{- $context := index . 0 -}}
+{{- $dependencies := index . 1 -}}
+
+{{- if not $dependencies.services -}}{{- $_ := set $dependencies "services" list -}}{{- end -}}
+{{- if not $dependencies.jobs -}}{{- $_ := set $dependencies "jobs" list -}}{{- end -}}
+{{- if not $dependencies.daemonset -}}{{- $_ := set $dependencies "daemonset" list -}}{{- end -}}
+{{- if not $dependencies.container -}}{{- $_ := set $dependencies "container" list -}}{{- end -}}
+
+- name: init
+  image: {{ $context.Values.images.tags.dep_check }}
+  imagePullPolicy: {{ $context.Values.images.pull_policy }}
+  env:
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: INTERFACE_NAME
+      value: eth0
+    - name: DEPENDENCY_SERVICE
+      value: {{ $dependencies.services | join "," | quote}}
+    - name: DEPENDENCY_JOBS
+      value: {{ $dependencies.jobs | join "," | quote }}
+    - name: DEPENDENCY_DAEMONSET
+      value: {{ $dependencies.daemonset | join "," | quote }}
+    - name: DEPENDENCY_CONTAINER
+      value: {{ $dependencies.container | join "," | quote }}
+    - name: COMMAND
+      value: "echo \"Dependencies Resolved for pod $POD_NAME\""
+  command:
+    - kubernetes-entrypoint
+{{- end -}}

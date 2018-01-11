@@ -1,0 +1,39 @@
+{{- if .Values.manifests.daemonset_kafka }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: kafka
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "kafka" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.kafka.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.kafka.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      initContainers:
+{{ tuple $context .Values.dependencies.kafka | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: kafka
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.kafka .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        env:
+        - name: CONTROLLER_NODES
+          value: {{ .Values.conf.controller_nodes | quote }}
+        - name: ZOOKEEPER_ANALYTICS_PORT
+          value: {{ .Values.conf.analytics_zookeeper.port | quote }}
+{{- end }}
