@@ -34,6 +34,9 @@ conf:
   rabbitmq:
     use_ssl: False
 
+  analytics_zookeeper:
+    port: 2181
+
 # typically overriden by environmental
 # values, but should include all endpoints
 # required by this chart
