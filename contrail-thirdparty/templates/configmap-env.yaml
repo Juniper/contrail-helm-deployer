@@ -1,0 +1,40 @@
+{{- if .Values.manifests.configmap_env }}
+{{- $context := . }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-configdb
+data:
+# TODO: fix seeds and listen address
+  CASSANDRA_SEEDS: {{ .Values.conf.controller_nodes }}
+  CASSANDRA_CLUSTER_NAME: ContrailConfigDB
+  CASSANDRA_START_RPC: "true"
+  CASSANDRA_LISTEN_ADDRESS: {{ .Values.conf.controller_nodes }}
+  JVM_EXTRA_OPTS: >-
+    -Dcassandra.rpc_port=9161
+    -Dcassandra.native_transport_port=9041
+    -Dcassandra.ssl_storage_port=7011
+    -Dcassandra.storage_port=7010
+    -Dcassandra.jmx.local.port=7200
+    -Xms2G -Xmx2G
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-analyticsdb
+data:
+# TODO: fix seeds and listen address
+  CASSANDRA_SEEDS: {{ .Values.conf.controller_nodes }}
+  CASSANDRA_CLUSTER_NAME: Contrail
+  CASSANDRA_START_RPC: "true"
+  CASSANDRA_LISTEN_ADDRESS: {{ .Values.conf.controller_nodes }}
+  JVM_EXTRA_OPTS: >-
+    -Dcassandra.rpc_port=9160
+    -Dcassandra.native_transport_port=9042
+    -Dcassandra.ssl_storage_port=7001
+    -Dcassandra.storage_port=7000
+    -Xms2G -Xmx2G
+
+{{- end }}

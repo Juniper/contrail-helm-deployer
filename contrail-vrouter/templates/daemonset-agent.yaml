@@ -1,0 +1,100 @@
+{{- if .Values.manifests.daemonset_agent }}
+{{- $context := . }}
+# host_os is a mandatory field
+{{- $_ := required ".Values.conf.host_os must be specified, valid values are ubuntu, centos" .Values.conf.host_os }}
+{{- $host_os := .Values.conf.host_os }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-agent
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-agent" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+    spec:
+      #Disable affinity for single node setup
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.agent.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.agent.node_selector_value }}
+      #Enable tolerations for single node setup
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      initContainers:
+{{ tuple $context .Values.dependencies.agent | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+        - name: contrail-agent-init-kernel
+          image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.agent_vrouter_init_kernel .Values.images.tags.contrail_version | quote }}
+          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          envFrom:
+          - configMapRef:
+              name: configmap-vrouter
+          - configMapRef:
+              name: configmap-vrouter-auth
+      containers:
+      - name: contrail-agent
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.agent_vrouter .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        securityContext:
+          privileged: true
+        envFrom:
+        - configMapRef:
+            name: configmap-vrouter
+        - configMapRef:
+            name: configmap-vrouter-auth
+        env:
+        - name: PHYSICAL_INTERFACE
+          value: eth0
+        volumeMounts:
+        - mountPath: /usr/src
+          name: usr-src
+        - mountPath: /lib/modules
+          name: lib-modules
+        - mountPath: /var/lib/contrail/
+          name: var-lib-contrail
+      - name: contrail-agent-nodemgr
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.nodemgr .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-vrouter
+        - configMapRef:
+            name: configmap-vrouter-auth
+        env:
+        - name: NODE_TYPE
+          value: vrouter
+        - name: DOCKER_HOST
+          value: "unix://mnt/docker.sock"
+# todo: there is type Socket in new kubernetes, it is possible to use full
+# path:
+# hostPath:
+#   path: /var/run/docker.sock and
+#   type: Socket
+        volumeMounts:
+        - mountPath: /mnt
+          name: docker-unix-socket
+      volumes:
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run
+      - name: usr-src
+        hostPath:
+          path: /usr/src
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: var-lib-contrail
+        hostPath:
+          path: /var/lib/contrail/
+{{- end }}

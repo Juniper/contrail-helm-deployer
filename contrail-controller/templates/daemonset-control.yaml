@@ -1,0 +1,88 @@
+{{- if .Values.manifests.daemonset_control }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-control
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-control" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.controller.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.controller.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      initContainers:
+{{ tuple $context .Values.dependencies.config | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: contrail-control
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.control_control .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+        - configMapRef:
+            name: configmap-controller-rabbitmq
+      - name: contrail-dns
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.control_dns .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+        - configMapRef:
+            name: configmap-controller-rabbitmq
+      - name: contrail-named
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.control_named .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        securityContext:
+          privileged: true
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+        - configMapRef:
+            name: configmap-controller-rabbitmq
+      - name: contrail-control-nodemgr
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.nodemgr .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+        env:
+        - name: NODE_TYPE
+          value: control
+        - name: DOCKER_HOST
+          value: "unix://mnt/docker.sock"
+# todo: there is type Socket in new kubernetes, it is possible to use full
+# path:
+# hostPath:
+#   path: /var/run/docker.sock and
+#   type: Socket
+        volumeMounts:
+        - mountPath: /mnt
+          name: docker-unix-socket
+      volumes:
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run
+{{- end }}

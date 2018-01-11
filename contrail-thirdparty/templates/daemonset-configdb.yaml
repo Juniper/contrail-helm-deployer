@@ -1,0 +1,44 @@
+{{- if .Values.manifests.daemonset_configdb }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-configdb
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-configdb" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.configdb.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.configdb.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      initContainers:
+{{ tuple $context .Values.dependencies.configdb | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: contrail-configdb
+        image: {{ .Values.images.tags.cassandra | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: contrail-configdb
+        volumeMounts:
+        - mountPath: /var/lib/cassandra
+          name: configdb-data
+      volumes:
+      - name: configdb-data
+        hostPath:
+          path: /var/lib/configdb
+{{- end }}

@@ -1,0 +1,53 @@
+images:
+  tags:
+    registry: "10.87.65.243:5000"
+    contrail_version: "5.0.0-139-newton"
+    nodemgr: "contrail-nodemgr"
+    agent_vrouter: "contrail-agent-vrouter"
+    agent_vrouter_init_kernel: "contrail-agent-vrouter-init-kernel"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+  imagePullPolicy: "IfNotPresent"
+
+labels:
+  agent:
+    node_selector_key: openstack-compute-node
+    node_selector_value: enabled
+
+dependencies:
+  agent:
+    daemonset:
+    - contrail-config
+
+conf:
+  # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
+  host_os: centos
+  controller_nodes: 10.87.65.248
+  log_level: SYS_NOTICE
+
+  cloud_orchestrator: openstack
+  aaa_mode: cloud-admin
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  # TO-DO
+  cluster_domain: svc.cluster.local
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+    host: keystone-api
+    namespace: openstack
+    path: /v3
+    port:
+      admin: 35357
+      api: 80
+    protocol: http
+
+manifests:
+  configmap_env: true
+  daemonset_agent: true

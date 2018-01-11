@@ -1,0 +1,87 @@
+images:
+  tags:
+    registry: "10.87.65.243:5000"
+    contrail_version: "5.0.0-139-newton"
+    nodemgr: "contrail-nodemgr"
+    control_control: "contrail-controller-control-control"
+    control_dns: "contrail-controller-control-dns"
+    control_named: "contrail-controller-control-named"
+    config_api: "contrail-controller-config-api"
+    config_devicemgr: "contrail-controller-config-devicemgr"
+    config_schema_transformer: "contrail-controller-config-schema"
+    config_svcmonitor: "contrail-controller-config-svcmonitor"
+    webui_job: "contrail-controller-webui-job"
+    webui_web: "contrail-controller-webui-web"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+  imagePullPolicy: "IfNotPresent"
+
+labels:
+  controller:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+
+dependencies:
+  config:
+    daemonset:
+    - contrail-configdb
+  control:
+    daemonset:
+    - contrail-config
+  webui:
+    daemonset:
+    - contrail-config
+    - redis
+
+conf:
+  # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
+  host_os: ubuntu
+  controller_nodes: 10.87.65.248
+  log_level: SYS_NOTICE
+
+  cloud_orchestrator: openstack
+  aaa_mode: cloud-admin
+
+  rabbitmq:
+    use_ssl: False
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  # TO-DO
+  cluster_domain: svc.cluster.local
+  rabbitmq:
+    auth:
+      admin:
+        username: admin
+        password: password
+      user:
+        username: rabbitmq
+        password: password
+    path: /
+    host: rabbitmq
+    port:
+      amqp: 5672
+    namespace: openstack
+    domain_override: null
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+    host: keystone-api
+    namespace: openstack
+    path: /v3
+    port:
+      admin: 35357
+      api: 80
+    protocol: http
+
+manifests:
+  configmap_env: true
+  daemonset_config: true
+  daemonset_control: true
+  daemonset_webui: true
+  daemonset_agent: true

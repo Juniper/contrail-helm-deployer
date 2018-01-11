@@ -1,0 +1,47 @@
+{{- if .Values.manifests.daemonset_webui }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-webui
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-webui" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.controller.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.controller.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      initContainers:
+{{ tuple $context .Values.dependencies.webui | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: contrail-webui-job
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.webui_job .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+      - name: contrail-webui-web
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.webui_web .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+{{- end }}

@@ -1,0 +1,32 @@
+{{- if .Values.manifests.configmap_env }}
+{{- $context := . }}
+{{- $keystone_auth_host := tuple $context "keystone" | include "contrail-helper.get_endpoint_host" }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-vrouter
+data:
+  CONTROLLER_NODES: {{ .Values.conf.controller_nodes }}
+  LOG_LEVEL: {{ .Values.conf.log_level }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-vrouter-auth
+data:
+  CLOUD_ORCHESTRATOR: {{ .Values.conf.cloud_orchestrator }}
+  AAA_MODE: {{ .Values.conf.aaa_mode }}
+  KEYSTONE_AUTH_ADMIN_USER: {{ .Values.endpoints.keystone.auth.username }}
+  KEYSTONE_AUTH_ADMIN_TENANT: {{ .Values.endpoints.keystone.auth.project_name }}
+  KEYSTONE_AUTH_ADMIN_PASSWORD: {{ .Values.endpoints.keystone.auth.password }}
+  KEYSTONE_AUTH_USER_DOMAIN_NAME: {{ .Values.endpoints.keystone.auth.user_domain_name }}
+  KEYSTONE_AUTH_PROJECT_DOMAIN_NAME: {{ .Values.endpoints.keystone.auth.project_domain_name }}
+  KEYSTONE_AUTH_URL_VERSION: {{ .Values.endpoints.keystone.path }}
+  KEYSTONE_AUTH_HOST: {{ $keystone_auth_host }}
+  KEYSTONE_AUTH_PROTO: {{ .Values.endpoints.keystone.protocol }}
+  KEYSTONE_AUTH_ADMIN_PORT: {{ .Values.endpoints.keystone.port.admin | quote }}
+  KEYSTONE_AUTH_PUBLIC_PORT: {{ .Values.endpoints.keystone.port.api | quote }}
+
+{{- end }}

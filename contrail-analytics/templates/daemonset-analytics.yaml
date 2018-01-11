@@ -1,0 +1,112 @@
+{{- if .Values.manifests.daemonset_analytics }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-analytics
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-analytics" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.analytics.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.analytics.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      initContainers:
+{{ tuple $context .Values.dependencies.analytics | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: contrail-analytics-api
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_api .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-analytics
+        - configMapRef:
+            name: configmap-analytics-auth
+      - name: contrail-collector
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_collector .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-analytics
+        - configMapRef:
+            name: configmap-analytics-auth
+        - configMapRef:
+            name: configmap-analytics-rabbitmq
+      - name: contrail-alarm-gen
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_alarm_gen .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-analytics
+        - configMapRef:
+            name: configmap-analytics-auth
+        - configMapRef:
+            name: configmap-analytics-rabbitmq
+      - name: contrail-query-engine
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_query_engine .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-analytics
+        - configMapRef:
+            name: configmap-analytics-auth
+      - name: contrail-snmp-collector
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_snmp_collector .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-analytics
+        - configMapRef:
+            name: configmap-analytics-auth
+        - configMapRef:
+            name: configmap-analytics-rabbitmq
+      - name: contrail-topology
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_topology .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-analytics
+        - configMapRef:
+            name: configmap-analytics-auth
+        - configMapRef:
+            name: configmap-analytics-rabbitmq
+      - name: contrail-analytics-nodemgr
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.nodemgr .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-analytics
+        - configMapRef:
+            name: configmap-analytics-auth
+        env:
+        - name: NODE_TYPE
+          value: analytics
+        - name: DOCKER_HOST
+          value: "unix://mnt/docker.sock"
+# todo: there is type Socket in new kubernetes, it is possible to use full
+# path:
+# hostPath:
+#   path: /var/run/docker.sock and
+#   type: Socket
+        volumeMounts:
+        - mountPath: /mnt
+          name: docker-unix-socket
+      volumes:
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run
+{{- end }}

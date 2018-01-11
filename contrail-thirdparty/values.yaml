@@ -1,0 +1,69 @@
+images:
+  tags:
+    registry: "10.87.65.243:5000"
+    contrail_version: 5.0.0-139-newton
+    kafka: "contrail-external-kafka"
+    cassandra: "cassandra:3.11.1"
+    redis: "redis:4.0.2"
+    zookeeper: "zookeeper:3.4.10"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1 
+
+labels:
+  configdb:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  analyticsdb:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  zookeeper:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  redis:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  kafka:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+
+dependencies:
+  kafka:
+    daemonset:
+    - zookeeper
+  analyticsdb:
+    daemonset:
+    - zookeeper
+    - kafka
+  configdb:
+    daemonset:
+    - zookeeper
+    - kafka
+  redis: {}
+  zookeeper: {}
+
+
+conf:
+  # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
+  host_os: ubuntu
+  controller_nodes: 10.87.65.248
+  log_level: SYS_NOTICE
+
+  cloud_orchestrator: openstack
+  aaa_mode: cloud-admin
+
+  analytics_zookeeper:
+    port: "2181"
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  # TO-DO
+  default: null
+
+manifests:
+  configmap_env: true
+  daemonset_configdb: true
+  daemonset_analyticsdb: true
+  daemonset_redis: true
+  daemonset_zookeeper: true
+  daemonset_kafka: true
