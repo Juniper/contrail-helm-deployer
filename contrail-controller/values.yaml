@@ -30,7 +30,7 @@ dependencies:
   webui:
     daemonset:
     - contrail-config
-    - redis
+    - contrail-redis
 
 conf:
   # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
