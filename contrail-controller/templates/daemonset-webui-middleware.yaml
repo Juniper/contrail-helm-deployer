@@ -1,16 +1,15 @@
-{{- if not .Values.manifests.each_container_is_pod }}
-{{- if .Values.manifests.daemonset_webui }}
+{{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_webui }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: contrail-webui
+  name: contrail-webui-middleware
 spec:
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-webui" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-webui-middleware" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
     spec:
       affinity:
         nodeAffinity:
@@ -27,7 +26,7 @@ spec:
         effect: NoSchedule
       hostNetwork: true
       initContainers:
-{{ tuple $context .Values.dependencies.webui | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.webui_middleware | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-webui-middleware
         image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.webui_middleware .Values.images.tags.contrail_version | quote }}
@@ -37,13 +36,11 @@ spec:
             name: configmap-controller
         - configMapRef:
             name: configmap-controller-auth
-      - name: contrail-webui
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.webui .Values.images.tags.contrail_version | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
-        envFrom:
-        - configMapRef:
-            name: configmap-controller
-        - configMapRef:
-            name: configmap-controller-auth
-{{- end }}
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+      volumes:
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/
 {{- end }}
