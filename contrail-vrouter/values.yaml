@@ -14,9 +14,13 @@ labels:
     node_selector_value: enabled
 
 dependencies:
-  agent:
+  vrouter_agent:
     daemonset:
     - contrail-config
+  vrouter_nodemgr:
+    daemonset:
+    - contrail-config
+    - contrail-vrouter-agent
 
 conf:
   # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
@@ -49,5 +53,6 @@ endpoints:
     protocol: http
 
 manifests:
+  each_container_is_pod: true
   configmap_env: true
   daemonset_agent: true

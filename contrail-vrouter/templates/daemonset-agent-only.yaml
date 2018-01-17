@@ -1,5 +1,4 @@
-{{- if not .Values.manifests.each_container_is_pod }}
-{{- if .Values.manifests.daemonset_agent }}
+{{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_agent }}
 {{- $context := . }}
 # host_os is a mandatory field
 {{- $_ := required ".Values.conf.host_os must be specified, valid values are ubuntu, centos" .Values.conf.host_os }}
@@ -13,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-agent" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-vrouter-agent" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
     spec:
       #Disable affinity for single node setup
       affinity:
@@ -32,7 +31,7 @@ spec:
         effect: NoSchedule
       hostNetwork: true
       initContainers:
-{{ tuple $context .Values.dependencies.agent | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.vrouter_agent | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
         - name: contrail-agent-init-kernel
           image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.agent_vrouter_init_kernel .Values.images.tags.contrail_version | quote }}
           imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -64,31 +63,9 @@ spec:
           name: lib-modules
         - mountPath: /var/lib/contrail/
           name: var-lib-contrail
-      - name: contrail-agent-nodemgr
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.nodemgr .Values.images.tags.contrail_version | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
-        envFrom:
-        - configMapRef:
-            name: configmap-vrouter
-        - configMapRef:
-            name: configmap-vrouter-auth
-        env:
-        - name: NODE_TYPE
-          value: vrouter
-        - name: DOCKER_HOST
-          value: "unix://mnt/docker.sock"
-# todo: there is type Socket in new kubernetes, it is possible to use full
-# path:
-# hostPath:
-#   path: /var/run/docker.sock and
-#   type: Socket
-        volumeMounts:
-        - mountPath: /mnt
-          name: docker-unix-socket
+        - mountPath: /var/log/contrail
+          name: var-log-contrail
       volumes:
-      - name: docker-unix-socket
-        hostPath:
-          path: /var/run
       - name: usr-src
         hostPath:
           path: /usr/src
@@ -98,5 +75,7 @@ spec:
       - name: var-lib-contrail
         hostPath:
           path: /var/lib/contrail/
-{{- end }}
+      - name: var-log-contrail
+        hostPath:
+          path: /var/log/contrail/
 {{- end }}
