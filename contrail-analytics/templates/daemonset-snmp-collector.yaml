@@ -1,0 +1,48 @@
+{{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_analytics }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-snmp-collector
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-snmp-collector" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.analytics.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.analytics.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      initContainers:
+{{ tuple $context .Values.dependencies.snmp_collector | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: contrail-snmp-collector
+        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_snmp_collector .Values.images.tags.contrail_version | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-analytics
+        - configMapRef:
+            name: configmap-analytics-auth
+        - configMapRef:
+            name: configmap-analytics-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+      volumes:
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/
+{{- end }}

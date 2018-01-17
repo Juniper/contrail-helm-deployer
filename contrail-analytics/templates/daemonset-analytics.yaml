@@ -1,3 +1,4 @@
+{{- if not .Values.manifests.each_container_is_pod }}
 {{- if .Values.manifests.daemonset_analytics }}
 {{- $context := . }}
 ---
@@ -109,4 +110,5 @@ spec:
       - name: docker-unix-socket
         hostPath:
           path: /var/run
+{{- end }}
 {{- end }}
