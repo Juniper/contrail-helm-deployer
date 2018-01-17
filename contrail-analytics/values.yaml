@@ -21,6 +21,24 @@ dependencies:
   analytics:
     daemonset:
     - contrail-analyticsdb
+  collector:
+    daemonset:
+    - contrail-analytics
+  alarm_gen:
+    daemonset:
+    - contrail-analytics
+  query_engine:
+    daemonset:
+    - contrail-analytics
+  snmp_collector:
+    daemonset:
+    - contrail-analytics
+  topology:
+    daemonset:
+    - contrail-analytics
+  analytics_nodemgr:
+    daemonset:
+    - contrail-analytics
 
 conf:
   # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
@@ -73,5 +91,6 @@ endpoints:
     protocol: http
 
 manifests:
+  each_container_is_pod: true
   configmap_env: true
   daemonset_analytics: true

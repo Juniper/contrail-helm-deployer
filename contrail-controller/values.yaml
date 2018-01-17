@@ -10,8 +10,8 @@ images:
     config_devicemgr: "contrail-controller-config-devicemgr"
     config_schema_transformer: "contrail-controller-config-schema"
     config_svcmonitor: "contrail-controller-config-svcmonitor"
-    webui_job: "contrail-controller-webui-job"
-    webui_web: "contrail-controller-webui-web"
+    webui_middleware: "contrail-controller-webui-job"
+    webui: "contrail-controller-webui-web"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
@@ -24,13 +24,41 @@ dependencies:
   config:
     daemonset:
     - contrail-configdb
+  schema_transformer:
+    daemonset:
+    - contrail-config
+  svcmonitor:
+    daemonset:
+    - contrail-config
+  devicemgr:
+    daemonset:
+    - contrail-config
+  config_nodemgr:
+    daemonset:
+    - contrail-config
   control:
     daemonset:
+    - contrail-config
+  contrail_named:
+    daemonset:
+    - contrail-control
+    - contrail-config
+  contrail_dns:
+    daemonset:
+    - contrail-control
+    - contrail-config
+  control_nodemgr:
+    daemonset:
+    - contrail-control
     - contrail-config
   webui:
     daemonset:
     - contrail-config
     - contrail-redis
+  webui_middleware:
+    daemonset:
+    - contrail-config
+    - contrail-webui
 
 conf:
   # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
@@ -80,6 +108,7 @@ endpoints:
     protocol: http
 
 manifests:
+  each_container_is_pod: true
   configmap_env: true
   daemonset_config: true
   daemonset_control: true

@@ -61,8 +61,8 @@ data:
   CASSANDRA_START_RPC: "true"
   CASSANDRA_LISTEN_ADDRESS: {{ .Values.conf.analyticsdb_nodes | default $controller_nodes | quote }}
   JVM_EXTRA_OPTS: >-
-    -Dcassandra.rpc_port={{ .Values.conf.configdb.rpc_port }}
-    -Dcassandra.native_transport_port={{ .Values.conf.configdb.cql_port }}
+    -Dcassandra.rpc_port={{ .Values.conf.analyticsdb.rpc_port }}
+    -Dcassandra.native_transport_port={{ .Values.conf.analyticsdb.cql_port }}
     -Dcassandra.ssl_storage_port=7001
     -Dcassandra.storage_port=7000
     -Xms2G -Xmx2G

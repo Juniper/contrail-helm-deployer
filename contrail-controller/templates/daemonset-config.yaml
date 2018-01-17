@@ -1,3 +1,4 @@
+{{- if not .Values.manifests.each_container_is_pod }}
 {{- if .Values.manifests.daemonset_config }}
 {{- $context := . }}
 ---
@@ -38,6 +39,9 @@ spec:
             name: configmap-controller-auth
         - configMapRef:
             name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
       - name: contrail-devicemgr
         image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.config_devicemgr .Values.images.tags.contrail_version | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -48,6 +52,9 @@ spec:
             name: configmap-controller-auth
         - configMapRef:
             name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
       - name: contrail-schema-transformer
         image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.config_schema_transformer .Values.images.tags.contrail_version | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -58,6 +65,9 @@ spec:
             name: configmap-controller-auth
         - configMapRef:
             name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
       - name: contrail-svcmonitor
         image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.config_svcmonitor .Values.images.tags.contrail_version | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -68,6 +78,9 @@ spec:
             name: configmap-controller-auth
         - configMapRef:
             name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
       - name: contrail-config-nodemgr
         image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.nodemgr .Values.images.tags.contrail_version | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -89,8 +102,14 @@ spec:
         volumeMounts:
         - mountPath: /mnt
           name: docker-unix-socket
+        - mountPath: /var/log/contrail/
+          name: contrail-log
       volumes:
       - name: docker-unix-socket
         hostPath:
           path: /var/run
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/
+{{- end }}
 {{- end }}
