@@ -43,6 +43,13 @@ spec:
               name: configmap-vrouter
           - configMapRef:
               name: configmap-vrouter-auth
+          volumeMounts:
+{{- if eq $host_os "ubuntu"}}
+          - mountPath: /usr/src
+            name: usr-src
+          - mountPath: /lib/modules
+            name: lib-modules
+{{- end }}  
       containers:
       - name: contrail-vrouter-agent
         image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.agent_vrouter .Values.images.tags.contrail_version | quote }}
