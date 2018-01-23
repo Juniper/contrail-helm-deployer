@@ -30,7 +30,7 @@ spec:
 {{ tuple $context .Values.dependencies.analytics | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-analytics-api
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_api .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.analytics_api | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -38,7 +38,7 @@ spec:
         - configMapRef:
             name: configmap-analytics-auth
       - name: contrail-collector
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_collector .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.analytics_collector | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -48,7 +48,7 @@ spec:
         - configMapRef:
             name: configmap-analytics-rabbitmq
       - name: contrail-alarm-gen
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_alarm_gen .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.analytics_alarm_gen | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -58,7 +58,7 @@ spec:
         - configMapRef:
             name: configmap-analytics-rabbitmq
       - name: contrail-query-engine
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_query_engine .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.analytics_query_engine | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -66,7 +66,7 @@ spec:
         - configMapRef:
             name: configmap-analytics-auth
       - name: contrail-snmp-collector
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_snmp_collector .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.analytics_snmp_collector | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -76,7 +76,7 @@ spec:
         - configMapRef:
             name: configmap-analytics-rabbitmq
       - name: contrail-topology
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_topology .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.analytics_topology | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -86,7 +86,7 @@ spec:
         - configMapRef:
             name: configmap-analytics-rabbitmq
       - name: contrail-analytics-nodemgr
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.nodemgr .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

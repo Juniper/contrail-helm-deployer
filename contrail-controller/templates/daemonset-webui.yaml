@@ -29,7 +29,7 @@ spec:
 {{ tuple $context .Values.dependencies.webui | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-webui
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.webui .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.webui | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

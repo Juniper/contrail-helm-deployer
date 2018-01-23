@@ -29,7 +29,7 @@ spec:
 {{ tuple $context .Values.dependencies.contrail_named | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-named
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.control_named .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.control_named | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         securityContext:
           privileged: true

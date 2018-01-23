@@ -1,10 +1,8 @@
 images:
   tags:
-    registry: "10.87.65.243:5000"
-    contrail_version: "5.0.0-139-newton"
-    nodemgr: "contrail-nodemgr"
-    agent_vrouter: "contrail-agent-vrouter"
-    agent_vrouter_init_kernel: "contrail-agent-vrouter-init-kernel"
+    nodemgr: "10.87.65.243:5000/contrail-nodemgr:5.0.0-139-newton"
+    agent_vrouter: "10.87.65.243:5000/contrail-agent-vrouter:5.0.0-139-newton"
+    agent_vrouter_init_kernel: "10.87.65.243:5000/contrail-agent-vrouter-init-kernel:5.0.0-139-newton"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
