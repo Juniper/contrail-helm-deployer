@@ -10,6 +10,9 @@ labels:
   agent:
     node_selector_key: openstack-compute-node
     node_selector_value: enabled
+  vrouter_nodemgr:
+    node_selector_key: openstack-compute-node
+    node_selector_value: enabled
 
 dependencies:
   vrouter_agent:

@@ -16,10 +16,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.controller.node_selector_key }}
+              - key: {{ .Values.labels.contrail_control.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.controller.node_selector_value }}
+                - {{ .Values.labels.contrail_control.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
@@ -29,7 +29,7 @@ spec:
 {{ tuple $context .Values.dependencies.control | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-control
-        image: {{ .Values.images.tags.control_control | quote }}
+        image: {{ .Values.images.tags.contrail_control | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

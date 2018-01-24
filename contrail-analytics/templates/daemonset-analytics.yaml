@@ -38,7 +38,7 @@ spec:
         - configMapRef:
             name: configmap-analytics-auth
       - name: contrail-collector
-        image: {{ .Values.images.tags.analytics_collector | quote }}
+        image: {{ .Values.images.tags.contrail_collector | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -76,7 +76,7 @@ spec:
         - configMapRef:
             name: configmap-analytics-rabbitmq
       - name: contrail-topology
-        image: {{ .Values.images.tags.analytics_topology | quote }}
+        image: {{ .Values.images.tags.contrail_topology | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

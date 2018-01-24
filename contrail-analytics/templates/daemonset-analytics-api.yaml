@@ -16,10 +16,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.analytics.node_selector_key }}
+              - key: {{ .Values.labels.analytics_api.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.analytics.node_selector_value }}
+                - {{ .Values.labels.analytics_api.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
