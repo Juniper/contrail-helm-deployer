@@ -16,20 +16,21 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.analytics.node_selector_key }}
+              - key: {{ .Values.labels.analytics_api.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.analytics.node_selector_value }}
+                - {{ .Values.labels.analytics_api.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.analytics | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-analytics-api
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_api .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.analytics_api | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

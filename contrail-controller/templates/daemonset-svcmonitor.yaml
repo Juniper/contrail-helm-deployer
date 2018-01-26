@@ -16,20 +16,21 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.controller.node_selector_key }}
+              - key: {{ .Values.labels.svc_monitor.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.controller.node_selector_value }}
+                - {{ .Values.labels.svc_monitor.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.svcmonitor | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-svc-monitor
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.config_svcmonitor .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.config_svcmonitor | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

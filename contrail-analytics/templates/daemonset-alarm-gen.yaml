@@ -16,20 +16,21 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.analytics.node_selector_key }}
+              - key: {{ .Values.labels.alarm_gen.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.analytics.node_selector_value }}
+                - {{ .Values.labels.alarm_gen.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.alarm_gen | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-alarm-gen
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.analytics_alarm_gen .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.analytics_alarm_gen | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

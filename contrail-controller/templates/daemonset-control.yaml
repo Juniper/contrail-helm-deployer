@@ -26,11 +26,12 @@ spec:
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.control | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-control
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.control_control .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.contrail_control | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -40,7 +41,7 @@ spec:
         - configMapRef:
             name: configmap-controller-rabbitmq
       - name: contrail-dns
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.control_dns .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.control_dns | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -50,7 +51,7 @@ spec:
         - configMapRef:
             name: configmap-controller-rabbitmq
       - name: contrail-named
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.control_named .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.control_named | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         securityContext:
           privileged: true
@@ -62,7 +63,7 @@ spec:
         - configMapRef:
             name: configmap-controller-rabbitmq
       - name: contrail-control-nodemgr
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.nodemgr .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

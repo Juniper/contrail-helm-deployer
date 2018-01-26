@@ -1,22 +1,53 @@
 images:
   tags:
-    registry: "10.87.65.243:5000"
-    contrail_version: "5.0.0-139-newton"
-    nodemgr: "contrail-nodemgr"
-    control_control: "contrail-controller-control-control"
-    control_dns: "contrail-controller-control-dns"
-    control_named: "contrail-controller-control-named"
-    config_api: "contrail-controller-config-api"
-    config_devicemgr: "contrail-controller-config-devicemgr"
-    config_schema_transformer: "contrail-controller-config-schema"
-    config_svcmonitor: "contrail-controller-config-svcmonitor"
-    webui_middleware: "contrail-controller-webui-job"
-    webui: "contrail-controller-webui-web"
+    nodemgr: "10.87.65.243:5000/contrail-nodemgr:5.0.0-139-newton"
+    contrail_control: "10.87.65.243:5000/contrail-controller-control-control:5.0.0-139-newton"
+    control_dns: "10.87.65.243:5000/contrail-controller-control-dns:5.0.0-139-newton"
+    control_named: "10.87.65.243:5000/contrail-controller-control-named:5.0.0-139-newton"
+    config_api: "10.87.65.243:5000/contrail-controller-config-api:5.0.0-139-newton"
+    config_devicemgr: "10.87.65.243:5000/contrail-controller-config-devicemgr:5.0.0-139-newton"
+    config_schema_transformer: "10.87.65.243:5000/contrail-controller-config-schema:5.0.0-139-newton"
+    config_svcmonitor: "10.87.65.243:5000/contrail-controller-config-svcmonitor:5.0.0-139-newton"
+    webui_middleware: "10.87.65.243:5000/contrail-controller-webui-job:5.0.0-139-newton"
+    webui: "10.87.65.243:5000/contrail-controller-webui-web:5.0.0-139-newton"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
 labels:
   controller:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  config_api:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  config_devicemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  schema_transformer:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  svc_monitor:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  config_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  contrail_control:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  control_dns:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  control_named:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  control_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  webui_middleware:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  webui:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
 

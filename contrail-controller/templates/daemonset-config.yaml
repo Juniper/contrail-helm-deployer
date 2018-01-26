@@ -26,11 +26,12 @@ spec:
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.config | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-config-api
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.config_api .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.config_api | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -43,7 +44,7 @@ spec:
         - mountPath: /var/log/contrail/
           name: contrail-log
       - name: contrail-devicemgr
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.config_devicemgr .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.config_devicemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -56,7 +57,7 @@ spec:
         - mountPath: /var/log/contrail/
           name: contrail-log
       - name: contrail-schema-transformer
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.config_schema_transformer .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.config_schema_transformer | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -69,7 +70,7 @@ spec:
         - mountPath: /var/log/contrail/
           name: contrail-log
       - name: contrail-svcmonitor
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.config_svcmonitor .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.config_svcmonitor | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -82,7 +83,7 @@ spec:
         - mountPath: /var/log/contrail/
           name: contrail-log
       - name: contrail-config-nodemgr
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.nodemgr .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

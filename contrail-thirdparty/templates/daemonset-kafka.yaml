@@ -25,11 +25,12 @@ spec:
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.kafka | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: kafka
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.kafka .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.kafka | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:

@@ -1,8 +1,6 @@
 images:
   tags:
-    registry: "10.87.65.243:5000"
-    contrail_version: 5.0.0-139-newton
-    kafka: "contrail-external-kafka"
+    kafka: "10.87.65.243:5000/contrail-external-kafka:5.0.0-139-newton"
     cassandra: "cassandra:3.11.1"
     redis: "redis:4.0.2"
     zookeeper: "zookeeper:3.4.10"

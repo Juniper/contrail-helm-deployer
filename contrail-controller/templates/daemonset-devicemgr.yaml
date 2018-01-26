@@ -16,20 +16,21 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.controller.node_selector_key }}
+              - key: {{ .Values.labels.config_devicemgr.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.controller.node_selector_value }}
+                - {{ .Values.labels.config_devicemgr.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.devicemgr | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-devicemgr
-        image: {{ printf "%s/%s:%s" .Values.images.tags.registry .Values.images.tags.config_devicemgr .Values.images.tags.contrail_version | quote }}
+        image: {{ .Values.images.tags.config_devicemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
