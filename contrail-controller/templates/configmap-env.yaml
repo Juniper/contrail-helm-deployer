@@ -1,7 +1,7 @@
 {{- if .Values.manifests.configmap_env }}
 {{- $context := . }}
-{{- $keystone_auth_host := tuple $context "keystone" | include "contrail-helper.get_endpoint_host" }}
-{{- $rabbitmq_host := tuple $context "rabbitmq" | include "contrail-helper.get_endpoint_host" }}
+{{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
+{{- $rabbitmq_host := tuple "rabbitmq" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
 
 ---
 apiVersion: v1
@@ -9,27 +9,26 @@ kind: ConfigMap
 metadata:
   name: configmap-controller
 data:
-  CONTROLLER_NODES: {{ .Values.conf.controller_nodes }}
-  LOG_LEVEL: {{ .Values.conf.log_level }}
-  CONFIG_API_PORT: "8082"
+  {{- range $key, $value := .Values.contrail_env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: configmap-controller-auth
 data:
-  CLOUD_ORCHESTRATOR: {{ .Values.conf.cloud_orchestrator }}
-  AAA_MODE: {{ .Values.conf.aaa_mode }}
   KEYSTONE_AUTH_ADMIN_USER: {{ .Values.endpoints.keystone.auth.username }}
   KEYSTONE_AUTH_ADMIN_TENANT: {{ .Values.endpoints.keystone.auth.project_name }}
   KEYSTONE_AUTH_ADMIN_PASSWORD: {{ .Values.endpoints.keystone.auth.password }}
   KEYSTONE_AUTH_USER_DOMAIN_NAME: {{ .Values.endpoints.keystone.auth.user_domain_name }}
   KEYSTONE_AUTH_PROJECT_DOMAIN_NAME: {{ .Values.endpoints.keystone.auth.project_domain_name }}
-  KEYSTONE_AUTH_URL_VERSION: {{ .Values.endpoints.keystone.path }}
+  KEYSTONE_AUTH_URL_VERSION: {{ .Values.endpoints.keystone.path.default }}
   KEYSTONE_AUTH_HOST: {{ $keystone_auth_host }}
-  KEYSTONE_AUTH_PROTO: {{ .Values.endpoints.keystone.protocol }}
-  KEYSTONE_AUTH_ADMIN_PORT: {{ .Values.endpoints.keystone.port.admin | quote }}
-  KEYSTONE_AUTH_PUBLIC_PORT: {{ .Values.endpoints.keystone.port.api | quote }}
+  KEYSTONE_AUTH_PROTO: {{ .Values.endpoints.keystone.scheme.default }}
+  KEYSTONE_AUTH_ADMIN_PORT: {{ .Values.endpoints.keystone.port.admin.default | quote }}
+  KEYSTONE_AUTH_PUBLIC_PORT: {{ .Values.endpoints.keystone.port.api.default | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -37,9 +36,10 @@ metadata:
   name: configmap-controller-rabbitmq
 data:
   RABBITMQ_NODES: {{ $rabbitmq_host }}
-  RABBITMQ_PORT: {{ .Values.endpoints.rabbitmq.port.amqp | quote }}
-  RABBITMQ_USER: {{ .Values.endpoints.rabbitmq.auth.user.username | quote }}
-  RABBITMQ_PASSWORD: {{ .Values.endpoints.rabbitmq.auth.user.password | quote }}
-  RABBITMQ_USE_SSL: {{ .Values.conf.rabbitmq.use_ssl | quote }}
+  RABBITMQ_PORT: {{ .Values.endpoints.rabbitmq.port.amqp.default | quote }}
+  RABBITMQ_USER: {{ .Values.endpoints.rabbitmq.auth.username | quote }}
+  RABBITMQ_PASSWORD: {{ .Values.endpoints.rabbitmq.auth.password | quote }}
+  RABBITMQ_USE_SSL: {{ .Values.contrail_env.RABBITMQ_USE_SSL | default "false" | quote }}
+  RABBITMQ_VHOST: {{ .Values.endpoints.rabbitmq.path | default "/" | quote }}
 
 {{- end }}

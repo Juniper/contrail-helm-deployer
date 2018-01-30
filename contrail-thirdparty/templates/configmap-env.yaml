@@ -1,6 +1,7 @@
 {{- if .Values.manifests.configmap_env }}
 {{- $context := . }}
-{{- $controller_nodes := .Values.conf.controller_nodes }}
+{{- $config_nodes := .Values.contrail_env.CONFIG_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
+{{- $analytics_nodes := .Values.contrail_env.ANALYTICS_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
 
 ---
 apiVersion: v1
@@ -8,7 +9,7 @@ kind: ConfigMap
 metadata:
   name: contrail-analytics-zookeeper
 data:
-  ZOO_PORT: {{ .Values.conf.analytics_zookeeper.port | default 2182 | quote }}
+  ZOO_PORT: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_PORT | default 2182 | quote }}
 
 ---
 apiVersion: v1
@@ -16,7 +17,7 @@ kind: ConfigMap
 metadata:
   name: contrail-config-zookeeper
 data:
-  ZOO_PORT: {{ .Values.conf.config_zookeeper.port | default 2181 | quote }}
+  ZOO_PORT: {{ .Values.contrail_env.ZOOKEEPER_PORT | default 2181 | quote }}
 
 ---
 apiVersion: v1
@@ -24,11 +25,9 @@ kind: ConfigMap
 metadata:
   name: contrail-thirdparty
 data:
-  CONTROLLER_NODES: {{ $controller_nodes }}
-  KAFKA_NODES: {{ .Values.conf.kafka_nodes | default "" }}
-  ZOOKEEPER_NODES: {{ .Values.conf.analyticsdb_nodes | default "" }}
-  ZOOKEEPER_ANALYTICS_PORT: {{ .Values.conf.analytics_zookeeper.port | default 2182 | quote}}
-  LOG_LEVEL: {{ .Values.conf.log_level }}
+  {{- range $key, $value := .Values.contrail_env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
 
 ---
 apiVersion: v1
@@ -37,13 +36,13 @@ metadata:
   name: contrail-configdb
 data:
   # TODO: fix seeds and listen address
-  CASSANDRA_SEEDS: {{ .Values.conf.configdb_nodes | default $controller_nodes }}
+  CASSANDRA_SEEDS: {{ .Values.contrail_env.CONFIGDB_NODES | default $config_nodes | quote }}
+  CASSANDRA_LISTEN_ADDRESS: {{ .Values.contrail_env.CONFIGDB_NODES | default $config_nodes | quote }}
   CASSANDRA_CLUSTER_NAME: ContrailConfigDB
   CASSANDRA_START_RPC: "true"
-  CASSANDRA_LISTEN_ADDRESS: {{ .Values.conf.configdb_nodes | default $controller_nodes }}
   JVM_EXTRA_OPTS: >-
-    -Dcassandra.rpc_port={{ .Values.conf.configdb.rpc_port }}
-    -Dcassandra.native_transport_port={{ .Values.conf.configdb.cql_port }}
+    -Dcassandra.rpc_port={{ .Values.contrail_env.CONFIGDB_PORT | default 9161 }}
+    -Dcassandra.native_transport_port={{ .Values.contrail_env.CONFIGDB_CQL_PORT | default 9041 }}
     -Dcassandra.ssl_storage_port=7011
     -Dcassandra.storage_port=7010
     -Dcassandra.jmx.local.port=7200
@@ -55,17 +54,16 @@ kind: ConfigMap
 metadata:
   name: contrail-analyticsdb
 data:
-  # TODO: fix seeds and listen address
-  CASSANDRA_SEEDS: {{ .Values.conf.analyticsdb_nodes | default $controller_nodes | quote }}
-  CASSANDRA_CLUSTER_NAME: Contrail
+  CASSANDRA_SEEDS: {{ .Values.contrail_env.ANALYTICSDB_NODES | default $analytics_nodes | quote }}
+  CASSANDRA_LISTEN_ADDRESS: {{ .Values.contrail_env.ANALYTICSDB_NODES | default $analytics_nodes | quote }}
+  CASSANDRA_CLUSTER_NAME: ContrailAnalyticsDB
   CASSANDRA_START_RPC: "true"
-  CASSANDRA_LISTEN_ADDRESS: {{ .Values.conf.analyticsdb_nodes | default $controller_nodes | quote }}
   JVM_EXTRA_OPTS: >-
-    -Dcassandra.rpc_port={{ .Values.conf.analyticsdb.rpc_port }}
-    -Dcassandra.native_transport_port={{ .Values.conf.analyticsdb.cql_port }}
+    -Dcassandra.rpc_port={{ .Values.contrail_env.ANALYTICSDB_PORT | default 9160 }}
+    -Dcassandra.native_transport_port={{ .Values.contrail_env.ANALYTICSDB_CQL_PORT | default 9042}}
     -Dcassandra.ssl_storage_port=7001
     -Dcassandra.storage_port=7000
+    -Dcassandra.jmx.local.port=7100
     -Xms2G -Xmx2G
 
----
 {{- end }}

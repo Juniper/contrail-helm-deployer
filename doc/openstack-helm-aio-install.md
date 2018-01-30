@@ -92,21 +92,21 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
   kubectl replace -f ${OSH_PATH}/tools/kubeadm-aio/assets/opt/rbac/dev.yaml
 
   helm install --name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty \
-  --namespace=openstack --set conf.controller_nodes=${CONTROLLER_NODE} \
+  --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \
   --set manifests.each_container_is_pod=true
 
   helm install --name contrail-controller ${CHD_PATH}/contrail-controller \
-  --namespace=openstack --set conf.controller_nodes=${CONTROLLER_NODE} \
+  --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \
   --set manifests.each_container_is_pod=true
 
   helm install --name contrail-analytics ${CHD_PATH}/contrail-analytics \
-  --namespace=openstack --set conf.controller_nodes=${CONTROLLER_NODE} \
+  --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \
   --set manifests.each_container_is_pod=true
 
   # Edit contrail-vrouter/values.yaml and make sure that images.tags.agent_vrouter_init_kernel is right. Image tag name will be different depending upon your linux. Also set the conf.host_os to ubuntu or centos depending on your system
 
   helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
-  --namespace=openstack --set conf.controller_nodes=${CONTROLLER_NODE} \
+  --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \
   --set manifests.each_container_is_pod=true
 
   ```

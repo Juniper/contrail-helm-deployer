@@ -2,8 +2,8 @@
 {{- if .Values.manifests.daemonset_agent }}
 {{- $context := . }}
 # host_os is a mandatory field
-{{- $_ := required ".Values.conf.host_os must be specified, valid values are ubuntu, centos" .Values.conf.host_os }}
-{{- $host_os := .Values.conf.host_os }}
+{{- $_ := required ".Values.node.host_os must be specified, valid values are ubuntu, centos" .Values.node.host_os }}
+{{- $host_os := .Values.node.host_os }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-agent" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-agent" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
     spec:
       #Disable affinity for single node setup
       affinity:
@@ -33,7 +33,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
-{{ tuple $context .Values.dependencies.agent | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.agent nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: contrail-agent-init-kernel
           image: {{ .Values.images.tags.agent_vrouter_init_kernel | quote }}
           imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}

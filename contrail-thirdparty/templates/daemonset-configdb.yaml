@@ -9,7 +9,7 @@ spec:
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-configdb" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-configdb" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
     spec:
       affinity:
         nodeAffinity:
@@ -27,7 +27,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
-{{ tuple $context .Values.dependencies.configdb | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.configdb nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-configdb
         image: {{ .Values.images.tags.cassandra | quote }}

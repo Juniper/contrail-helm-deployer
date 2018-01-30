@@ -9,7 +9,7 @@ spec:
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-schema-transformer" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-schema-transformer" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
     spec:
       affinity:
         nodeAffinity:
@@ -27,7 +27,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
-{{ tuple $context .Values.dependencies.schema_transformer | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.schema_transformer nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-schema-transformer
         image: {{ .Values.images.tags.config_schema_transformer | quote }}

@@ -37,40 +37,13 @@ dependencies:
   configdb:
     daemonset:
     - contrail-config-zookeeper
-  redis: {}
-  analytics_zookeeper: {}
-  config_zookeeper: {}
 
 
-conf:
-  # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
-  host_os: ubuntu
-  controller_nodes: 10.87.65.248
-  log_level: SYS_NOTICE
-
-  cloud_orchestrator: openstack
-  aaa_mode: cloud-admin
-
-  configdb:
-    rpc_port: 9161
-    cql_port: 9041
-
-  analyticsdb:
-    rpc_port: 9160
-    cql_port: 9042
-
-  config_zookeeper:
-    port: 2181
-
-  analytics_zookeeper:
-    port: 2182
-
-# typically overriden by environmental
-# values, but should include all endpoints
-# required by this chart
-endpoints:
-  # TO-DO
-  default: null
+contrail_env:
+  CONTROLLER_NODES: 10.87.65.248
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: openstack
+  AAA_MODE: cloud-admin
 
 manifests:
   configmap_env: true

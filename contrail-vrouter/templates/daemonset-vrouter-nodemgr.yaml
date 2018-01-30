@@ -1,8 +1,5 @@
 {{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_agent }}
 {{- $context := . }}
-# host_os is a mandatory field
-{{- $_ := required ".Values.conf.host_os must be specified, valid values are ubuntu, centos" .Values.conf.host_os }}
-{{- $host_os := .Values.conf.host_os }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -12,7 +9,7 @@ spec:
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-vrouter-nodemgr" | include "contrail-helper.kubernetes_spec.get_metadata_label" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-vrouter-nodemgr" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
     spec:
       #Disable affinity for single node setup
       affinity:
@@ -32,7 +29,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
-{{ tuple $context .Values.dependencies.vrouter_nodemgr | include "contrail-helper.kubernetes_spec.get_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.vrouter_nodemgr nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-agent-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
