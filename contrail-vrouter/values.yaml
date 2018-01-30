@@ -23,21 +23,20 @@ dependencies:
     - contrail-config
     - contrail-vrouter-agent
 
-conf:
-  # host_os - (OPTIONAL) host operating system release. Sample values "ubuntu" and "centos". Default is ubuntu
-  host_os: centos
-  controller_nodes: 10.87.65.248
-  log_level: SYS_NOTICE
+contrail_env:
+  CONTROLLER_NODES: 10.87.65.248
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: openstack
+  AAA_MODE: cloud-admin
 
-  cloud_orchestrator: openstack
-  aaa_mode: cloud-admin
+node:
+  host_os: ubuntu
 
 # typically overriden by environmental
 # values, but should include all endpoints
 # required by this chart
 endpoints:
-  # TO-DO
-  cluster_domain: svc.cluster.local
+  cluster_domain_suffix: cluster.local
   keystone:
     auth:
       username: admin
@@ -45,13 +44,19 @@ endpoints:
       project_name: admin
       user_domain_name: default
       project_domain_name: default
-    host: keystone-api
-    namespace: openstack
-    path: /v3
+    hosts:
+      default: keystone-api
+    path:
+      default: /v3
     port:
-      admin: 35357
-      api: 80
-    protocol: http
+      admin:
+        default: 35357
+      api:
+        default: 80
+    scheme:
+      default: http
+    host_fqdn_override:
+       default: null
 
 manifests:
   each_container_is_pod: true

@@ -2,8 +2,8 @@
 {{- if .Values.manifests.daemonset_agent }}
 {{- $context := . }}
 # host_os is a mandatory field
-{{- $_ := required ".Values.conf.host_os must be specified, valid values are ubuntu, centos" .Values.conf.host_os }}
-{{- $host_os := .Values.conf.host_os }}
+{{- $_ := required ".Values.node.host_os must be specified, valid values are ubuntu, centos" .Values.node.host_os }}
+{{- $host_os := .Values.node.host_os }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet

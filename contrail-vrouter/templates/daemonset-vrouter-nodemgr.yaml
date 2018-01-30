@@ -1,8 +1,5 @@
 {{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_agent }}
 {{- $context := . }}
-# host_os is a mandatory field
-{{- $_ := required ".Values.conf.host_os must be specified, valid values are ubuntu, centos" .Values.conf.host_os }}
-{{- $host_os := .Values.conf.host_os }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
