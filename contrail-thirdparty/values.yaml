@@ -1,6 +1,6 @@
 images:
   tags:
-    kafka: "10.87.65.243:5000/contrail-external-kafka:5.0.0-139-newton"
+    kafka: "docker.io/opencontrail/contrail-external-kafka:5.0.0-175-centos7-newton"
     cassandra: "cassandra:3.11.1"
     redis: "redis:4.0.2"
     zookeeper: "zookeeper:3.4.10"

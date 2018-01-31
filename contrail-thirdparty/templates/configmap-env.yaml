@@ -37,7 +37,6 @@ metadata:
 data:
   # TODO: fix seeds and listen address
   CASSANDRA_SEEDS: {{ .Values.contrail_env.CONFIGDB_NODES | default $config_nodes | quote }}
-  CASSANDRA_LISTEN_ADDRESS: {{ .Values.contrail_env.CONFIGDB_NODES | default $config_nodes | quote }}
   CASSANDRA_CLUSTER_NAME: ContrailConfigDB
   CASSANDRA_START_RPC: "true"
   JVM_EXTRA_OPTS: >-
@@ -55,7 +54,6 @@ metadata:
   name: contrail-analyticsdb
 data:
   CASSANDRA_SEEDS: {{ .Values.contrail_env.ANALYTICSDB_NODES | default $analytics_nodes | quote }}
-  CASSANDRA_LISTEN_ADDRESS: {{ .Values.contrail_env.ANALYTICSDB_NODES | default $analytics_nodes | quote }}
   CASSANDRA_CLUSTER_NAME: ContrailAnalyticsDB
   CASSANDRA_START_RPC: "true"
   JVM_EXTRA_OPTS: >-
