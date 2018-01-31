@@ -27,4 +27,5 @@ data:
   KEYSTONE_AUTH_PROTO: {{ .Values.endpoints.keystone.scheme.default }}
   KEYSTONE_AUTH_ADMIN_PORT: {{ .Values.endpoints.keystone.port.admin.default | quote }}
   KEYSTONE_AUTH_PUBLIC_PORT: {{ .Values.endpoints.keystone.port.api.default | quote }}
+  KEYSTONE_AUTH_REGION_NAME: {{ .Values.endpoints.keystone.auth.region_name | quote }}
 {{- end }}

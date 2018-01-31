@@ -32,14 +32,11 @@ spec:
       - name: contrail-analyticsdb
         image: {{ .Values.images.tags.cassandra | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
-        env:
-        - name: CASSANDRA_LISTEN_ADDRESS
-          valueFrom :
-            fieldRef: 
-              fieldPath: spec.nodeName
         envFrom:
         - configMapRef:
             name: contrail-analyticsdb
+        - configMapRef:
+            name: contrail-thirdparty
         volumeMounts:
         - mountPath: /var/lib/cassandra
           name: analyticsdb-data
