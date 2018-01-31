@@ -124,6 +124,7 @@ endpoints:
       project_name: admin
       user_domain_name: default
       project_domain_name: default
+      region_name: RegionOne
     hosts:
       default: keystone-api
     path:

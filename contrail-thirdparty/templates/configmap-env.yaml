@@ -9,7 +9,9 @@ kind: ConfigMap
 metadata:
   name: contrail-analytics-zookeeper
 data:
-  ZOO_PORT: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_PORT | default 2182 | quote }}
+  ZOOKEEPER_PORT: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_PORT | default 2182 | quote }}
+  ZOOKEEPER_PORTS: "4888:5888"
+  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_NODES | default $analytics_nodes | quote }}
 
 ---
 apiVersion: v1
@@ -17,7 +19,9 @@ kind: ConfigMap
 metadata:
   name: contrail-config-zookeeper
 data:
-  ZOO_PORT: {{ .Values.contrail_env.ZOOKEEPER_PORT | default 2181 | quote }}
+  ZOOKEEPER_PORT: {{ .Values.contrail_env.ZOOKEEPER_PORT | default 2181 | quote }}
+  ZOOKEEPER_PORTS: "2888:3888"
+  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_NODES | default $config_nodes | quote }}
 
 ---
 apiVersion: v1
@@ -39,13 +43,11 @@ data:
   CASSANDRA_SEEDS: {{ .Values.contrail_env.CONFIGDB_NODES | default $config_nodes | quote }}
   CASSANDRA_CLUSTER_NAME: ContrailConfigDB
   CASSANDRA_START_RPC: "true"
-  JVM_EXTRA_OPTS: >-
-    -Dcassandra.rpc_port={{ .Values.contrail_env.CONFIGDB_PORT | default 9161 }}
-    -Dcassandra.native_transport_port={{ .Values.contrail_env.CONFIGDB_CQL_PORT | default 9041 }}
-    -Dcassandra.ssl_storage_port=7011
-    -Dcassandra.storage_port=7010
-    -Dcassandra.jmx.local.port=7200
-    -Xms2G -Xmx2G
+  CASSANDRA_PORT: {{ .Values.contrail_env.CONFIGDB_PORT | default 9161 | quote }}
+  CASSANDRA_CQL_PORT: {{ .Values.contrail_env.CONFIGDB_CQL_PORT | default 9041 | quote }}
+  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7011 | quote }}
+  CASSANDRA_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_STORAGE_PORT | default 7010 | quote  }}
+  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.contrail_env.JMX_LOCAL_PORT | default 7200 | quote }}
 
 ---
 apiVersion: v1
@@ -56,12 +58,10 @@ data:
   CASSANDRA_SEEDS: {{ .Values.contrail_env.ANALYTICSDB_NODES | default $analytics_nodes | quote }}
   CASSANDRA_CLUSTER_NAME: ContrailAnalyticsDB
   CASSANDRA_START_RPC: "true"
-  JVM_EXTRA_OPTS: >-
-    -Dcassandra.rpc_port={{ .Values.contrail_env.ANALYTICSDB_PORT | default 9160 }}
-    -Dcassandra.native_transport_port={{ .Values.contrail_env.ANALYTICSDB_CQL_PORT | default 9042}}
-    -Dcassandra.ssl_storage_port=7001
-    -Dcassandra.storage_port=7000
-    -Dcassandra.jmx.local.port=7100
-    -Xms2G -Xmx2G
+  CASSANDRA_PORT: {{ .Values.contrail_env.CONFIGDB_PORT | default 9160 | quote }}
+  CASSANDRA_CQL_PORT: {{ .Values.contrail_env.CONFIGDB_CQL_PORT | default 9042 | quote }}
+  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7001 | quote }}
+  CASSANDRA_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_STORAGE_PORT | default 7000 | quote  }}
+  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.contrail_env.JMX_LOCAL_PORT | default 7100 | quote }}
 
 {{- end }}

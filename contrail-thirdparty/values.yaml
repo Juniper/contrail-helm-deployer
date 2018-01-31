@@ -1,9 +1,9 @@
 images:
   tags:
     kafka: "docker.io/opencontrail/contrail-external-kafka:5.0.0-175-centos7-newton"
-    cassandra: "cassandra:3.11.1"
+    cassandra: "docker.io/opencontrail/contrail-external-cassandra:5.0.0-175-centos7-newton"
     redis: "redis:4.0.2"
-    zookeeper: "zookeeper:3.4.10"
+    zookeeper: "docker.io/opencontrail/contrail-external-zookeeper:5.0.0-175-centos7-newton"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
 
 labels:
