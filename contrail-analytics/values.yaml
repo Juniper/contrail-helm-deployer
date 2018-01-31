@@ -1,12 +1,12 @@
 images:
   tags:
-    nodemgr: "10.87.65.243:5000/contrail-nodemgr:5.0.0-139-newton"
-    analytics_api: "10.87.65.243:5000/contrail-analytics-api:5.0.0-139-newton"
-    contrail_collector: "10.87.65.243:5000/contrail-analytics-collector:5.0.0-139-newton"
-    analytics_alarm_gen: "10.87.65.243:5000/contrail-analytics-alarm-gen:5.0.0-139-newton"
-    analytics_query_engine: "10.87.65.243:5000/contrail-analytics-query-engine:5.0.0-139-newton"
-    analytics_snmp_collector: "10.87.65.243:5000/contrail-analytics-snmp-collector:5.0.0-139-newton"
-    contrail_topology: "10.87.65.243:5000/contrail-analytics-topology:5.0.0-139-newton"
+    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-175-centos7-newton"
+    analytics_api: "docker.io/opencontrail/contrail-analytics-api:5.0.0-175-centos7-newton"
+    contrail_collector: "docker.io/opencontrail/contrail-analytics-collector:5.0.0-175-centos7-newton"
+    analytics_alarm_gen: "docker.io/opencontrail/contrail-analytics-alarm-gen:5.0.0-175-centos7-newton"
+    analytics_query_engine: "docker.io/opencontrail/contrail-analytics-query-engine:5.0.0-175-centos7-newton"
+    analytics_snmp_collector: "docker.io/opencontrail/contrail-analytics-snmp-collector:5.0.0-175-centos7-newton"
+    contrail_topology: "docker.io/opencontrail/contrail-analytics-topology:5.0.0-175-centos7-newton"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
