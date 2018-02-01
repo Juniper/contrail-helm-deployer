@@ -40,8 +40,14 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
+        - mountPath: /etc/contrail/contrail-webui-userauth.js
+          name: webui-userauth
+          subPath: webui_conf
       volumes:
       - name: contrail-log
         hostPath:
           path: /var/log/contrail/
+      - name: webui-userauth
+        configMap:
+          name: webui-conf
 {{- end }}

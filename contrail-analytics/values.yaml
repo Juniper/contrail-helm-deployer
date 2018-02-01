@@ -26,6 +26,9 @@ labels:
   analytics_nodemgr:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
+  analyticsdb_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
   query_engine:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
