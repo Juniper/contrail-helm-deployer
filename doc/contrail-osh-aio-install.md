@@ -1,12 +1,23 @@
-# All-in-one openstack-helm with contrail cluster
+# All-in-one openstack-helm with contrail cluster (NON-HA)
 
 Using below step you can bring an all-in-one cluster with openstack and contrail
+
+#### Tested with
+
+1. Operating system: Ubuntu 16.04.2
+2. Kernel: 4.4.0-62-generic
+3. docker: 1.13.1
+4. helm: v2.7.2
+5. kubernetes: v1.8.3
+6. openstack: newton
 
 ### Prerequisites
 
 * Below are the list of pacakges which needs to be installed on you all-in-one node
   ```notes
   git
+  make
+  linux-headers-$(uname -r)
   ```
 
 ### Installation steps
@@ -43,28 +54,13 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
   bash tools/deployment/developer/01-deploy-k8s.sh
   ```
 
-3. Add insecure docker registy
-
-   [*To-do, need to make changes to openstack-helm-infra so that we can add insecure registry through the ansible playbook*]
-
-  ```bash
-  # In this case 10.87.65.243 is the IP on ehcih docker registry is hosted and 5000 is a port on which it is listening
-  sudo bash -c 'cat << EOF > /etc/docker/daemon.json
-  {
-    "insecure-registries" : ["10.87.65.243:5000"]
-  }
-  EOF'
-
-  service docker restart
-  ```
-
-4. Build all helm charts and intll openstack and heat client
+3. Build all helm charts and intll openstack and heat client
 
   ```bash
   bash tools/deployment/developer/02-setup-client.sh
   ```
 
-5. Deploy openstack-helm related charts
+4. Deploy openstack-helm related charts
 
   ```bash
   bash tools/deployment/developer/03-ingress.sh
@@ -80,7 +76,7 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
   bash tools/deployment/developer/14-libvirt.sh
   ```
 
-6. Now deploy opencontrail charts
+5. Now deploy opencontrail charts
 
   ```
   cd $CHD_PATH
@@ -111,7 +107,7 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
 
   ```
 
-7. Install remaining openstack charts
+6. Install remaining openstack charts
 
   ```bash
   cd $OSH_PATH
