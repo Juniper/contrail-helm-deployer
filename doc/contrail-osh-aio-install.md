@@ -2,14 +2,19 @@
 
 Using below step you can bring an all-in-one cluster with openstack and contrail
 
-#### Tested with
+### Tested with
 
-1. Operating system: Ubuntu 16.04.2
-2. Kernel: 4.4.0-62-generic
+1. Operating system: Ubuntu 16.04.3 LTS
+2. Kernel: 4.4.0-87-generic
 3. docker: 1.13.1
 4. helm: v2.7.2
 5. kubernetes: v1.8.3
 6. openstack: newton
+
+### Resource spec (used for internal validation)
+
+1. CPU: 40
+2. RAM: 256
 
 ### Prerequisites
 
