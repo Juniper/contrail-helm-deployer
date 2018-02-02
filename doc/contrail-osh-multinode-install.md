@@ -1,25 +1,29 @@
-# Installation guide for Contrail HA and Openstack-Helm 
+# Installation guide for Contrail HA and Openstack-Helm
 
-#### Tested with
+### Tested with
 
-1. Operating system: Ubuntu 16.04.2
-2. Kernel: 4.4.0-62-generic
+1. Operating system: Ubuntu 16.04.3 LTS
+2. Kernel: 4.4.0-87-generic
 3. docker: 1.13.1
 4. helm: v2.7.2
 5. kubernetes: v1.8.3
 6. openstack: newton
 
-#### Pre-requisites
+### Pre-requisites
 
-1. Have a kubernetes cluster up and running. [Quickstart steps to bring up a k8s cluster](installing_k8s.md)
-2. Install below software's on all nodes
+1. Have a kubernetes cluster up and running ([Quickstart steps to bring up a k8s cluster](installing_k8s.md))
+
+2. Have helm installed and intitialized ([Steps to install and initialize helm](installing_helm.md))
+
+3. Install below software's on all nodes
   ```bash
   sudo apt-get install -y ceph-common \
         make \
         git \
         linux-headers-$(uname -r)
   ```
-3. Add kube-dns svc IP as one of your dns server also add k8s cluster domain as search domain
+
+4. Add kube-dns svc IP as one of your dns server also add k8s cluster domain as search domain
 
   ```bash
   # Example
@@ -29,11 +33,17 @@
   search openstack.svc.cluster.local svc.cluster.local contrail.juniper.netjuniper.netjnpr.net
   ```
 
-4. Updating ClusterRole (This is needed by contrail pods for now)
+5. Updating ClusterRole (This is needed by contrail pods for now)
 
   ```bash
   kubectl replace -f \
   https://raw.githubusercontent.com/madhukar32/openstack-helm/contrail_5_0/tools/kubeadm-aio/assets/opt/rbac/dev.yaml
+  ```
+
+6. If you are running workloads on master then untaint the master node
+
+  ```bash
+  kubectl taint nodes --all node-role.kubernetes.io/master-
   ```
 
 #### Installation steps
@@ -171,6 +181,7 @@
   --set deployment.ceph=false \
   --set deployment.rbd_provisioner=false \
   --set deployment.client_secrets=false \
+  --set deployment.cephfs_provisioner=false \
   --set deployment.rgw_keystone_user_and_endpoints=true
   ```
 
@@ -244,3 +255,5 @@
       --values=${OSH_PATH}/tools/overrides/mvp/nova-opencontrail.yaml \
       --name=nova
   ```
+
+### [FAQ's](faq.md)
