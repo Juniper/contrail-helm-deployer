@@ -33,6 +33,18 @@
   search openstack.svc.cluster.local svc.cluster.local contrail.juniper.netjuniper.netjnpr.net
   ```
 
+  Use `nslookup` to verify that you are able to resolve k8s cluster specific names
+  ```bash
+  root@b7s32:~# nslookup
+  > kubernetes.default.svc.cluster.local
+  Server:         10.96.0.10
+  Address:        10.96.0.10#53
+
+  Non-authoritative answer:
+  Name:   kubernetes.default.svc.cluster.local
+  Address: 10.96.0.1
+  ```
+
 5. Updating ClusterRole (This is needed by contrail pods for now)
 
   ```bash
@@ -40,11 +52,6 @@
   https://raw.githubusercontent.com/madhukar32/openstack-helm/contrail_5_0/tools/kubeadm-aio/assets/opt/rbac/dev.yaml
   ```
 
-6. If you are running workloads on master then untaint the master node
-
-  ```bash
-  kubectl taint nodes --all node-role.kubernetes.io/master-
-  ```
 
 #### Installation steps
 
@@ -93,19 +100,19 @@
   cd ${OSH_PATH}
   : ${CEPH_RGW_KEYSTONE_ENABLED:="true"}
   helm install --namespace=ceph ${OSH_PATH}/ceph --name=ceph \
-  --set endpoints.identity.namespace=openstack \
-  --set endpoints.object_store.namespace=ceph \
-  --set endpoints.ceph_mon.namespace=ceph \
-  --set ceph.rgw_keystone_auth=${CEPH_RGW_KEYSTONE_ENABLED} \
-  --set network.public=${OSD_PUBLIC_NETWORK} \
-  --set network.cluster=${OSD_CLUSTER_NETWORK} \
-  --set deployment.storage_secrets=true \
-  --set deployment.ceph=true \
-  --set deployment.rbd_provisioner=true \
-  --set deployment.cephfs_provisioner=true \
-  --set deployment.client_secrets=false \
-  --set deployment.rgw_keystone_user_and_endpoints=false \
-  --set bootstrap.enabled=true
+    --set endpoints.identity.namespace=openstack \
+    --set endpoints.object_store.namespace=ceph \
+    --set endpoints.ceph_mon.namespace=ceph \
+    --set ceph.rgw_keystone_auth=${CEPH_RGW_KEYSTONE_ENABLED} \
+    --set network.public=${OSD_PUBLIC_NETWORK} \
+    --set network.cluster=${OSD_CLUSTER_NETWORK} \
+    --set deployment.storage_secrets=true \
+    --set deployment.ceph=true \
+    --set deployment.rbd_provisioner=true \
+    --set deployment.cephfs_provisioner=true \
+    --set deployment.client_secrets=false \
+    --set deployment.rgw_keystone_user_and_endpoints=false \
+    --set bootstrap.enabled=true
   ```
 
   Verifying all ceph pods are up

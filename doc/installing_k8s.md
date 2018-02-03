@@ -18,19 +18,26 @@
   sudo apt-get install -y kubelet=1.8.3-00
   sudo apt-get install -y kubeadm=1.8.3-00
   sudo apt-get install -y docker.io
+
+  # Disable all swaps on all nodes
+  swapoff -a
   ```
+
 
 2. Bring up k8s master on a single node by running the below command.
 
   ```bash
+
+  # Initialize a kubernetes master node
   kubeadm init --kubernetes-version v1.8.3
 
+  # Copy the right conf file for kubectl to detect
   mkdir -p $HOME/.kube
   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
   # Install CNI
-  kubectl apply -f https://docs.projectcalico.org/v2.1/getting-started/kubernetes/installation/hosted/kubeadm/1.6/calico.yaml
+  kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/kubeadm/1.6/calico.yaml
   ```
 
 3. Joining the rest of nodes as slave to the k8s cluster
@@ -58,4 +65,19 @@
 
   ```bash
   kubectl taint nodes --all node-role.kubernetes.io/master-
+  ```
+
+6. Adding upstream servers for kubernetes to resolve names which does not match the k8s domain names
+
+  ```bash
+  cat <<EOF | kubectl create -f -
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: kube-dns
+    namespace: kube-system
+  data:
+    upstreamNameservers: |
+      ["8.8.8.8", "8.8.4.4"]
+  EOF
   ```

@@ -1,4 +1,4 @@
-# Installing helm
+# Installing helm (*Install on master node only*)
 
 1. Downloading Helm
 
@@ -15,4 +15,12 @@
 
   ```bash
   helm init
+  ```
+
+3. Setting up helm repo
+
+  ```bash
+  helm serve &
+  helm repo add local http://localhost:8879/charts
+  helm repo remove stable
   ```
