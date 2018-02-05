@@ -46,6 +46,4 @@ ___
 13. Support for adding TSN node
 14. Test adding single vrouter at a time
 15. Test contrail HA
-16. Adding test cases for each of helm charts
 17. Support for provisioning hybrid cloud connect
-18. Patching contrail changes with the latest openstack-helm charts
