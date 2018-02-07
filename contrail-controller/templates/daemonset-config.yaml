@@ -1,0 +1,116 @@
+{{- if not .Values.manifests.each_container_is_pod }}
+{{- if .Values.manifests.daemonset_config }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-config
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-config" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.controller.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.controller.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+{{ tuple $context .Values.dependencies.config nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: contrail-config-api
+        image: {{ .Values.images.tags.config_api | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+        - configMapRef:
+            name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+      - name: contrail-devicemgr
+        image: {{ .Values.images.tags.config_devicemgr | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+        - configMapRef:
+            name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+      - name: contrail-schema-transformer
+        image: {{ .Values.images.tags.config_schema_transformer | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+        - configMapRef:
+            name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+      - name: contrail-svcmonitor
+        image: {{ .Values.images.tags.config_svcmonitor | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+        - configMapRef:
+            name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+      - name: contrail-config-nodemgr
+        image: {{ .Values.images.tags.nodemgr | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-controller
+        - configMapRef:
+            name: configmap-controller-auth
+        env:
+        - name: NODE_TYPE
+          value: config
+        - name: DOCKER_HOST
+          value: "unix://mnt/docker.sock"
+# todo: there is type Socket in new kubernetes, it is possible to use full
+# path:
+# hostPath:
+#   path: /var/run/docker.sock and
+#   type: Socket
+        volumeMounts:
+        - mountPath: /mnt
+          name: docker-unix-socket
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+      volumes:
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/
+{{- end }}
+{{- end }}

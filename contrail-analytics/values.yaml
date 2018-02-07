@@ -1,0 +1,116 @@
+images:
+  tags:
+    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-175-centos7-newton"
+    analytics_api: "docker.io/opencontrail/contrail-analytics-api:5.0.0-175-centos7-newton"
+    contrail_collector: "docker.io/opencontrail/contrail-analytics-collector:5.0.0-175-centos7-newton"
+    analytics_alarm_gen: "docker.io/opencontrail/contrail-analytics-alarm-gen:5.0.0-175-centos7-newton"
+    analytics_query_engine: "docker.io/opencontrail/contrail-analytics-query-engine:5.0.0-175-centos7-newton"
+    analytics_snmp_collector: "docker.io/opencontrail/contrail-analytics-snmp-collector:5.0.0-175-centos7-newton"
+    contrail_topology: "docker.io/opencontrail/contrail-analytics-topology:5.0.0-175-centos7-newton"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+  imagePullPolicy: "IfNotPresent"
+
+labels:
+  analytics:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  alarm_gen:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  analytics_api:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  contrail_collector:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  analytics_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  analyticsdb_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  query_engine:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  snmp_collector:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  contrail_topology:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+
+
+dependencies:
+  analytics:
+    daemonset:
+    - contrail-analyticsdb
+  contrail_collector:
+    daemonset:
+    - contrail-analytics
+  alarm_gen:
+    daemonset:
+    - contrail-analytics
+  query_engine:
+    daemonset:
+    - contrail-analytics
+  snmp_collector:
+    daemonset:
+    - contrail-analytics
+  contrail_topology:
+    daemonset:
+    - contrail-analytics
+  analytics_nodemgr:
+    daemonset:
+    - contrail-analytics
+
+contrail_env:
+  CONTROLLER_NODES: 10.87.65.248
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: openstack
+  AAA_MODE: cloud-admin
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  cluster_domain_suffix: cluster.local
+  rabbitmq:
+    auth:
+      username: rabbitmq
+      password: password
+    path: /
+    scheme: rabbit
+    port:
+      amqp:
+        default: 5672
+    hosts:
+      default: rabbitmq
+    host_fqdn_override:
+       default: null
+    domain_override: null
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+      region_name: RegionOne
+    hosts:
+      default: keystone-api
+    path:
+      default: /v3
+    port:
+      admin:
+        default: 35357
+      api:
+        default: 80
+    scheme:
+      default: http
+    host_fqdn_override:
+       default: null
+
+manifests:
+  each_container_is_pod: true
+  configmap_env: true
+  daemonset_analytics: true

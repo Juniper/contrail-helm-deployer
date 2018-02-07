@@ -1,0 +1,17 @@
+{{/*
+Name: contrail-helper.kubernetes_spec.get_metadata_label
+Description: Template for metadata label spec
+Arguements:
+  1. context
+  2. application name
+  3. component name
+*/}}
+
+{{- define "contrail-helper.kubernetes_spec.get_metadata_label" -}}
+{{- $context := index . 0 -}}
+{{- $application := index . 1 -}}
+{{- $component := index . 2 -}}
+helm_release: {{ $context.Release.Name }}
+application: {{ $application }}
+component: {{ $component }}
+{{- end -}}

@@ -1,0 +1,148 @@
+images:
+  tags:
+    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-175-centos7-newton"
+    contrail_control: "docker.io/opencontrail/contrail-controller-control-control:5.0.0-175-centos7-newton"
+    control_dns: "docker.io/opencontrail/contrail-controller-control-dns:5.0.0-175-centos7-newton"
+    control_named: "docker.io/opencontrail/contrail-controller-control-named:5.0.0-175-centos7-newton"
+    config_api: "docker.io/opencontrail/contrail-controller-config-api:5.0.0-175-centos7-newton"
+    config_devicemgr: "docker.io/opencontrail/contrail-controller-config-devicemgr:5.0.0-175-centos7-newton"
+    config_schema_transformer: "docker.io/opencontrail/contrail-controller-config-schema:5.0.0-175-centos7-newton"
+    config_svcmonitor: "docker.io/opencontrail/contrail-controller-config-svcmonitor:5.0.0-175-centos7-newton"
+    webui_middleware: "docker.io/opencontrail/contrail-controller-webui-job:5.0.0-175-centos7-newton"
+    webui: "docker.io/opencontrail/contrail-controller-webui-web:5.0.0-175-centos7-newton"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+  imagePullPolicy: "IfNotPresent"
+
+labels:
+  controller:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  config_api:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  config_devicemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  schema_transformer:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  svc_monitor:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  config_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  contrail_control:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  control_dns:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  control_named:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  control_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  webui_middleware:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  webui:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+
+dependencies:
+  config:
+    daemonset:
+    - contrail-configdb
+  schema_transformer:
+    daemonset:
+    - contrail-config
+  svcmonitor:
+    daemonset:
+    - contrail-config
+  devicemgr:
+    daemonset:
+    - contrail-config
+  config_nodemgr:
+    daemonset:
+    - contrail-config
+  control:
+    daemonset:
+    - contrail-config
+  contrail_named:
+    daemonset:
+    - contrail-control
+    - contrail-config
+  contrail_dns:
+    daemonset:
+    - contrail-control
+    - contrail-config
+  control_nodemgr:
+    daemonset:
+    - contrail-control
+    - contrail-config
+  webui:
+    daemonset:
+    - contrail-config
+    - contrail-redis
+  webui_middleware:
+    daemonset:
+    - contrail-config
+    - contrail-webui
+
+contrail_env:
+  CONTROLLER_NODES: 10.87.65.248
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: openstack
+  AAA_MODE: cloud-admin
+
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  cluster_domain_suffix: cluster.local
+  rabbitmq:
+    auth:
+      username: rabbitmq
+      password: password
+    path: /
+    scheme: rabbit
+    port:
+      amqp:
+        default: 5672
+    hosts:
+      default: rabbitmq
+    host_fqdn_override:
+       default: null
+    domain_override: null
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+      region_name: RegionOne
+    hosts:
+      default: keystone-api
+    path:
+      default: /v3
+    port:
+      admin:
+        default: 35357
+      api:
+        default: 80
+    scheme:
+      default: http
+    host_fqdn_override:
+       default: null
+
+manifests:
+  each_container_is_pod: true
+  configmap_env: true
+  daemonset_config: true
+  daemonset_control: true
+  daemonset_webui: true
+  daemonset_agent: true

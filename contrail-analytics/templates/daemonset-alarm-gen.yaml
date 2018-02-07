@@ -1,0 +1,49 @@
+{{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_analytics }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-alarm-gen
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-alarm-gen" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.alarm_gen.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.alarm_gen.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+{{ tuple $context .Values.dependencies.alarm_gen nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: contrail-alarm-gen
+        image: {{ .Values.images.tags.analytics_alarm_gen | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-analytics
+        - configMapRef:
+            name: configmap-analytics-auth
+        - configMapRef:
+            name: configmap-analytics-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+      volumes:
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/
+{{- end }}

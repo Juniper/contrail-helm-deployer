@@ -1,0 +1,67 @@
+{{- if .Values.manifests.configmap_env }}
+{{- $context := . }}
+{{- $config_nodes := .Values.contrail_env.CONFIG_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
+{{- $analytics_nodes := .Values.contrail_env.ANALYTICS_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-analytics-zookeeper
+data:
+  ZOOKEEPER_PORT: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_PORT | default 2182 | quote }}
+  ZOOKEEPER_PORTS: "4888:5888"
+  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_NODES | default $analytics_nodes | quote }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-config-zookeeper
+data:
+  ZOOKEEPER_PORT: {{ .Values.contrail_env.ZOOKEEPER_PORT | default 2181 | quote }}
+  ZOOKEEPER_PORTS: "2888:3888"
+  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_NODES | default $config_nodes | quote }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-thirdparty
+data:
+  {{- range $key, $value := .Values.contrail_env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-configdb
+data:
+  # TODO: fix seeds and listen address
+  CASSANDRA_SEEDS: {{ .Values.contrail_env.CONFIGDB_NODES | default $config_nodes | quote }}
+  CASSANDRA_CLUSTER_NAME: ContrailConfigDB
+  CASSANDRA_START_RPC: "true"
+  CASSANDRA_PORT: {{ .Values.contrail_env.CONFIGDB_PORT | default 9161 | quote }}
+  CASSANDRA_CQL_PORT: {{ .Values.contrail_env.CONFIGDB_CQL_PORT | default 9041 | quote }}
+  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7011 | quote }}
+  CASSANDRA_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_STORAGE_PORT | default 7010 | quote  }}
+  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.contrail_env.JMX_LOCAL_PORT | default 7200 | quote }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-analyticsdb
+data:
+  CASSANDRA_SEEDS: {{ .Values.contrail_env.ANALYTICSDB_NODES | default $analytics_nodes | quote }}
+  CASSANDRA_CLUSTER_NAME: ContrailAnalyticsDB
+  CASSANDRA_START_RPC: "true"
+  CASSANDRA_PORT: {{ .Values.contrail_env.CONFIGDB_PORT | default 9160 | quote }}
+  CASSANDRA_CQL_PORT: {{ .Values.contrail_env.CONFIGDB_CQL_PORT | default 9042 | quote }}
+  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7001 | quote }}
+  CASSANDRA_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_STORAGE_PORT | default 7000 | quote  }}
+  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.contrail_env.JMX_LOCAL_PORT | default 7100 | quote }}
+
+{{- end }}

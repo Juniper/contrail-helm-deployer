@@ -1,0 +1,50 @@
+{{- if .Values.manifests.daemonset_analytics_zookeeper }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-analytics-zookeeper
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "analytics-zookeeper" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.analytics_zookeeper.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.analytics_zookeeper.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+{{ tuple $context .Values.dependencies.analytics_zookeeper nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: zookeeper
+        image: {{ .Values.images.tags.zookeeper | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: contrail-analytics-zookeeper
+        volumeMounts:
+        - mountPath: /data
+          name: analytics-zookeeper-data
+        - mountPath: /datalog
+          name: analytics-zookeeper-datalog
+      volumes:
+      - name: analytics-zookeeper-data
+        hostPath:
+          path: /var/lib/analytics_zookeeper_data
+      - name: analytics-zookeeper-datalog
+        hostPath:
+          path: /var/lib/analytics_zookeeper_datalog
+{{- end }}

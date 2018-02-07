@@ -1,0 +1,64 @@
+{{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_agent }}
+{{- $context := . }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-vrouter-nodemgr
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-vrouter-nodemgr" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+    spec:
+      #Disable affinity for single node setup
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.vrouter_nodemgr.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.vrouter_nodemgr.node_selector_value }}
+      #Enable tolerations for single node setup
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+{{ tuple $context .Values.dependencies.vrouter_nodemgr nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+      containers:
+      - name: contrail-agent-nodemgr
+        image: {{ .Values.images.tags.nodemgr | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-vrouter
+        - configMapRef:
+            name: configmap-vrouter-auth
+        env:
+        - name: NODE_TYPE
+          value: vrouter
+        - name: DOCKER_HOST
+          value: "unix://mnt/docker.sock"
+# todo: there is type Socket in new kubernetes, it is possible to use full
+# path:
+# hostPath:
+#   path: /var/run/docker.sock and
+#   type: Socket
+        volumeMounts:
+        - mountPath: /mnt
+          name: docker-unix-socket
+        - mountPath: /var/log/contrail
+          name: var-log-contrail
+      volumes:
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run
+      - name: var-log-contrail
+        hostPath:
+          path: /var/log/contrail/
+{{- end }}

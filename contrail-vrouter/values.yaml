@@ -1,0 +1,65 @@
+images:
+  tags:
+    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-175-centos7-newton"
+    agent_vrouter: "docker.io/opencontrail/contrail-agent-vrouter:5.0.0-175-centos7-newton"
+    agent_vrouter_init_kernel: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel:5.0.0-175-ubuntu16-newton"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+  imagePullPolicy: "IfNotPresent"
+
+labels:
+  agent:
+    node_selector_key: openstack-compute-node
+    node_selector_value: enabled
+  vrouter_nodemgr:
+    node_selector_key: openstack-compute-node
+    node_selector_value: enabled
+
+dependencies:
+  vrouter_agent:
+    daemonset:
+    - contrail-config
+  vrouter_nodemgr:
+    daemonset:
+    - contrail-config
+    - contrail-vrouter-agent
+
+contrail_env:
+  CONTROLLER_NODES: 10.87.65.248
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: openstack
+  AAA_MODE: cloud-admin
+
+node:
+  host_os: ubuntu
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  cluster_domain_suffix: cluster.local
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+      region_name: RegionOne
+    hosts:
+      default: keystone-api
+    path:
+      default: /v3
+    port:
+      admin:
+        default: 35357
+      api:
+        default: 80
+    scheme:
+      default: http
+    host_fqdn_override:
+       default: null
+
+manifests:
+  each_container_is_pod: true
+  configmap_env: true
+  daemonset_agent: true
