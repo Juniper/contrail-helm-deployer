@@ -56,3 +56,7 @@
 3. How to enter into pod?
 
   Use command `kubectl exec -it <contrail-pod> -n openstack -- bash`
+
+4. How to access Openstack Horizon and OpenContrail WebUI?
+
+  Use following document: https://github.com/juniper/contrail-helm-deployer/blob/master/doc/contrail-osh-cluster-access.md  
