@@ -26,9 +26,6 @@ labels:
   analytics_nodemgr:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
-  analyticsdb_nodemgr:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
   query_engine:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
@@ -57,9 +54,6 @@ dependencies:
     daemonset:
     - contrail-analytics
   contrail_topology:
-    daemonset:
-    - contrail-analytics
-  analytics_nodemgr:
     daemonset:
     - contrail-analytics
 

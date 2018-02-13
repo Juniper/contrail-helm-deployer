@@ -42,8 +42,13 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       volumes:
+      - name: etc-contrail
+        hostPath:
+          path: /etc/contrail/control/
       - name: contrail-log
         hostPath:
-          path: /var/log/contrail/
+          path: /var/log/contrail/control/
 {{- end }}

@@ -38,6 +38,11 @@ spec:
             name: configmap-analytics
         - configMapRef:
             name: configmap-analytics-auth
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-collector
         image: {{ .Values.images.tags.contrail_collector | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -48,6 +53,11 @@ spec:
             name: configmap-analytics-auth
         - configMapRef:
             name: configmap-analytics-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-alarm-gen
         image: {{ .Values.images.tags.analytics_alarm_gen | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -58,6 +68,11 @@ spec:
             name: configmap-analytics-auth
         - configMapRef:
             name: configmap-analytics-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-query-engine
         image: {{ .Values.images.tags.analytics_query_engine | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -66,6 +81,11 @@ spec:
             name: configmap-analytics
         - configMapRef:
             name: configmap-analytics-auth
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-snmp-collector
         image: {{ .Values.images.tags.analytics_snmp_collector | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -76,6 +96,11 @@ spec:
             name: configmap-analytics-auth
         - configMapRef:
             name: configmap-analytics-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-topology
         image: {{ .Values.images.tags.contrail_topology | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -86,6 +111,11 @@ spec:
             name: configmap-analytics-auth
         - configMapRef:
             name: configmap-analytics-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-analytics-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -99,6 +129,11 @@ spec:
           value: analytics
         - name: DOCKER_HOST
           value: "unix://mnt/docker.sock"
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
 # todo: there is type Socket in new kubernetes, it is possible to use full
 # path:
 # hostPath:
@@ -111,5 +146,12 @@ spec:
       - name: docker-unix-socket
         hostPath:
           path: /var/run
+      - name: etc-contrail
+        hostPath:
+          path: /etc/contrail/analytics/
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/analytics/
+
 {{- end }}
 {{- end }}

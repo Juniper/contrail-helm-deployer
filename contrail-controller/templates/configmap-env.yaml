@@ -44,16 +44,4 @@ data:
   RABBITMQ_USE_SSL: {{ .Values.contrail_env.RABBITMQ_USE_SSL | default "false" | quote }}
   RABBITMQ_VHOST: {{ .Values.endpoints.rabbitmq.path | default "/" | quote }}
 
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: webui-conf
-data:
-  webui_conf: |+
-    var auth = {};
-    auth.admin_user = {{ .Values.endpoints.keystone.auth.username }};
-    auth.admin_password = {{ .Values.endpoints.keystone.auth.password }};
-    auth.admin_token = '';
-    auth.admin_tenant_name = {{ .Values.endpoints.keystone.auth.project_name }};
 {{- end }}

@@ -43,6 +43,8 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-devicemgr
         image: {{ .Values.images.tags.config_devicemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -56,6 +58,8 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-schema-transformer
         image: {{ .Values.images.tags.config_schema_transformer | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -69,6 +73,8 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-svcmonitor
         image: {{ .Values.images.tags.config_svcmonitor | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -82,6 +88,8 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-config-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -105,12 +113,17 @@ spec:
           name: docker-unix-socket
         - mountPath: /var/log/contrail/
           name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       volumes:
       - name: docker-unix-socket
         hostPath:
           path: /var/run
+      - name: etc-contrail
+        hostPath:
+          path: /etc/contrail/config/
       - name: contrail-log
         hostPath:
-          path: /var/log/contrail/
+          path: /var/log/contrail/config/
 {{- end }}
 {{- end }}

@@ -40,6 +40,11 @@ spec:
             name: configmap-controller-auth
         - configMapRef:
             name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-dns
         image: {{ .Values.images.tags.control_dns | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -50,6 +55,11 @@ spec:
             name: configmap-controller-auth
         - configMapRef:
             name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-named
         image: {{ .Values.images.tags.control_named | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -62,6 +72,11 @@ spec:
             name: configmap-controller-auth
         - configMapRef:
             name: configmap-controller-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-control-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -83,9 +98,19 @@ spec:
         volumeMounts:
         - mountPath: /mnt
           name: docker-unix-socket
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       volumes:
       - name: docker-unix-socket
         hostPath:
           path: /var/run
+      - name: etc-contrail
+        hostPath:
+          path: /etc/contrail/control/
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/control/
 {{- end }}
 {{- end }}

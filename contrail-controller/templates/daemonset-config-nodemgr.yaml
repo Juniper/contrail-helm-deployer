@@ -47,11 +47,16 @@ spec:
           name: docker-unix-socket
         - mountPath: /var/log/contrail/
           name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       volumes:
       - name: docker-unix-socket
         hostPath:
           path: /var/run
+      - name: etc-contrail
+        hostPath:
+          path: /etc/contrail/config/
       - name: contrail-log
         hostPath:
-          path: /var/log/contrail/
+          path: /var/log/contrail/config/
 {{- end }}
