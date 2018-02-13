@@ -38,6 +38,11 @@ spec:
             name: configmap-controller
         - configMapRef:
             name: configmap-controller-auth
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-webui
         image: {{ .Values.images.tags.webui | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -46,5 +51,17 @@ spec:
             name: configmap-controller
         - configMapRef:
             name: configmap-controller-auth
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
+      volumes:
+      - name: etc-contrail
+        hostPath:
+          path: /etc/contrail/webui/
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/webui/
 {{- end }}
 {{- end }}

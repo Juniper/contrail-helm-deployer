@@ -71,8 +71,10 @@ spec:
           name: lib-modules
         - mountPath: /var/lib/contrail/
           name: var-lib-contrail
-        - mountPath: /var/log/contrail
-          name: var-log-contrail
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       volumes:
       - name: usr-src
         hostPath:
@@ -83,7 +85,10 @@ spec:
       - name: var-lib-contrail
         hostPath:
           path: /var/lib/contrail/
-      - name: var-log-contrail
+      - name: etc-contrail
         hostPath:
-          path: /var/log/contrail/
+          path: /etc/contrail/vrouter/
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/vrouter/
 {{- end }}

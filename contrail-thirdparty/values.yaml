@@ -4,6 +4,7 @@ images:
     cassandra: "docker.io/opencontrail/contrail-external-cassandra:5.0.0-175-centos7-newton"
     redis: "redis:4.0.2"
     zookeeper: "docker.io/opencontrail/contrail-external-zookeeper:5.0.0-175-centos7-newton"
+    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-175-centos7-newton"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
 
 labels:
@@ -25,6 +26,9 @@ labels:
   kafka:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
+  analyticsdb_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
 
 dependencies:
   kafka:
@@ -37,6 +41,9 @@ dependencies:
   configdb:
     daemonset:
     - contrail-config-zookeeper
+  analytics_nodemgr:
+    daemonset:
+    - contrail-analyticsdb
 
 
 contrail_env:

@@ -72,6 +72,10 @@ spec:
           name: lib-modules
         - mountPath: /var/lib/contrail/
           name: var-lib-contrail
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       - name: contrail-agent-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -93,6 +97,10 @@ spec:
         volumeMounts:
         - mountPath: /mnt
           name: docker-unix-socket
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /etc/contrail/
+          name: etc-contrail
       volumes:
       - name: docker-unix-socket
         hostPath:
@@ -106,5 +114,14 @@ spec:
       - name: var-lib-contrail
         hostPath:
           path: /var/lib/contrail/
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run
+      - name: etc-contrail
+        hostPath:
+          path: /etc/contrail/vrouter/
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/vrouter/
 {{- end }}
 {{- end }}
