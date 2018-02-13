@@ -1,0 +1,123 @@
+{{- if not .Values.manifests.each_container_is_pod }}
+{{- if .Values.manifests.daemonset_dpdk }}
+{{- $context := . }}
+# host_os is a mandatory field
+{{- $_ := required ".Values.node.host_os must be specified, valid values are ubuntu, centos" .Values.node.host_os }}
+{{- $host_os := .Values.node.host_os }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-vrouter-agent-dpdk
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "vrouter-agent-dpdk" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+    spec:
+      #Disable affinity for single node setup
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.agent.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.agent.node_selector_value }}
+      #Enable tolerations for single node setup
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+{{ tuple $context .Values.dependencies.agent_dpdk nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+        - name: contrail-vrouter-agent-dpdk
+          image: {{ .Values.images.tags.agent_vrouter_dpdk | quote }}
+          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          envFrom:
+          - configMapRef:
+              name: configmap-vrouter
+          - configMapRef:
+              name: configmap-vrouter-auth
+          env:
+          - name: PHYSICAL_INTERFACE
+            value: p1p2
+          - name: DPDK_COREMASK
+            value: 3-6
+          - name: DPDK_UIO_DRIVER
+            value: uio_pci_generic
+          - name: DPDK_HUGE_PAGES
+            value: 50
+          volumeMounts:
+{{- if eq $host_os "ubuntu"}}
+          - mountPath: /dev/:/dev/
+            name: device
+          - mountPath: /lib/modules
+            name: lib-modules
+          - mountPath: /var/run
+            name: var-run
+{{- end }}
+      containers:
+      - name: contrail-vrouter-agent
+        image: {{ .Values.images.tags.agent_vrouter | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        securityContext:
+          privileged: true
+        envFrom:
+        - configMapRef:
+            name: configmap-vrouter
+        - configMapRef:
+            name: configmap-vrouter-auth
+        env:
+        - name: PHYSICAL_INTERFACE
+          value: p1p2
+        - name: AGENT_PLATFORM
+          value: dpdk
+        volumeMounts:
+        - mountPath: /usr/src
+          name: usr-src
+        - mountPath: /lib/modules
+          name: lib-modules
+        - mountPath: /var/lib/contrail/
+          name: var-lib-contrail
+      - name: contrail-agent-nodemgr
+        image: {{ .Values.images.tags.nodemgr | quote }}
+        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-vrouter
+        - configMapRef:
+            name: configmap-vrouter-auth
+        env:
+        - name: NODE_TYPE
+          value: vrouter
+        - name: DOCKER_HOST
+          value: "unix://mnt/docker.sock"
+# todo: there is type Socket in new kubernetes, it is possible to use full
+# path:
+# hostPath:
+#   path: /var/run/docker.sock and
+#   type: Socket
+        volumeMounts:
+        - mountPath: /mnt
+          name: docker-unix-socket
+      volumes:
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run
+      - name: usr-src
+        hostPath:
+          path: /usr/src
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: var-lib-contrail
+        hostPath:
+          path: /var/lib/contrail/
+{{- end }}
+{{- end }}
