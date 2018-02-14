@@ -2,7 +2,8 @@ images:
   tags:
     nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-175-centos7-newton"
     agent_vrouter: "docker.io/opencontrail/contrail-agent-vrouter:5.0.0-175-centos7-newton"
-    agent_vrouter_init_kernel: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel:5.0.0-175-ubuntu16-newton"
+    agent_vrouter_dpdk: "docker.io/opencontrail/contrail-agent-vrouter-dpdk:5.0.0-175-centos7-newton"
+    agent_vrouter_init_kernel_dpdk: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel-dpdk:5.0.0-175-centos7-newton"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
@@ -22,12 +23,16 @@ dependencies:
     daemonset:
     - contrail-config
     - contrail-vrouter-agent
-
+  dpdk:
+    daemonset:
+    - contrail-config
 contrail_env:
   CONTROLLER_NODES: 10.87.65.248
   LOG_LEVEL: SYS_NOTICE
   CLOUD_ORCHESTRATOR: openstack
   AAA_MODE: cloud-admin
+  PHYSICAL_INTERFACE: p1p2
+  VROUTER_GATEWAY: 10.87.65.254
 
 node:
   host_os: ubuntu
@@ -62,4 +67,5 @@ endpoints:
 manifests:
   each_container_is_pod: true
   configmap_env: true
-  daemonset_agent: true
+  daemonset_agent: false
+  daemonset_dpdk: true
