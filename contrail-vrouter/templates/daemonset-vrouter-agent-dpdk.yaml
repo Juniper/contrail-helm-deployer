@@ -1,0 +1,190 @@
+{{- if .Values.manifests.daemonset_dpdk }}
+{{- $context := . }}
+# host_os is a mandatory field
+{{- $_ := required ".Values.node.host_os must be specified, valid values are ubuntu, centos" .Values.node.host_os }}
+{{- $host_os := .Values.node.host_os }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-vrouter-agent-dpdk
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-vrouter-agent-dpdk" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.vrouter_agent_dpdk.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.vrouter_agent_dpdk.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      hostPID: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+{{ tuple $context .Values.dependencies.vrouter_agent_dpdk nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+        - name: contrail-init-dpdk
+          image: {{ .Values.images.tags.vrouter_init_dpdk | quote }}
+          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          envFrom:
+          - configMapRef:
+              name: configmap-vrouter
+          - configMapRef:
+              name: configmap-vrouter-auth
+          volumeMounts:
+          - mountPath: /lib/modules
+            name: lib-modules
+          - mountPath: /var/run
+            name: var-run
+          - mountPath: /etc/os-release
+            name: os-release
+          - mountPath: /etc/lsb-release
+            name: lsb-release
+          - mountPath: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+            name: hugepages
+      containers:
+        - name: contrail-vrouter-dpdk
+          image: {{ .Values.images.tags.vrouter_dpdk | quote }}
+          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          envFrom:
+          - configMapRef:
+              name: configmap-vrouter
+          - configMapRef:
+              name: configmap-vrouter-auth
+          volumeMounts:
+          - mountPath: /etc/
+            name: mount-etc
+          - mountPath: /lib/modules
+            name: lib-modules
+          - mountPath: /var/run
+            name: var-run
+          - mountPath: /var/log/contrail
+            name: contrail-log
+          - mountPath: /etc/contrail/
+            name: etc-contrail-dpdk
+          - mountPath: /etc/os-release
+            name: os-release
+          - mountPath: /etc/lsb-release
+            name: lsb-release
+          - mountPath: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+            name: hugepages
+        - name: contrail-dpdk-watchdog
+          image: {{ .Values.images.tags.dpdk_watchdog | quote }}
+          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          envFrom:
+          - configMapRef:
+              name: configmap-vrouter
+          - configMapRef:
+              name: configmap-vrouter-auth
+          volumeMounts:
+{{- if eq $host_os "centos"}}
+          - mountPath: /etc/sysconfig/network-scripts
+            name: network-scripts
+{{- end }}
+          - mountPath: /lib/modules/
+            name: lib-modules
+          - mountPath: /var/run/
+            name: var-run
+        - name: contrail-vrouter-dpdk-agent
+          image: {{ .Values.images.tags.vrouter_agent | quote }}
+          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          envFrom:
+          - configMapRef:
+              name: configmap-vrouter
+          - configMapRef:
+              name: configmap-vrouter-auth
+          volumeMounts:
+          - mountPath: /var/lib/contrail/
+            name: var-lib-contrail
+          - mountPath: /var/log/contrail/
+            name: contrail-log
+          - mountPath: /etc/contrail/
+            name: etc-contrail
+          - mountPath: /var/run/
+            name: var-run
+{{- if eq $host_os "centos"}}
+          - mountPath: /etc/sysconfig/network-scripts
+            name: network-scripts
+{{- end }}
+        - name: contrail-agent-nodemgr
+          image: {{ .Values.images.tags.nodemgr | quote }}
+          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          envFrom:
+          - configMapRef:
+              name: configmap-vrouter
+          - configMapRef:
+              name: configmap-vrouter-auth
+          env:
+          - name: NODE_TYPE
+            value: vrouter
+          - name: DOCKER_HOST
+            value: "unix://mnt/docker.sock"
+# todo: there is type Socket in new kubernetes, it is possible to use full
+# path:
+# hostPath:
+#   path: /var/run/docker.sock and
+#   type: Socket
+          volumeMounts:
+          - mountPath: /mnt
+            name: var-run
+          - mountPath: /var/log/contrail/
+            name: contrail-log
+          - mountPath: /etc/contrail/
+            name: etc-contrail
+      volumes:
+{{- if eq $host_os "centos"}}
+      - name: network-scripts
+        hostPath:
+          path: /etc/sysconfig/network-scripts
+{{- end }}
+      - name: var-run
+        hostPath:
+          path: /var/run
+      - name: usr-src
+        hostPath:
+          path: /usr/src
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: var-lib-contrail
+        hostPath:
+          path: /var/lib/contrail
+      - name: etc-contrail-dpdk
+        hostPath:
+          path: /etc/contrail/vrouter/dpdk
+      - name: etc-contrail
+        hostPath:
+          path: /etc/contrail/vrouter
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail/vrouter/
+      - name: os-release
+        hostPath:
+          path: /usr/lib/os-release
+      - name: lsb-release
+        hostPath:
+          path: /etc/lsb-release
+      - name: mount-etc
+        hostPath:
+          path: /etc
+      - name: hugepages
+        hostPath:
+          path: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+{{- end }}

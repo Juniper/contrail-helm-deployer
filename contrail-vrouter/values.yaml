@@ -1,22 +1,29 @@
 images:
   tags:
-    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-175-centos7-newton"
-    build_driver_init: "docker.io/opencontrail/contrail-agent-build-driver-init:5.0.0-189-ubuntu16-newton"
-    vrouter_agent: "docker.io/opencontrail/contrail-agent-vrouter:5.0.0-175-centos7-newton"
-    vrouter_init_kernel: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel:5.0.0-175-ubuntu16-newton"
+    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-20180220070035-centos7-newton"
+    build_driver_init: "docker.io/opencontrail/contrail-agent-build-driver-init:5.0.0-20180220070035-centos7-newton"
+    vrouter_agent: "docker.io/opencontrail/contrail-agent-vrouter:5.0.0-20180220070035-centos7-newton"
+    vrouter_init_kernel: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel:opencontrail/contrail-agent-build-driver-init:5.0.0-20180220070035-ubuntu16-newton"
+    vrouter_dpdk: "opencontrailnightly/contrail-agent-vrouter-dpdk:5.0.0-20180220070035-centos7-newton"
+    vrouter_init_dpdk: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel-dpdk:5.0.0-20180220070035-centos7-newton"
+    dpdk_watchdog: "docker.io/opencontrail/contrail-agent-net-watchdog:5.0.0-20180220070035-centos7-newton"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
 labels:
-  vrouter_kernel:
-    node_selector_key: openstack-compute-node
-    node_selector_value: enabled
-  vrouter_nodemgr:
-    node_selector_key: openstack-compute-node
-    node_selector_value: enabled
+  vrouter_agent_kernel:
+    node_selector_key: "opencontrail.org/vrouter-kernel"
+    node_selector_value: "enabled"
+  vrouter_agent_dpdk:
+    node_selector_key: "opencontrail.org/vrouter-dpdk"
+    node_selector_value: "enabled"
 
 dependencies:
-  vrouter_kernel:
+  vrouter_agent_kernel:
+    daemonset:
+    - contrail-config
+    - contrail-control
+  vrouter_agent_dpdk:
     daemonset:
     - contrail-config
     - contrail-control
@@ -26,6 +33,13 @@ contrail_env:
   LOG_LEVEL: SYS_NOTICE
   CLOUD_ORCHESTRATOR: openstack
   AAA_MODE: cloud-admin
+  #PHYSICAL_INTERFACE: p1p2
+  #CPU_CORE_MASK: "0xf"
+  #DPDK_UIO_DRIVER: uio_pci_generic
+  #HUGE_PAGES: 32000
+  #AGENT_MODE: dpdk
+  #HUGE_PAGES_DIR: /hugepages
+  #VROUTER_GATEWAY: 8.0.0.254
 
 node:
   host_os: ubuntu
@@ -60,3 +74,4 @@ endpoints:
 manifests:
   configmap_env: true
   daemonset_kernel: true
+  daemonset_dpdk: false
