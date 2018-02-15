@@ -1,4 +1,4 @@
-{{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_agent }}
+{{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_kernel }}
 {{- $context := . }}
 # host_os is a mandatory field
 {{- $_ := required ".Values.node.host_os must be specified, valid values are ubuntu, centos" .Values.node.host_os }}
@@ -7,12 +7,12 @@
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: contrail-vrouter-agent
+  name: contrail-vrouter-agent-kernel
 spec:
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-vrouter-agent" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-vrouter-agent-kernel" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
     spec:
       #Disable affinity for single node setup
       affinity:
@@ -20,10 +20,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.agent.node_selector_key }}
+              - key: {{ .Values.labels.vrouter_agent_kernel.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.agent.node_selector_value }}
+                - {{ .Values.labels.vrouter_agent_kernel.node_selector_value }}
       #Enable tolerations for single node setup
       tolerations:
       - key: node-role.kubernetes.io/master
@@ -32,7 +32,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
-{{ tuple $context .Values.dependencies.vrouter_agent nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.vrouter_agent_kernel nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: contrail-agent-init-kernel
           image: {{ .Values.images.tags.agent_vrouter_init_kernel | quote }}
           imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
