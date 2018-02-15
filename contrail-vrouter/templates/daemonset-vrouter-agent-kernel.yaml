@@ -20,10 +20,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.vrouter_kernel.node_selector_key }}
+              - key: {{ .Values.labels.vrouter_agent_kernel.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.vrouter_kernel.node_selector_value }}
+                - {{ .Values.labels.vrouter_agent_kernel.node_selector_value }}
       #Enable tolerations for single node setup
       tolerations:
       - key: node-role.kubernetes.io/master
@@ -32,7 +32,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
-{{ tuple $context .Values.dependencies.vrouter_kernel nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.vrouter_agent_kernel nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
 {{- if eq $host_os "ubuntu"}}
         - name: contrail-init-kernel
           image: {{ .Values.images.tags.build_driver_init | quote }}
@@ -103,7 +103,7 @@ spec:
 #   type: Socket
         volumeMounts:
         - mountPath: /mnt
-          name: docker-unix-socket
+          name:  var-run
         - mountPath: /var/log/contrail/
           name: contrail-log
         - mountPath: /etc/contrail/
@@ -124,9 +124,6 @@ spec:
       - name: var-lib-contrail
         hostPath:
           path: /var/lib/contrail/
-      - name: docker-unix-socket
-        hostPath:
-          path: /var/run
       - name: etc-contrail
         hostPath:
           path: /etc/contrail/vrouter/
