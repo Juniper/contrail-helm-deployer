@@ -1,13 +1,14 @@
 images:
   tags:
     nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-175-centos7-newton"
-    agent_vrouter: "docker.io/opencontrail/contrail-agent-vrouter:5.0.0-175-centos7-newton"
-    agent_vrouter_init_kernel: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel:5.0.0-175-ubuntu16-newton"
+    build_driver_init: "docker.io/opencontrail/contrail-agent-build-driver-init:5.0.0-189-ubuntu16-newton"
+    vrouter_agent: "docker.io/opencontrail/contrail-agent-vrouter:5.0.0-175-centos7-newton"
+    vrouter_init_kernel: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel:5.0.0-175-ubuntu16-newton"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
 labels:
-  agent:
+  vrouter_kernel:
     node_selector_key: openstack-compute-node
     node_selector_value: enabled
   vrouter_nodemgr:
@@ -15,13 +16,10 @@ labels:
     node_selector_value: enabled
 
 dependencies:
-  vrouter_agent:
+  vrouter_kernel:
     daemonset:
     - contrail-config
-  vrouter_nodemgr:
-    daemonset:
-    - contrail-config
-    - contrail-vrouter-agent
+    - contrail-control
 
 contrail_env:
   CONTROLLER_NODES: 10.87.65.248
@@ -60,6 +58,5 @@ endpoints:
        default: null
 
 manifests:
-  each_container_is_pod: true
   configmap_env: true
-  daemonset_agent: true
+  daemonset_kernel: true
