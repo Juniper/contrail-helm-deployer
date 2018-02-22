@@ -1,15 +1,15 @@
 images:
   tags:
-    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-175-centos7-newton"
-    contrail_control: "docker.io/opencontrail/contrail-controller-control-control:5.0.0-175-centos7-newton"
-    control_dns: "docker.io/opencontrail/contrail-controller-control-dns:5.0.0-175-centos7-newton"
-    control_named: "docker.io/opencontrail/contrail-controller-control-named:5.0.0-175-centos7-newton"
-    config_api: "docker.io/opencontrail/contrail-controller-config-api:5.0.0-175-centos7-newton"
-    config_devicemgr: "docker.io/opencontrail/contrail-controller-config-devicemgr:5.0.0-175-centos7-newton"
-    config_schema_transformer: "docker.io/opencontrail/contrail-controller-config-schema:5.0.0-175-centos7-newton"
-    config_svcmonitor: "docker.io/opencontrail/contrail-controller-config-svcmonitor:5.0.0-175-centos7-newton"
-    webui_middleware: "docker.io/opencontrail/contrail-controller-webui-job:5.0.0-175-centos7-newton"
-    webui: "docker.io/opencontrail/contrail-controller-webui-web:5.0.0-175-centos7-newton"
+    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-20180220070035-centos7-newton"
+    contrail_control: "docker.io/opencontrail/contrail-controller-control-control:5.0.0-20180220070035-centos7-newton"
+    control_dns: "docker.io/opencontrail/contrail-controller-control-dns:5.0.0-20180220070035-centos7-newton"
+    control_named: "docker.io/opencontrail/contrail-controller-control-named:5.0.0-20180220070035-centos7-newton"
+    config_api: "docker.io/opencontrail/contrail-controller-config-api:5.0.0-20180220070035-centos7-newton"
+    config_devicemgr: "docker.io/opencontrail/contrail-controller-config-devicemgr:5.0.0-20180220070035-centos7-newton"
+    config_schema_transformer: "docker.io/opencontrail/contrail-controller-config-schema:5.0.0-20180220070035-centos7-newton"
+    config_svcmonitor: "docker.io/opencontrail/contrail-controller-config-svcmonitor:5.0.0-20180220070035-centos7-newton"
+    webui_middleware: "docker.io/opencontrail/contrail-controller-webui-job:5.0.0-20180220070035-centos7-newton"
+    webui: "docker.io/opencontrail/contrail-controller-webui-web:5.0.0-20180220070035-centos7-newton"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
