@@ -14,48 +14,13 @@ labels:
   analytics:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
-  alarm_gen:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
-  analytics_api:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
-  contrail_collector:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
-  analytics_nodemgr:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
-  query_engine:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
-  snmp_collector:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
-  contrail_topology:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
 
 
 dependencies:
   analytics:
     daemonset:
     - contrail-analyticsdb
-  contrail_collector:
-    daemonset:
-    - contrail-analytics
-  alarm_gen:
-    daemonset:
-    - contrail-analytics
-  query_engine:
-    daemonset:
-    - contrail-analytics
-  snmp_collector:
-    daemonset:
-    - contrail-analytics
-  contrail_topology:
-    daemonset:
-    - contrail-analytics
+    - contrail-config
 
 contrail_env:
   CONTROLLER_NODES: 10.87.65.248
@@ -105,6 +70,5 @@ endpoints:
        default: null
 
 manifests:
-  each_container_is_pod: true
   configmap_env: true
   daemonset_analytics: true

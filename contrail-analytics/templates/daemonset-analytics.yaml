@@ -1,4 +1,3 @@
-{{- if not .Values.manifests.each_container_is_pod }}
 {{- if .Values.manifests.daemonset_analytics }}
 {{- $context := . }}
 ---
@@ -153,5 +152,4 @@ spec:
         hostPath:
           path: /var/log/contrail/analytics/
 
-{{- end }}
 {{- end }}

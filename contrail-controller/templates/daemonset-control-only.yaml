@@ -1,25 +1,25 @@
-{{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_control }}
+{{- if .Values.manifests.daemonset_control_only }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: contrail-control
+  name: contrail-control-only
 spec:
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-control" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-control-only" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
     spec:
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.contrail_control.node_selector_key }}
+              - key: {{ .Values.labels.control_only.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.contrail_control.node_selector_value }}
+                - {{ .Values.labels.control_only.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
@@ -27,7 +27,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
-{{ tuple $context .Values.dependencies.control nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.control_only nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-control
         image: {{ .Values.images.tags.contrail_control | quote }}
