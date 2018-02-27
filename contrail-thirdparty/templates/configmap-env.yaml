@@ -1,7 +1,7 @@
 {{- if .Values.manifests.configmap_env }}
 {{- $context := . }}
-{{- $config_nodes := .Values.contrail_env.CONFIG_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
-{{- $analytics_nodes := .Values.contrail_env.ANALYTICS_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
+{{- $configdb_nodes := .Values.contrail_env.CONFIG_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
+{{- $analyticsdb_nodes := .Values.contrail_env.ANALYTICS_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
 
 ---
 apiVersion: v1
@@ -11,7 +11,7 @@ metadata:
 data:
   ZOOKEEPER_PORT: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_PORT | default 2182 | quote }}
   ZOOKEEPER_PORTS: "4888:5888"
-  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_NODES | default $analytics_nodes | quote }}
+  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_NODES | default .Values.contrail_env.ANALYTICSDB_NODES | default $analyticsdb_nodes | quote }}
 
 ---
 apiVersion: v1
@@ -21,7 +21,7 @@ metadata:
 data:
   ZOOKEEPER_PORT: {{ .Values.contrail_env.ZOOKEEPER_PORT | default 2181 | quote }}
   ZOOKEEPER_PORTS: "2888:3888"
-  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_NODES | default $config_nodes | quote }}
+  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_NODES | default .Values.contrail_env.CONFIGDB_NODES | default $configdb_nodes | quote }}
 
 ---
 apiVersion: v1
@@ -40,7 +40,7 @@ metadata:
   name: contrail-configdb
 data:
   # TODO: fix seeds and listen address
-  CASSANDRA_SEEDS: {{ .Values.contrail_env.CONFIGDB_NODES | default $config_nodes | quote }}
+  CASSANDRA_SEEDS: {{ .Values.contrail_env.CONFIGDB_NODES | default $configdb_nodes | quote }}
   CASSANDRA_CLUSTER_NAME: ContrailConfigDB
   CASSANDRA_START_RPC: "true"
   CASSANDRA_PORT: {{ .Values.contrail_env.CONFIGDB_PORT | default 9161 | quote }}
@@ -55,7 +55,7 @@ kind: ConfigMap
 metadata:
   name: contrail-analyticsdb
 data:
-  CASSANDRA_SEEDS: {{ .Values.contrail_env.ANALYTICSDB_NODES | default $analytics_nodes | quote }}
+  CASSANDRA_SEEDS: {{ .Values.contrail_env.ANALYTICSDB_NODES | default $analyticsdb_nodes | quote  }}
   CASSANDRA_CLUSTER_NAME: ContrailAnalyticsDB
   CASSANDRA_START_RPC: "true"
   CASSANDRA_PORT: {{ .Values.contrail_env.CONFIGDB_PORT | default 9160 | quote }}
