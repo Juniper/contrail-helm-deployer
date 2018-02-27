@@ -1,0 +1,32 @@
+{{- if .Values.manifests.ingress_analytics_api }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: contrail-analytics-api
+spec:
+  rules:
+  - host: analytics-api
+    http:
+      paths:
+      - backend:
+          serviceName: contrail-analytics-api
+          servicePort: api
+        path: /
+  - host: analytics-api.{{ .Release.Namespace }}
+    http:
+      paths:
+      - backend:
+          serviceName: contrail-analytics-api
+          servicePort: api
+        path: /
+  - host: analytics-api.{{ .Release.Namespace }}.svc.cluster.local
+    http:
+      paths:
+      - backend:
+          serviceName: contrail-analytics-api
+          servicePort: api
+        path: /
+{{- end }}

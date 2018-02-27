@@ -32,6 +32,11 @@ spec:
       - name: contrail-config-api
         image: {{ .Values.images.tags.config_api | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        ports:
+        - name: api-port
+          containerPort: {{ .Values.contrail_env.CONFIG_API_PORT | default 8082 }}
+        - name: introspect-port
+          containerPort: {{ .Values.contrail_env.CONFIG_API_INTROSPECT_PORT | default 8084 }}
         envFrom:
         - configMapRef:
             name: configmap-controller

@@ -32,6 +32,11 @@ spec:
       - name: contrail-webui-middleware
         image: {{ .Values.images.tags.webui_middleware | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        ports:
+        - name: http-port
+          containerPort: {{ .Values.contrail_env.WEBUI_HTTP_LISTEN_PORT | default 8080 }}
+        - name: https-port
+          containerPort: {{ .Values.contrail_env.WEBUI_HTTPS_LISTEN_PORT | default 8143 }}
         envFrom:
         - configMapRef:
             name: configmap-controller

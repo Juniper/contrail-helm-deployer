@@ -69,6 +69,12 @@ endpoints:
     host_fqdn_override:
        default: null
 
+# Service related inputs are defined here
+service:
+  analytics_api_public_port: ""
+
 manifests:
   configmap_env: true
   daemonset_analytics: true
+  service_analytics_api: true
+  ingress_analytics_api: true
