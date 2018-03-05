@@ -41,7 +41,7 @@ dependencies:
   configdb:
     daemonset:
     - contrail-config-zookeeper
-  analytics_nodemgr:
+  analyticsdb_nodemgr:
     daemonset:
     - contrail-analyticsdb
 
@@ -52,6 +52,30 @@ contrail_env:
   CLOUD_ORCHESTRATOR: openstack
   AAA_MODE: cloud-admin
 
+endpoints:
+  cluster_domain_suffix: cluster.local
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+      region_name: RegionOne
+    hosts:
+      default: keystone-api
+    path:
+      default: /v3
+    port:
+      admin:
+        default: 35357
+      api:
+        default: 80
+    scheme:
+      default: http
+    host_fqdn_override:
+       default: null
+
 manifests:
   configmap_env: true
   daemonset_configdb: true
@@ -60,3 +84,4 @@ manifests:
   daemonset_analytics_zookeeper: true
   daemonset_config_zookeeper: true
   daemonset_kafka: true
+  daemonset_analyticsdb_nodemgr: true

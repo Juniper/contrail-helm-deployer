@@ -2,6 +2,7 @@
 {{- $context := . }}
 {{- $configdb_nodes := .Values.contrail_env.CONFIG_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
 {{- $analyticsdb_nodes := .Values.contrail_env.ANALYTICS_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
+{{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_short_endpoint_lookup" }}
 
 ---
 apiVersion: v1
@@ -32,6 +33,24 @@ data:
   {{- range $key, $value := .Values.contrail_env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-thirdparty-auth
+data:
+  KEYSTONE_AUTH_ADMIN_USER: {{ .Values.endpoints.keystone.auth.username }}
+  KEYSTONE_AUTH_ADMIN_TENANT: {{ .Values.endpoints.keystone.auth.project_name }}
+  KEYSTONE_AUTH_ADMIN_PASSWORD: {{ .Values.endpoints.keystone.auth.password }}
+  KEYSTONE_AUTH_USER_DOMAIN_NAME: {{ .Values.endpoints.keystone.auth.user_domain_name }}
+  KEYSTONE_AUTH_PROJECT_DOMAIN_NAME: {{ .Values.endpoints.keystone.auth.project_domain_name }}
+  KEYSTONE_AUTH_URL_VERSION: {{ .Values.endpoints.keystone.path.default }}
+  KEYSTONE_AUTH_HOST: {{ $keystone_auth_host }}
+  KEYSTONE_AUTH_PROTO: {{ .Values.endpoints.keystone.scheme.default }}
+  KEYSTONE_AUTH_ADMIN_PORT: {{ .Values.endpoints.keystone.port.admin.default | quote }}
+  KEYSTONE_AUTH_PUBLIC_PORT: {{ .Values.endpoints.keystone.port.api.default | quote }}
+  KEYSTONE_AUTH_REGION_NAME: {{ .Values.endpoints.keystone.auth.region_name | quote }}
 
 ---
 apiVersion: v1

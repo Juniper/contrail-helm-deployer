@@ -1,4 +1,4 @@
-{{- if and .Values.manifests.each_container_is_pod .Values.manifests.daemonset_analytics }}
+{{- if .Values.manifests.daemonset_analyticsdb_nodemgr }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
@@ -9,7 +9,7 @@ spec:
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-analytics-nodemgr" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-analyticsdb-nodemgr" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
     spec:
       affinity:
         nodeAffinity:
@@ -27,16 +27,16 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
-{{ tuple $context .Values.dependencies.analytics_nodemgr nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{ tuple $context .Values.dependencies.analyticsdb_nodemgr nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-analyticsdb-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-analytics
+            name: contrail-thirdparty-auth
         - configMapRef:
-            name: configmap-analytics-auth
+            name: contrail-thirdparty
         env:
         - name: NODE_TYPE
           value: database
@@ -60,8 +60,8 @@ spec:
           path: /var/run
       - name: etc-contrail
         hostPath:
-          path: /etc/contrail/analytics/
+          path: /etc/contrail/analyticsdb/
       - name: contrail-log
         hostPath:
-          path: /var/log/contrail/analytics/
+          path: /var/log/contrail/analyticsdb/
 {{- end }}
