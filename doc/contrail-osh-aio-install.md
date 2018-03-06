@@ -9,30 +9,30 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
 3. docker: 1.13.1
 4. helm: v2.7.2
 5. kubernetes: v1.8.3
-6. openstack: newton
+6. openstack: ocata
 
 ### Resource spec (used for internal validation)
 
-1. CPU: 40
-2. RAM: 256
+1. CPU: 8
+2. RAM: 32 GB
+3. HDD: 120 GB
 
-### Prerequisites
+### Pre-req packages
 
-* Below are the list of pacakges which needs to be installed on you all-in-one node
-  ```notes
+Install below packages on your setup
+
+```bash
   git
-  make
-  linux-headers-$(uname -r)
-  ```
+```
 
 ### Installation steps
 
 1. Git clone the necessary repo's using below command
   ```bash
   # Download openstack-helm code
-  git clone https://github.com/madhukar32/openstack-helm.git -b contrail_5_0
+  git clone https://github.com/Juniper/openstack-helm.git
   # Download openstack-helm-infra code
-  git clone https://github.com/madhukar32/openstack-helm-infra.git -b contrail_5_0
+  git clone https://github.com/Juniper/openstack-helm-infra.git
   # Download contrail-helm-deployer code
   git clone https://github.com/Juniper/contrail-helm-deployer.git
   ```
@@ -44,9 +44,6 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
   export OSH_PATH=${BASE_DIR}/openstack-helm
   export OSH_INFRA_PATH=${BASE_DIR}/openstack-helm-infra
   export CHD_PATH=${BASE_DIR}/contrail-helm-deployer
-  # Set the IP of your controller node and config node
-  export CONTROLLER_NODE=10.87.65.245
-  export CONFIG_NODE=10.87.65.245
   ```
 
 2. Installing necessary packages and deploying kubernetes
@@ -54,31 +51,31 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
   Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to install a different version of kubernetes, cni, calico. This overrides the default values given in `${OSH_INFRA_PATH}/tools/gate/playbooks/vars.yaml`
 
   ```bash
-  cd ${BASE_DIR}/openstack-helm
-  bash tools/deployment/developer/00-install-packages.sh
-  bash tools/deployment/developer/01-deploy-k8s.sh
+  cd ${OSH_PATH}
+  ./tools/deployment/developer/common/001-install-packages-opencontrail.sh
+  ./tools/deployment/developer/common/010-deploy-k8s.sh
   ```
 
-3. Build all helm charts and intll openstack and heat client
+3. Install openstack and heat client
 
   ```bash
-  bash tools/deployment/developer/02-setup-client.sh
+  ./tools/deployment/developer/common/020-setup-client.sh
   ```
 
 4. Deploy openstack-helm related charts
 
   ```bash
-  bash tools/deployment/developer/03-ingress.sh
-  bash tools/deployment/developer/04-ceph.sh
-  bash tools/deployment/developer/05-ceph-ns-activate.sh
-  bash tools/deployment/developer/06-mariadb.sh
-  bash tools/deployment/developer/07-rabbitmq.sh
-  bash tools/deployment/developer/08-memcached.sh
-  bash tools/deployment/developer/09-keystone.sh
-  bash tools/deployment/developer/10-ceph-radosgateway.sh
-  bash tools/deployment/developer/11-horizon.sh
-  bash tools/deployment/developer/12-glance.sh
-  bash tools/deployment/developer/14-libvirt.sh
+  ./tools/deployment/developer/nfs/030-ingress.sh
+  ./tools/deployment/developer/nfs/040-nfs-provisioner.sh
+  ./tools/deployment/developer/nfs/050-mariadb.sh
+  ./tools/deployment/developer/nfs/060-rabbitmq.sh
+  ./tools/deployment/developer/nfs/070-memcached.sh
+  ./tools/deployment/developer/nfs/080-keystone.sh
+  ./tools/deployment/developer/nfs/091-heat-opencontrail.sh
+  ./tools/deployment/developer/nfs/100-horizon.sh
+  ./tools/deployment/developer/nfs/120-glance.sh
+  ./tools/deployment/developer/nfs/151-libvirt-opencontrail.sh
+  ./tools/deployment/developer/nfs/161-compute-kit-opencontrail.sh
   ```
 
 5. Now deploy opencontrail charts
@@ -88,35 +85,32 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
 
   make
 
+  # Set the IP of your CONTROL_NODES (specify your control data ip, if you have one)
+  export CONTROL_NODES=10.87.65.245
+  # set the control data network cidr list separated by comma and set the respective gateway
+  export CONTROL_DATA_NET_LIST=10.87.65.128/25
+  export VROUTER_GATEWAY=10.87.65.129
+
   kubectl label node opencontrail.org/controller=enabled --all
+  kubectl label node opencontrail.org/vrouter-kernel=enabled --all
 
   kubectl replace -f ${OSH_PATH}/tools/kubeadm-aio/assets/opt/rbac/dev.yaml
 
   helm install --name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty \
-  --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \
-  --set manifests.each_container_is_pod=true
+  --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1
 
   helm install --name contrail-controller ${CHD_PATH}/contrail-controller \
-  --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \
-  --set manifests.each_container_is_pod=true
+  --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1 \
+  --set contrail_env.CONTROL_NODES=${CONTROL_NODES}
 
   helm install --name contrail-analytics ${CHD_PATH}/contrail-analytics \
-  --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \
-  --set manifests.each_container_is_pod=true
+  --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1
 
   # Edit contrail-vrouter/values.yaml and make sure that images.tags.agent_vrouter_init_kernel is right. Image tag name will be different depending upon your linux. Also set the conf.host_os to ubuntu or centos depending on your system
 
   helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
-  --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \
-  --set manifests.each_container_is_pod=true
-
-  ```
-
-6. Install remaining openstack charts
-
-  ```bash
-  cd $OSH_PATH
-  bash tools/deployment/developer/15-compute-kit.sh
-  bash tools/deployment/developer/17-cinder.sh
-  bash tools/deployment/developer/18-heat.sh
+  --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1 \
+  --set contrail_env.CONTROL_NODES=${CONTROL_NODES} \
+  --set contrail_env.CONTROL_DATA_NET_LIST=${CONTROL_DATA_NET_LIST} \
+  --set contrail_env.VROUTER_GATEWAY=${VROUTER_GATEWAY}
   ```
