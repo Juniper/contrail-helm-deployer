@@ -104,7 +104,7 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
   --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \
   --set manifests.each_container_is_pod=true
 
-  # Edit contrail-vrouter/values.yaml and make sure that images.tags.agent_vrouter_init_kernel is right. Image tag name will be different depending upon your linux. Also set the conf.host_os to ubuntu or centos depending on your system
+  # Edit contrail-vrouter/values.yaml and make sure that images.tags.vrouter_kernel_init is right. Image tag name will be different depending upon your linux. Also set the conf.host_os to ubuntu or centos depending on your system
 
   helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
   --namespace=openstack --set contrail_env.CONTROLLER_NODES=${CONTROLLER_NODE} \

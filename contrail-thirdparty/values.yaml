@@ -1,10 +1,10 @@
 images:
   tags:
-    kafka: "docker.io/opencontrail/contrail-external-kafka:5.0.0-20180220070035-centos7-newton"
-    cassandra: "docker.io/opencontrail/contrail-external-cassandra:5.0.0-20180220070035-centos7-newton"
+    kafka: "docker.io/opencontrailnightly/contrail-external-kafka:newton-master-17"
+    cassandra: "docker.io/opencontrailnightly/contrail-external-cassandra:newton-master-17"
     redis: "redis:4.0.2"
-    zookeeper: "docker.io/opencontrail/contrail-external-zookeeper:5.0.0-20180220070035-centos7-newton"
-    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-20180220070035-centos7-newton"
+    zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:newton-master-17"
+    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:newton-master-17"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
 
 labels:

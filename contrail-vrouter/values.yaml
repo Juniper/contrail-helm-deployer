@@ -1,12 +1,12 @@
 images:
   tags:
-    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-20180220070035-centos7-newton"
-    build_driver_init: "docker.io/opencontrail/contrail-agent-build-driver-init:5.0.0-20180220070035-ubuntu16-newton"
-    vrouter_agent: "docker.io/opencontrail/contrail-agent-vrouter:5.0.0-20180220070035-centos7-newton"
-    vrouter_init_kernel: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel:5.0.0-20180220070035-centos7-newton"
-    vrouter_dpdk: "docker.io/opencontrail/contrail-agent-vrouter-dpdk:5.0.0-20180220070035-centos7-newton"
-    vrouter_init_dpdk: "docker.io/opencontrail/contrail-agent-vrouter-init-kernel-dpdk:5.0.0-20180220070035-centos7-newton"
-    dpdk_watchdog: "docker.io/opencontrail/contrail-agent-net-watchdog:5.0.0-20180220070035-centos7-newton"
+    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:newton-master-17"
+    build_driver_init: "docker.io/opencontrailnightly/contrail-vrouter-kernel-build-init:newton-master-17"
+    vrouter_agent: "docker.io/opencontrailnightly/contrail-vrouter-agent:newton-master-17"
+    vrouter_init_kernel: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init:newton-master-17"
+    vrouter_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-agent-dpdk:newton-master-17"
+    vrouter_init_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init-dpdk:newton-master-17"
+    dpdk_watchdog: "docker.io/opencontrailnightly/contrail-vrouter-net-watchdog:newton-master-17"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 

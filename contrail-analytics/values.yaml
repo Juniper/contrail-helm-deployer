@@ -1,12 +1,12 @@
 images:
   tags:
-    nodemgr: "docker.io/opencontrail/contrail-nodemgr:5.0.0-20180220070035-centos7-newton"
-    analytics_api: "docker.io/opencontrail/contrail-analytics-api:5.0.0-20180220070035-centos7-newton"
-    contrail_collector: "docker.io/opencontrail/contrail-analytics-collector:5.0.0-20180220070035-centos7-newton"
-    analytics_alarm_gen: "docker.io/opencontrail/contrail-analytics-alarm-gen:5.0.0-20180220070035-centos7-newton"
-    analytics_query_engine: "docker.io/opencontrail/contrail-analytics-query-engine:5.0.0-20180220070035-centos7-newton"
-    analytics_snmp_collector: "docker.io/opencontrail/contrail-analytics-snmp-collector:5.0.0-20180220070035-centos7-newton"
-    contrail_topology: "docker.io/opencontrail/contrail-analytics-topology:5.0.0-20180220070035-centos7-newton"
+    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:newton-master-17"
+    analytics_api: "docker.io/opencontrailnightly/contrail-analytics-api:newton-master-17"
+    contrail_collector: "docker.io/opencontrailnightly/contrail-analytics-collector:newton-master-17"
+    analytics_alarm_gen: "docker.io/opencontrailnightly/contrail-analytics-alarm-gen:newton-master-17"
+    analytics_query_engine: "docker.io/opencontrailnightly/contrail-analytics-query-engine:newton-master-17"
+    analytics_snmp_collector: "docker.io/opencontrailnightly/contrail-analytics-snmp-collector:newton-master-17"
+    contrail_topology: "docker.io/opencontrailnightly/contrail-analytics-topology:newton-master-17"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
