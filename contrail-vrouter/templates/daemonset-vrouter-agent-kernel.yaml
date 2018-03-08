@@ -41,7 +41,7 @@ spec:
             privileged: true
           envFrom:
           - configMapRef:
-              name: configmap-vrouter
+              name: configmap-vrouter-kernel
           - configMapRef:
               name: configmap-vrouter-auth
           volumeMounts:
@@ -69,7 +69,7 @@ spec:
           privileged: true
         envFrom:
         - configMapRef:
-            name: configmap-vrouter
+            name: configmap-vrouter-kernel
         - configMapRef:
             name: configmap-vrouter-auth
         volumeMounts:
@@ -88,7 +88,7 @@ spec:
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-vrouter
+            name: configmap-vrouter-kernel
         - configMapRef:
             name: configmap-vrouter-auth
         env:

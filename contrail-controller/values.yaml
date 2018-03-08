@@ -99,7 +99,6 @@ manifests:
   daemonset_control: true
   daemonset_control_only: false
   daemonset_webui: true
-  daemonset_agent: true
   service_config_api: true
   service_webui: true
   ingress_webui: true

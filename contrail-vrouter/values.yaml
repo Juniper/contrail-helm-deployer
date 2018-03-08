@@ -29,17 +29,22 @@ dependencies:
     - contrail-control
 
 contrail_env:
-  CONTROLLER_NODES: 10.87.65.248
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: openstack
-  AAA_MODE: cloud-admin
-  PHYSICAL_INTERFACE: enp0s8
-  #CPU_CORE_MASK: "0xf"
-  #DPDK_UIO_DRIVER: uio_pci_generic
-  #HUGE_PAGES: 32000
-  #AGENT_MODE: dpdk
-  #HUGE_PAGES_DIR: /hugepages
-  VROUTER_GATEWAY: None
+  vrouter_common:
+    CONTROLLER_NODES: 10.87.65.248
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
+    #CONTROL_DATA_NET_LIST: 8.0.0.0/24
+    #VROUTER_GATEWAY: 8.0.0.254
+  vrouter_kernel:
+    #AGENT_MODE: nic
+  vrouter_dpdk:
+    #CPU_CORE_MASK: "0xf"
+    #DPDK_UIO_DRIVER: uio_pci_generic
+    #HUGE_PAGES: 32000
+    #AGENT_MODE: dpdk
+    #HUGE_PAGES_DIR: /hugepages
+
 
 node:
   host_os: ubuntu
