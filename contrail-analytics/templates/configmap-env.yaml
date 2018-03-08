@@ -1,7 +1,7 @@
 {{- if .Values.manifests.configmap_env }}
 {{- $context := . }}
-{{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_short_endpoint_lookup" }}
-{{- $rabbitmq_host := tuple "rabbitmq" "internal" $context | include "helm-toolkit.endpoints.hostname_short_endpoint_lookup" }}
+{{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
+{{- $rabbitmq_host := tuple "rabbitmq" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
 
 ---
 apiVersion: v1
