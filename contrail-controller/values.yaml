@@ -1,15 +1,15 @@
 images:
   tags:
-    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:newton-master-17"
-    contrail_control: "docker.io/opencontrailnightly/contrail-controller-control-control:newton-master-17"
-    control_dns: "docker.io/opencontrailnightly/contrail-controller-control-dns:newton-master-17"
-    control_named: "docker.io/opencontrailnightly/contrail-controller-control-named:newton-master-17"
-    config_api: "docker.io/opencontrailnightly/contrail-controller-config-api:newton-master-17"
-    config_devicemgr: "docker.io/opencontrailnightly/contrail-controller-config-devicemgr:newton-master-17"
-    config_schema_transformer: "docker.io/opencontrailnightly/contrail-controller-config-schema:newton-master-17"
-    config_svcmonitor: "docker.io/opencontrailnightly/contrail-controller-config-svcmonitor:newton-master-17"
-    webui_middleware: "docker.io/opencontrailnightly/contrail-controller-webui-job:newton-master-17"
-    webui: "docker.io/opencontrailnightly/contrail-controller-webui-web:newton-master-17"
+    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
+    contrail_control: "docker.io/opencontrailnightly/contrail-controller-control-control:ocata-master-17"
+    control_dns: "docker.io/opencontrailnightly/contrail-controller-control-dns:ocata-master-17"
+    control_named: "docker.io/opencontrailnightly/contrail-controller-control-named:ocata-master-17"
+    config_api: "docker.io/opencontrailnightly/contrail-controller-config-api:ocata-master-17"
+    config_devicemgr: "docker.io/opencontrailnightly/contrail-controller-config-devicemgr:ocata-master-17"
+    config_schema_transformer: "docker.io/opencontrailnightly/contrail-controller-config-schema:ocata-master-17"
+    config_svcmonitor: "docker.io/opencontrailnightly/contrail-controller-config-svcmonitor:ocata-master-17"
+    webui_middleware: "docker.io/opencontrailnightly/contrail-controller-webui-job:ocata-master-17"
+    webui: "docker.io/opencontrailnightly/contrail-controller-webui-web:ocata-master-17"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
@@ -65,6 +65,7 @@ endpoints:
     host_fqdn_override:
        default: null
     domain_override: null
+    namespace: openstack
   keystone:
     auth:
       username: admin
@@ -86,6 +87,7 @@ endpoints:
       default: http
     host_fqdn_override:
        default: null
+    namespace: openstack
 
 # Service related inputs are defined here
 service:
@@ -97,7 +99,7 @@ manifests:
   daemonset_control: true
   daemonset_control_only: false
   daemonset_webui: true
-  daemonset_vrouter: true
+  daemonset_agent: true
   service_config_api: true
   service_webui: true
   ingress_webui: true

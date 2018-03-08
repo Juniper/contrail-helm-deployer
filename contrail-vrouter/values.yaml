@@ -1,12 +1,12 @@
 images:
   tags:
-    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:newton-master-17"
-    build_driver_init: "docker.io/opencontrailnightly/contrail-vrouter-kernel-build-init:newton-master-17"
-    vrouter_agent: "docker.io/opencontrailnightly/contrail-vrouter-agent:newton-master-17"
-    vrouter_init_kernel: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init:newton-master-17"
-    vrouter_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-agent-dpdk:newton-master-17"
-    vrouter_init_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init-dpdk:newton-master-17"
-    dpdk_watchdog: "docker.io/opencontrailnightly/contrail-vrouter-net-watchdog:newton-master-17"
+    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
+    build_driver_init: "docker.io/opencontrailnightly/contrail-agent-build-driver-init:ocata-master-17"
+    vrouter_agent: "docker.io/opencontrailnightly/contrail-agent-vrouter:ocata-master-17"
+    vrouter_init_kernel: "docker.io/opencontrailnightly/contrail-agent-vrouter-init-kernel:ocata-master-17"
+    vrouter_dpdk: "docker.io/opencontrailnightly/contrail-agent-vrouter-dpdk:ocata-master-17"
+    vrouter_init_dpdk: "docker.io/opencontrailnightly/contrail-agent-vrouter-init-kernel-dpdk:ocata-master-17"
+    dpdk_watchdog: "docker.io/opencontrailnightly/contrail-agent-net-watchdog:ocata-master-17"
     dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
   imagePullPolicy: "IfNotPresent"
 
@@ -33,13 +33,13 @@ contrail_env:
   LOG_LEVEL: SYS_NOTICE
   CLOUD_ORCHESTRATOR: openstack
   AAA_MODE: cloud-admin
-  #PHYSICAL_INTERFACE: p1p2
+  PHYSICAL_INTERFACE: enp0s8
   #CPU_CORE_MASK: "0xf"
   #DPDK_UIO_DRIVER: uio_pci_generic
   #HUGE_PAGES: 32000
   #AGENT_MODE: dpdk
   #HUGE_PAGES_DIR: /hugepages
-  #VROUTER_GATEWAY: 8.0.0.254
+  VROUTER_GATEWAY: None
 
 node:
   host_os: ubuntu
@@ -70,6 +70,7 @@ endpoints:
       default: http
     host_fqdn_override:
        default: null
+    namespace: openstack
 
 manifests:
   configmap_env: true

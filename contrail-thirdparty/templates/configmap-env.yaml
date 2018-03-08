@@ -2,7 +2,7 @@
 {{- $context := . }}
 {{- $configdb_nodes := .Values.contrail_env.CONFIG_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
 {{- $analyticsdb_nodes := .Values.contrail_env.ANALYTICS_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
-{{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_short_endpoint_lookup" }}
+{{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
 
 ---
 apiVersion: v1
