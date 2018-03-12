@@ -1,0 +1,16 @@
+version:
+  kubernetes: v1.8.3
+  helm: v2.7.2
+  cni: v0.6.0
+
+docker:
+  insecure_registries:
+    - "{{ docker_registry.fqdn }}:{{ docker_registry.port }}"
+
+kubernetes:
+  network:
+    default_device: docker0
+  cluster:
+    cni: calico
+    pod_subnet: 192.168.0.0/16
+    domain: cluster.local
