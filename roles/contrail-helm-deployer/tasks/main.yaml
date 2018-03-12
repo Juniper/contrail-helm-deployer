@@ -1,0 +1,31 @@
+- name: Set variables
+  set_fact:
+    repos_dir: "{{ ansible_env.HOME }}/src/{{ zuul.project.canonical_hostname }}/Juniper"
+    contrail_registry: "{{ docker_registry.fqdn }}:{{ docker_registry.port }}"
+
+- name: Set deployment address
+  set_fact:
+    deploy_address: "{{ item }}"
+  with_items: "{{ (hostvars[inventory_hostname]['ansible_all_ipv4_addresses'] | ipaddr(deploy_subnet))[0] }}"
+  when: hostvars[inventory_hostname]['ansible_all_ipv4_addresses'] | ipaddr(deploy_subnet) | length > 0
+
+- name: copy deployment script template to target machine
+  template:
+    src: templates/local-vars.yaml.j2
+    dest: "{{ repos_dir }}/openstack-helm-infra/tools/gate/devel/local-vars.yaml"
+    mode: 0644
+
+- name: run helm deployment script
+  script: helm-deploy.sh
+  environment:
+    BASE_DIR: "{{ repos_dir }}"
+    OSH_PATH: "{{ repos_dir }}/openstack-helm"
+    OSH_INFRA_PATH: "{{ repos_dir }}/openstack-helm-infra"
+    CHD_PATH: "{{ repos_dir }}/contrail-helm-deployer"
+    CONTROLLER_NODE: "{{ deploy_address }}"
+    CONFIG_NODE: "{{ deploy_address }}"
+    DOCKER_BRIDGE: "172.17.0.1"
+    CONTRAIL_REGISTRY: "{{ contrail_registry }}"
+    CONTAINER_TAG: "{{ container_tag }}"
+    VROUTER_CONTAINER_TAG: "{{ vrouter_module_tag }}"
+    PHYSICAL_INTERFACE: "{{ physical_interface }}"
