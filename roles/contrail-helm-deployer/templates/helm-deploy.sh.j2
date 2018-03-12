@@ -1,0 +1,85 @@
+#!/bin/bash
+set -ex
+cd ${OSH_PATH}
+./tools/deployment/developer/common/001-install-packages-opencontrail.sh
+./tools/deployment/developer/common/010-deploy-k8s.sh
+
+#Install openstack and heat client
+./tools/deployment/developer/common/020-setup-client.sh
+
+#Deploy openstack-helm related charts
+./tools/deployment/developer/nfs/030-ingress.sh
+./tools/deployment/developer/nfs/040-nfs-provisioner.sh
+./tools/deployment/developer/nfs/050-mariadb.sh
+./tools/deployment/developer/nfs/060-rabbitmq.sh
+./tools/deployment/developer/nfs/070-memcached.sh
+./tools/deployment/developer/nfs/080-keystone.sh
+./tools/deployment/developer/nfs/100-horizon.sh
+./tools/deployment/developer/nfs/120-glance.sh
+./tools/deployment/developer/nfs/151-libvirt-opencontrail.sh
+./tools/deployment/developer/nfs/161-compute-kit-opencontrail.sh
+
+#Now deploy opencontrail charts
+cd $CHD_PATH
+make
+kubectl label node opencontrail.org/controller=enabled --all
+kubectl replace -f rbac/cluster-admin.yaml
+
+# override default docker tags from values.yaml for opencontrail containers
+helm install \
+	--name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty \
+	--namespace=contrail \
+	--set contrail_env.CONTROLLER_NODES=${DOCKER_BRIDGE} \
+        --set images.tags.cassandra="{{ container_registry }}/contrail-external-cassandra:{{ container_tag }}" \
+        --set images.tags.kafka="{{ container_registry }}/contrail-external-kafka:{{ container_tag }}" \
+        --set images.tags.zookeeper="{{ container_registry }}/contrail-external-zookeeper:{{ container_tag }}"
+bash ${OSH_PATH}/tools/deployment/common/wait-for-pods.sh contrail
+
+helm install \
+	--name contrail-controller ${CHD_PATH}/contrail-controller \
+	--namespace=contrail \
+        --set contrail_env.CONTROLLER_NODES=${DOCKER_BRIDGE} \
+        --set contrail_env.CONTROL_NODES=${CONTROL_NODE} \
+        --set images.tags.config_api="{{ container_registry }}/contrail-controller-config-api:{{ container_tag }}" \
+        --set images.tags.config_devicemgr="{{ container_registry }}/contrail-controller-config-devicemgr:{{ container_tag }}" \
+        --set images.tags.config_schema_transformer="{{ container_registry }}/contrail-controller-config-schema:{{ container_tag }}" \
+        --set images.tags.config_svcmonitor="{{ container_registry }}/contrail-controller-config-svcmonitor:{{ container_tag }}" \
+        --set images.tags.contrail_control="{{ container_registry }}/contrail-controller-control-control:{{ container_tag }}" \
+        --set images.tags.control_dns="{{ container_registry }}/contrail-controller-control-dns:{{ container_tag }}" \
+        --set images.tags.control_named="{{ container_registry }}/contrail-controller-control-named:{{ container_tag }}" \
+        --set images.tags.nodemgr="{{ container_registry }}/contrail-nodemgr:{{ container_tag }}" \
+        --set images.tags.webui_middleware="{{ container_registry }}/contrail-controller-webui-job:{{ container_tag }}" \
+        --set images.tags.webui="{{ container_registry }}/contrail-controller-webui-web:{{ container_tag }}"
+bash ${OSH_PATH}/tools/deployment/common/wait-for-pods.sh contrail 600
+
+helm install \
+	--name contrail-analytics ${CHD_PATH}/contrail-analytics \
+	--namespace=contrail \
+        --set contrail_env.CONTROLLER_NODES=${DOCKER_BRIDGE} \
+        --set images.tags.analytics_alarm_gen="{{ container_registry }}/contrail-analytics-alarm-gen:{{ container_tag }}" \
+        --set images.tags.analytics_api="{{ container_registry }}/contrail-analytics-api:{{ container_tag }}" \
+        --set images.tags.analytics_query_engine="{{ container_registry }}/contrail-analytics-query-engine:{{ container_tag }}" \
+        --set images.tags.analytics_snmp_collector="{{ container_registry }}/contrail-analytics-snmp-collector:{{ container_tag }}" \
+        --set images.tags.contrail_collector="{{ container_registry }}/contrail-analytics-collector:{{ container_tag }}" \
+        --set images.tags.contrail_topology="{{ container_registry }}/contrail-analytics-topology:{{ container_tag }}" \
+        --set images.tags.nodemgr="{{ container_registry }}/contrail-nodemgr:{{ container_tag }}"
+bash ${OSH_PATH}/tools/deployment/common/wait-for-pods.sh contrail
+
+helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
+  --namespace=contrail \
+	--set contrail_env.CONTROL_NODES=${CONTROL_NODE} \
+        --set contrail_env.vrouter_common.CONTROLLER_NODES=${DOCKER_BRIDGE} \
+        --set contrail_env.vrouter_common.PHYSICAL_INTERFACE="{{ physical_interface }}" \
+        --set contrail_env.vrouter_common.VROUTER_GATEWAY="None" \
+        --set images.tags.build_driver_init="{{ container_registry }}/contrail-agent-build-driver-init:{{ vrouter_module_tag }}" \
+        --set images.tags.dpdk_watchdog="{{ container_registry }}/contrail-agent-net-watchdog:{{ container_tag }}" \
+        --set images.tags.nodemgr="{{ container_registry }}/contrail-nodemgr:{{ container_tag }}" \
+        --set images.tags.vrouter_agent="{{ container_registry }}/contrail-agent-vrouter:{{ container_tag }}" \
+        --set images.tags.vrouter_init_kernel="{{ container_registry }}/contrail-agent-vrouter-init-kernel:{{ container_tag }}" \
+        --set images.tags.vrouter_vrouter_dpdk="{{ container_registry }}/contrail-agent-vrouter-dpdk:{{ container_tag }}" \
+        --set images.tags.vrouter_init_dpdk="{{ container_registry }}/contrail-agent-vrouter-init-kernel-dpdk:{{ container_tag }}"
+bash ${OSH_PATH}/tools/deployment/common/wait-for-pods.sh contrail
+
+# Deploying heat charts after contrail charts are deployed as they have dependency on contrail charts
+cd ${OSH_PATH}
+./tools/deployment/developer/nfs/091-heat-opencontrail.sh
