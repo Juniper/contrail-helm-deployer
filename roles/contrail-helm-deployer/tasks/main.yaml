@@ -1,0 +1,28 @@
+- name: Set variables
+  set_fact:
+    repos_dir: "{{ ansible_env.HOME }}/src/{{ zuul.project.canonical_hostname }}/Juniper"
+
+- name: Set deployment address
+  set_fact:
+    deploy_address: "{{ item }}"
+  with_items: "{{ (hostvars[inventory_hostname]['ansible_all_ipv4_addresses'] | ipaddr(deploy_subnet))[0] }}"
+  when: hostvars[inventory_hostname]['ansible_all_ipv4_addresses'] | ipaddr(deploy_subnet) | length > 0
+
+- name: copy deployment script template to target machine
+  template:
+    src: templates/helm-deploy.sh.j2
+    dest: "{{ ansible_env.HOME }}/helm-deploy.sh"
+    mode: 0755
+
+- name: run helm deployment script
+  shell: ./helm-deploy.sh
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  environment:
+    BASE_DIR: "{{ repos_dir }}"
+    OSH_PATH: "{{ repos_dir }}/openstack-helm"
+    OSH_INFRA_PATH: "{{ repos_dir }}/openstack-helm-infra"
+    CHD_PATH: "{{ repos_dir }}/contrail-helm-deployer"
+    CONTROLLER_NODE: "{{ deploy_address }}"
+    CONFIG_NODE: "{{ deploy_address }}"
+    DOCKER_BRIDGE: "172.17.0.1"
