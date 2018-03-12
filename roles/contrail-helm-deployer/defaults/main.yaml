@@ -1,0 +1,5 @@
+deploy_subnet: "192.168.1.0/24"
+physical_interface: "ens4"
+container_registry: "docker.io/opencontrailnightly"
+container_tag: "master-4-centos7-newton"
+vrouter_module_tag: "master-4-ubuntu16-newton"
