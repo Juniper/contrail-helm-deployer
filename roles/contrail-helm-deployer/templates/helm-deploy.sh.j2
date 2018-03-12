@@ -1,0 +1,85 @@
+#!/bin/bash
+set -ex
+cd ${BASE_DIR}/openstack-helm
+bash tools/deployment/developer/ceph/000-install-packages.sh
+bash tools/deployment/developer/ceph/010-deploy-k8s.sh
+#Build all helm charts and intll openstack and heat client
+bash tools/deployment/developer/ceph/020-setup-client.sh
+#Deploy openstack-helm related charts
+bash tools/deployment/developer/ceph/030-ingress.sh
+bash tools/deployment/developer/ceph/040-ceph.sh
+bash tools/deployment/developer/ceph/045-ceph-ns-activate.sh
+bash tools/deployment/developer/ceph/050-mariadb.sh
+bash tools/deployment/developer/ceph/060-rabbitmq.sh
+bash tools/deployment/developer/ceph/070-memcached.sh
+bash tools/deployment/developer/ceph/080-keystone.sh
+bash tools/deployment/developer/ceph/100-horizon.sh
+bash tools/deployment/developer/ceph/120-glance.sh
+bash tools/deployment/developer/ceph/150-libvirt.sh
+#Now deploy opencontrail charts
+cd $CHD_PATH
+make
+kubectl label node opencontrail.org/controller=enabled --all
+kubectl replace -f ${OSH_PATH}/tools/kubeadm-aio/assets/opt/rbac/dev.yaml
+
+# override default docker tags from values.yaml for opencontrail containers
+helm install \
+	--name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty \
+	--namespace=openstack \
+	--set contrail_env.CONTROLLER_NODES=${CONFIG_NODE} \
+        --set images.tags.cassandra="{{ container_registry }}/contrail-external-cassandra:{{ container_tag }}" \
+        --set images.tags.kafka="{{ container_registry }}/contrail-external-kafka:{{ container_tag }}" \
+        --set images.tags.zookeeper="{{ container_registry }}/contrail-external-zookeeper:{{ container_tag }}"
+bash ${OSH_PATH}/tools/deployment/developer/wait-for-pods.sh openstack
+
+helm install \
+	--name contrail-controller ${CHD_PATH}/contrail-controller \
+	--namespace=openstack \
+        --set contrail_env.CONFIG_NODES=${CONFIG_NODE} \
+        --set contrail_env.CONTROLLER_NODES=${CONTROL_NODE} \
+        --set images.tags.config_api="{{ container_registry }}/contrail-controller-config-api:{{ container_tag }}" \
+        --set images.tags.config_devicemgr="{{ container_registry }}/contrail-controller-config-devicemgr:{{ container_tag }}" \
+        --set images.tags.config_schema_transformer="{{ container_registry }}/contrail-controller-config-schema:{{ container_tag }}" \
+        --set images.tags.config_svcmonitor="{{ container_registry }}/contrail-controller-config-svcmonitor:{{ container_tag }}" \
+        --set images.tags.contrail_control="{{ container_registry }}/contrail-controller-control-control:{{ container_tag }}" \
+        --set images.tags.control_dns="{{ container_registry }}/contrail-controller-control-dns:{{ container_tag }}" \
+        --set images.tags.control_named="{{ container_registry }}/contrail-controller-control-named:{{ container_tag }}" \
+        --set images.tags.nodemgr="{{ container_registry }}/contrail-nodemgr:{{ container_tag }}" \
+        --set images.tags.webui_middleware="{{ container_registry }}/contrail-controller-webui-job:{{ container_tag }}" \
+        --set images.tags.webui="{{ container_registry }}/contrail-controller-webui-web:{{ container_tag }}"
+bash ${OSH_PATH}/tools/deployment/developer/wait-for-pods.sh openstack 600
+
+helm install \
+	--name contrail-analytics ${CHD_PATH}/contrail-analytics \
+	--namespace=openstack \
+        --set contrail_env.CONFIG_NODES=${CONFIG_NODE} \
+        --set contrail_env.CONTROLLER_NODES=${CONTROL_NODE} \
+        --set images.tags.analytics_alarm_gen="{{ container_registry }}/contrail-analytics-alarm-gen:{{ container_tag }}" \
+        --set images.tags.analytics_api="{{ container_registry }}/contrail-analytics-api:{{ container_tag }}" \
+        --set images.tags.analytics_query_engine="{{ container_registry }}/contrail-analytics-query-engine:{{ container_tag }}" \
+        --set images.tags.analytics_snmp_collector="{{ container_registry }}/contrail-analytics-snmp-collector:{{ container_tag }}" \
+        --set images.tags.contrail_collector="{{ container_registry }}/contrail-analytics-collector:{{ container_tag }}" \
+        --set images.tags.contrail_topology="{{ container_registry }}/contrail-analytics-topology:{{ container_tag }}" \
+        --set images.tags.nodemgr="{{ container_registry }}/contrail-nodemgr:{{ container_tag }}"
+bash ${OSH_PATH}/tools/deployment/developer/wait-for-pods.sh openstack
+
+helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
+        --namespace=openstack \
+	--set contrail_env.CONFIG_NODES=${CONFIG_NODE} \
+        --set contrail_env.CONTROLLER_NODES=${CONTROL_NODE} \
+        --set contrail_env.PHYSICAL_INTERFACE="{{ physical_interface }}" \
+        --set contrail_env.VROUTER_GATEWAY="None" \
+        --set images.tags.build_driver_init="{{ container_registry }}/contrail-agent-build-driver-init:{{ vrouter_module_tag }}" \
+        --set images.tags.dpdk_watchdog="{{ container_registry }}/contrail-agent-net-watchdog:{{ container_tag }}" \
+        --set images.tags.nodemgr="{{ container_registry }}/contrail-nodemgr:{{ container_tag }}" \
+        --set images.tags.vrouter_agent="{{ container_registry }}/contrail-agent-vrouter:{{ container_tag }}" \
+        --set images.tags.vrouter_init_kernel="{{ container_registry }}/contrail-agent-vrouter-init-kernel:{{ container_tag }}" \
+        --set images.tags.vrouter_vrouter_dpdk="{{ container_registry }}/contrail-agent-vrouter-dpdk:{{ container_tag }}" \
+        --set images.tags.vrouter_init_dpdk="{{ container_registry }}/contrail-agent-vrouter-init-kernel-dpdk:{{ container_tag }}"
+
+# Install remaining openstack charts
+cd $OSH_PATH
+bash tools/deployment/developer/ceph/060-compute-kit.sh
+bash tools/deployment/developer/ceph/130-cinder.sh
+bash tools/deployment/developer/ceph/090-heat.sh
+bash tools/deployment/developer/ceph/091-heat-opencontrail.sh
