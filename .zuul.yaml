@@ -1,0 +1,6 @@
+- project:
+    name: Juniper/contrail-helm-deployer
+    check:
+      jobs:
+        - zuul-jobs-linters
+        - contrail-helm-deployer
