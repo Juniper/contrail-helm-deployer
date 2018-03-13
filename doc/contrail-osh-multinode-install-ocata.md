@@ -162,9 +162,9 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
 
 ### Installation of OpenStack Helm Charts
 
-Deploy OpenStack Helm charts using following commands.
+1. Deploy OpenStack Helm charts using following commands.
 
- ```bash
+```bash
   (k8s-master)> set -xe
   (k8s-master)> cd ${OSH_PATH}
 
@@ -183,11 +183,8 @@ Deploy OpenStack Helm charts using following commands.
   (k8s-master)>./tools/deployment/multinode/141-compute-kit-opencontrail.sh
 
 Note: Optional Horizon
-  (k8s-master)> ./tools/deployment/developer/ceph/100-horizon.sh
-
-Deploy Heat Chart after deploying Contrail helm charts
-  (k8s-master)> ./tools/deployment/multinode/151-heat-opencontrail.sh
-  ```
+(k8s-master)> ./tools/deployment/developer/ceph/100-horizon.sh
+```
 
 #### Installation of Contrail Helm charts
 
@@ -209,24 +206,79 @@ In following example "ubuntu-contrail-11" is DPDK and "ubuntu-contrail-10" is ke
 
  ```bash
 (k8s-master)> cd $CHD_PATH
-(k8s-master)> kubectl replace -f ${OSH_PATH}/tools/kubeadm-aio/assets/opt/rbac/dev.yaml
+(k8s-master)> kubectl replace -f ${CHD_PATH}/rbac/cluster-admin.yaml
   ```
 
 3. Now deploy opencontrail charts
 
-  ```bash
+```bash
  (k8s-master)> cd $CHD_PATH
  (k8s-master)> make
 
-  # Set the IP of your CONTROLLER_NODES in each chart values.yaml and BGP port for multi-node setup (specify your control data ip, if you have one)
-  CONTROLLER_NODES=192.168.1.43,192.168.1.44,192.168.1.45
+  # Set the IP of your CONTROLLER_NODES in each chart values.yaml and BGP port for multi-node setup (specify your control data ip, if you have one). Please note in below example 10.13.82.0/24 is MGMT & K8S clsuter host network and 192.168.1.0/24 is Contrail "Control-Data" network.
+  CONTROLLER_NODES=10.13.82.43,10.13.82.44,10.13.82.45
+  CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
   BGP_PORT=1179
 
   # set the control data network cidr list separated by comma and set the respective gateway
   CONTROL_DATA_NET_LIST=192.168.1.0/24
   VROUTER_GATEWAY=192.168.1.1
   AGENT_MODE: nic
+```
 
+Here are each chart **"contrail_env"** reference values.yaml file (**FYI**)
+
+* **contrail-thirdparty/values.yaml**
+
+```Text
+contrail_env:
+  CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: openstack
+  AAA_MODE: cloud-admin
+```
+
+* **contrail-controller/values.yaml**
+
+```Text
+contrail_env:
+  CONTROL_NODES: 192.168.1.237,192.168.1.238,192.168.1.239
+  CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: openstack
+  AAA_MODE: cloud-admin
+  BGP_PORT: 1179
+```
+
+* **contrail-controller/values.yaml**
+
+```Text
+contrail_env:
+  CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: openstack
+  AAA_MODE: cloud-admin
+```
+
+* **contrail-vrouter/values.yaml**
+
+```Text
+contrail_env:
+  vrouter_common:
+    CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+    CONTROL_NODES: 192.168.1.237,192.168.1.238,192.168.1.239
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
+    CONTROL_DATA_NET_LIST: 192.168.1.0/24
+    VROUTER_GATEWAY: 192.168.1.1
+  vrouter_kernel:
+    AGENT_MODE: nic
+```
+
+Here are helm install commands to deploy Contrail helm chart after setting configuration parameters in "values.yaml" files.
+
+```bash
   (k8s-master)> helm install --name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty \
   --namespace=contrail
 
@@ -240,25 +292,35 @@ In following example "ubuntu-contrail-11" is DPDK and "ubuntu-contrail-10" is ke
 
   (k8s-master)> helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
   --namespace=contrail
- ```
+```
+
+4. Once Contrail PODs are up and running deploy OpenStack Heat chart using following command.
+
+```bash
+(k8s-master)> ./tools/deployment/multinode/151-heat-opencontrail.sh
+```
 
 ### OSH Contrail Helm Clsuter basic testing
 
+1. Basic Virtual Network and VMs testing
+
  ```bash
-export OS_CLOUD=openstack_helm
+(k8s-master)> export OS_CLOUD=openstack_helm
 
-openstack network create MGMT-VN
-openstack subnet create --subnet-range 172.16.1.0/24 --network MGMT-VN MGMT-VN-subnet
+(k8s-master)> openstack network create MGMT-VN
+(k8s-master)> openstack subnet create --subnet-range 172.16.1.0/24 --network MGMT-VN MGMT-VN-subnet
 
-openstack server create --flavor m1.tiny --image 'Cirros 0.3.5 64-bit' \
-    --nic net-id=MGMT-VN \
-    --availability-zone nova:ubuntu-contrail-10 \
+(k8s-master)> openstack server create --flavor m1.tiny --image 'Cirros 0.3.5 64-bit' \
+--nic net-id=MGMT-VN \
 Test-01
 
-openstack server create --flavor m1.tiny --image 'Cirros 0.3.5 64-bit' \
-    --nic net-id=MGMT-VN \
-    --availability-zone nova:ubuntu-contrail-11 \
+(k8s-master)> openstack server create --flavor m1.tiny --image 'Cirros 0.3.5 64-bit' \
+--nic net-id=MGMT-VN \
 Test-02
  ```
+
+### Reference
+
+* <https://github.com/Juniper/openstack-helm/blob/master/doc/source/install/multinode.rst>
 
 ### [FAQ's](faq.md)
