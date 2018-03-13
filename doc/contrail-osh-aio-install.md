@@ -71,7 +71,6 @@ Install below packages on your setup
   ./tools/deployment/developer/nfs/060-rabbitmq.sh
   ./tools/deployment/developer/nfs/070-memcached.sh
   ./tools/deployment/developer/nfs/080-keystone.sh
-  ./tools/deployment/developer/nfs/091-heat-opencontrail.sh
   ./tools/deployment/developer/nfs/100-horizon.sh
   ./tools/deployment/developer/nfs/120-glance.sh
   ./tools/deployment/developer/nfs/151-libvirt-opencontrail.sh
@@ -80,7 +79,7 @@ Install below packages on your setup
 
 5. Now deploy opencontrail charts
 
-  ```
+  ```bash
   cd $CHD_PATH
 
   make
@@ -94,7 +93,7 @@ Install below packages on your setup
   kubectl label node opencontrail.org/controller=enabled --all
   kubectl label node opencontrail.org/vrouter-kernel=enabled --all
 
-  kubectl replace -f ${OSH_PATH}/tools/kubeadm-aio/assets/opt/rbac/dev.yaml
+  kubectl replace -f ${CHD_PATH}/rbac/cluster-admin.yaml
 
   helm install --name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty \
   --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1
@@ -109,8 +108,15 @@ Install below packages on your setup
   # Edit contrail-vrouter/values.yaml and make sure that images.tags.vrouter_kernel_init is right. Image tag name will be different depending upon your linux. Also set the conf.host_os to ubuntu or centos depending on your system
 
   helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
-  --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1 \
-  --set contrail_env.CONTROL_NODES=${CONTROL_NODES} \
-  --set contrail_env.CONTROL_DATA_NET_LIST=${CONTROL_DATA_NET_LIST} \
-  --set contrail_env.VROUTER_GATEWAY=${VROUTER_GATEWAY}
+  --namespace=contrail --set contrail_env.vrouter_common.CONTROLLER_NODES=172.17.0.1 \
+  --set contrail_env.vrouter_common.CONTROL_NODES=${CONTROL_NODES} \
+  --set contrail_env.vrouter_common.CONTROL_DATA_NET_LIST=${CONTROL_DATA_NET_LIST} \
+  --set contrail_env.vrouter_common.VROUTER_GATEWAY=${VROUTER_GATEWAY}
+  ```
+
+6. Deploy heat charts
+
+  ```bash
+  cd ${OSH_PATH}
+  ./tools/deployment/developer/nfs/091-heat-opencontrail.sh
   ```
