@@ -1,9 +1,9 @@
-{{- if .Values.manifests.service_webui }}
+{{- if .Values.manifests.service_web_controller }}
 {{- $context := . }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: contrail-webui
+  name: contrail-web-controller
 spec:
   ports:
   - name: http

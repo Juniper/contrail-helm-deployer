@@ -58,7 +58,7 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
 5. Change Calico Felix Prometheus Monitoring Port from "9091" to "9099". Please note port 9091 is used by vRouter and should not be used another application on compute nodes.
 
  ```bash
-(k8s-master)> vim ${OSH_INFRA_PATH}/calico/values.yaml 
+(k8s-master)> vim ${OSH_INFRA_PATH}/calico/values.yaml
 
 Old-Value= "port: 9091"
 New-Value= "port: 9099"
@@ -67,7 +67,7 @@ Old-Value= "FELIX_PROMETHEUSMETRICSPORT: \"9091\""
 New-Value= "FELIX_PROMETHEUSMETRICSPORT: \"9099\""
  ```
 
-6. Create an inventory file on the master node for ansible base provisoning, please note in below output 10.13.82.43/.44/.45 are nodes IP addresses and will use SSK-key generated in step 1 
+6. Create an inventory file on the master node for ansible base provisoning, please note in below output 10.13.82.43/.44/.45 are nodes IP addresses and will use SSK-key generated in step 1
 
  ```bash
  #!/bin/bash
@@ -169,7 +169,7 @@ Use `nslookup` to verify that you are able to resolve k8s cluster specific names
   (k8s-master)> cd ${OSH_PATH}
 
   (k8s-master)> ./tools/deployment/multinode/010-setup-client.sh
-  (k8s-master)> ./tools/deployment/multinode/020-ingress.sh
+  (k8s-master)> ./tools/deployment/multinode/021-ingress-opencontrail.sh
   (k8s-master)> ./tools/deployment/multinode/030-ceph.sh
   (k8s-master)> ./tools/deployment/multinode/040-ceph-ns-activate.sh
   (k8s-master)> ./tools/deployment/multinode/050-mariadb.sh

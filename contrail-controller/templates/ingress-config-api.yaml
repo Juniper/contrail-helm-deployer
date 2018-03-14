@@ -8,25 +8,25 @@ metadata:
   name: contrail-config-api
 spec:
   rules:
-  - host: config-api
+  - host: contrail-config-api
     http:
       paths:
       - backend:
-          serviceName: contrail-config-api
+          serviceName: config-api-server
           servicePort: api
         path: /
-  - host: config-api.{{ .Release.Namespace }}
+  - host: contrail-config-api.{{ .Release.Namespace }}
     http:
       paths:
       - backend:
-          serviceName: contrail-config-api
+          serviceName: config-api-server
           servicePort: api
         path: /
-  - host: config-api.{{ .Release.Namespace }}.svc.cluster.local
+  - host: contrail-config-api.{{ .Release.Namespace }}.svc.cluster.local
     http:
       paths:
       - backend:
-          serviceName: contrail-config-api
+          serviceName: config-api-server
           servicePort: api
         path: /
 {{- end }}

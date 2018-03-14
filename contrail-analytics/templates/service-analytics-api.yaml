@@ -1,9 +1,9 @@
-{{- if .Values.manifests.service_analytics_api }}
+{{- if .Values.manifests.service_analytics_api_server }}
 {{- $context := . }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: contrail-analytics-api
+  name: analytics-api-server
 spec:
   ports:
   - name: api

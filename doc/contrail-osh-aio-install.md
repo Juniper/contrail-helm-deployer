@@ -65,7 +65,7 @@ Install below packages on your setup
 4. Deploy openstack-helm related charts
 
   ```bash
-  ./tools/deployment/developer/nfs/030-ingress.sh
+  ./tools/deployment/developer/nfs/031-ingress-opencontrail.sh
   ./tools/deployment/developer/nfs/040-nfs-provisioner.sh
   ./tools/deployment/developer/nfs/050-mariadb.sh
   ./tools/deployment/developer/nfs/060-rabbitmq.sh

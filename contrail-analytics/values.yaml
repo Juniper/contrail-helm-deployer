@@ -78,5 +78,6 @@ service:
 manifests:
   configmap_env: true
   daemonset_analytics: true
-  service_analytics_api: true
+  service_analytics_api_server: true
+  service_analytics_api_ingress: true
   ingress_analytics_api: true

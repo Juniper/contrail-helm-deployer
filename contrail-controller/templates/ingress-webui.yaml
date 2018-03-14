@@ -12,21 +12,21 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: contrail-webui
-          servicePort: http
+          serviceName: contrail-web-controller
+          servicePort: https
         path: /
   - host: contrail-webui.{{ .Release.Namespace }}
     http:
       paths:
       - backend:
-          serviceName: contrail-webui
-          servicePort: http
+          serviceName: contrail-web-controller
+          servicePort: https
         path: /
   - host: contrail-webui.{{ .Release.Namespace }}.svc.cluster.local
     http:
       paths:
       - backend:
-          serviceName: contrail-webui
-          servicePort: http
+          serviceName: contrail-web-controller
+          servicePort: https
         path: /
 {{- end }}

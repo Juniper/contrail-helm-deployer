@@ -1,9 +1,9 @@
-{{- if .Values.manifests.service_config_api }}
+{{- if .Values.manifests.service_config_api_server }}
 {{- $context := . }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: contrail-config-api
+  name: config-api-server
 spec:
   ports:
   - name: api
