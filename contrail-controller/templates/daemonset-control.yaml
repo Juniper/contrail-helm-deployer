@@ -44,6 +44,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-control
       - name: contrail-dns
         image: {{ .Values.images.tags.control_dns | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -59,6 +61,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-control
       - name: contrail-named
         image: {{ .Values.images.tags.control_named | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -76,6 +80,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-control
       - name: contrail-control-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -101,6 +107,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-control
       volumes:
       - name: docker-unix-socket
         hostPath:
@@ -111,4 +119,7 @@ spec:
       - name: contrail-log
         hostPath:
           path: /var/log/contrail/control/
+      - name: var-crashes-control
+        hostPath:
+          path: /var/crashes/contrail/control
 {{- end }}

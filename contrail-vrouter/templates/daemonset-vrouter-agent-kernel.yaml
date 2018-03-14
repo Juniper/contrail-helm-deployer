@@ -133,4 +133,7 @@ spec:
       - name: contrail-log
         hostPath:
           path: /var/log/contrail/vrouter/
+      - name: var-crashes-vrouter
+        hostPath:
+          path: /var/crashes/contrail/vrouter
 {{- end }}
