@@ -47,6 +47,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-webui
       - name: contrail-webui
         image: {{ .Values.images.tags.webui | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -60,6 +62,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-webui
       volumes:
       - name: etc-contrail
         hostPath:
@@ -67,4 +71,7 @@ spec:
       - name: contrail-log
         hostPath:
           path: /var/log/contrail/webui/
+      - name: var-crashes-webui
+        hostPath:
+          path: /var/crashes/contrail/webui
 {{- end }}
