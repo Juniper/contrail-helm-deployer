@@ -47,6 +47,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-analytics
       - name: contrail-collector
         image: {{ .Values.images.tags.contrail_collector | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -62,6 +64,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-analytics
       - name: contrail-alarm-gen
         image: {{ .Values.images.tags.analytics_alarm_gen | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -77,6 +81,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-analytics
       - name: contrail-query-engine
         image: {{ .Values.images.tags.analytics_query_engine | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -90,6 +96,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-analytics
       - name: contrail-snmp-collector
         image: {{ .Values.images.tags.analytics_snmp_collector | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -105,6 +113,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-analytics
       - name: contrail-topology
         image: {{ .Values.images.tags.contrail_topology | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -120,6 +130,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-analytics
       - name: contrail-analytics-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -138,6 +150,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-analytics
 # todo: there is type Socket in new kubernetes, it is possible to use full
 # path:
 # hostPath:
@@ -156,5 +170,8 @@ spec:
       - name: contrail-log
         hostPath:
           path: /var/log/contrail/analytics/
+      - name: var-crashes-analytics
+        hostPath:
+          path: /var/crashes/contrail/analytics
 
 {{- end }}

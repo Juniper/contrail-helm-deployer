@@ -81,6 +81,8 @@ spec:
             name: lsb-release
           - mountPath: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
             name: hugepages
+          - mountPath: /var/crashes
+            name: var-crashes-vrouter
         - name: contrail-dpdk-watchdog
           image: {{ .Values.images.tags.dpdk_watchdog | quote }}
           imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -121,6 +123,8 @@ spec:
             name: var-run
           - mountPath: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
             name: hugepages
+          - mountPath: /var/crashes
+            name: var-crashes-vrouter
 {{- if eq $host_os "centos"}}
           - mountPath: /etc/sysconfig/network-scripts
             name: network-scripts
@@ -150,6 +154,8 @@ spec:
             name: contrail-log
           - mountPath: /etc/contrail/
             name: etc-contrail
+          - mountPath: /var/crashes
+            name: var-crashes-vrouter
       volumes:
 {{- if eq $host_os "centos"}}
       - name: network-scripts
@@ -189,4 +195,7 @@ spec:
       - name: hugepages
         hostPath:
           path: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+      - name: var-crashes-vrouter
+        hostPath:
+          path: /var/crashes/contrail/vrouter
 {{- end }}
