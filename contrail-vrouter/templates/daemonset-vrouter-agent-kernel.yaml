@@ -49,6 +49,8 @@ spec:
             name: usr-src
           - mountPath: /lib/modules
             name: lib-modules
+          - mountPath: /host/bin
+            name: host-bin
 {{- else if $host_os "centos" }}
         - name: contrail-init-kernel
           image: {{ .Values.images.tags.vrouter_init_kernel | quote }}
@@ -60,6 +62,11 @@ spec:
               name: configmap-vrouter
           - configMapRef:
               name: configmap-vrouter-auth
+          volumeMounts:
+          - mountPath: /etc/sysconfig/network-scripts
+            name: network-scripts
+          - mountPath: /host/bin
+            name: host-bin
 {{- end }}
       containers:
       - name: contrail-vrouter-kernel-agent
@@ -85,6 +92,8 @@ spec:
           name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-vrouter
+        - mountPath: /host/bin
+          name: host-bin
       - name: contrail-agent-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -140,4 +149,7 @@ spec:
       - name: var-crashes-vrouter
         hostPath:
           path: /var/crashes/contrail/vrouter
+      - name: host-bin
+        hostPath:
+          path: /bin
 {{- end }}
