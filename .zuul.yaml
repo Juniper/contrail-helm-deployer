@@ -3,3 +3,4 @@
     check:
       jobs:
         - zuul-jobs-linters
+        - contrail-sanity-ubuntu1604-helm-ocata
