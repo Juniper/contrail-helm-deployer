@@ -102,6 +102,8 @@ spec:
             name: lib-modules
           - mountPath: /var/run/
             name: var-run
+          - mountPath: /host/bin
+            name: host-bin
         - name: contrail-vrouter-dpdk-agent
           image: {{ .Values.images.tags.vrouter_agent | quote }}
           imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -125,6 +127,8 @@ spec:
             name: hugepages
           - mountPath: /var/crashes
             name: var-crashes-vrouter
+          - mountPath: /host/bin
+            name: host-bin
 {{- if eq $host_os "centos"}}
           - mountPath: /etc/sysconfig/network-scripts
             name: network-scripts
@@ -198,4 +202,7 @@ spec:
       - name: var-crashes-vrouter
         hostPath:
           path: /var/crashes/contrail/vrouter
+      - name: host-bin
+        hostPath:
+          path: /bin
 {{- end }}
