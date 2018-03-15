@@ -10,6 +10,7 @@ spec:
     metadata:
       labels:
 {{ tuple $context "opencontrail" "analytics-zookeeper" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+        net.juniper.contrail.pod: analytics-database
     spec:
       affinity:
         nodeAffinity:
