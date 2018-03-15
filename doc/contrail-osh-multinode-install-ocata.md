@@ -24,7 +24,7 @@ This installation procedure will use Juniper OpenStack Helm infra and OpenStack 
 (k8s-master)> ssh-copy-id -i ~/.ssh/id_rsa.pub 10.13.82.45
  ```
 
-2. Git clone the necessary repo's using below command on all Nodes
+2. Git clone the necessary repo's using below command on **all Nodes**
 
   ```bash
   # Download openstack-helm code
@@ -51,21 +51,8 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
 
   ```bash
   (k8s-master)> cd ${OSH_PATH}
-  (k8s-master)> ./tools/deployment/developer/common/000-install-packages.sh
   (k8s-master)> ./tools/deployment/developer/common/001-install-packages-opencontrail.sh
   ```
-
-5. Change Calico Felix Prometheus Monitoring Port from "9091" to "9099". Please note port 9091 is used by vRouter and should not be used another application on compute nodes.
-
- ```bash
-(k8s-master)> vim ${OSH_INFRA_PATH}/calico/values.yaml
-
-Old-Value= "port: 9091"
-New-Value= "port: 9099"
-
-Old-Value= "FELIX_PROMETHEUSMETRICSPORT: \"9091\""
-New-Value= "FELIX_PROMETHEUSMETRICSPORT: \"9099\""
- ```
 
 6. Create an inventory file on the master node for ansible base provisoning, please note in below output 10.13.82.43/.44/.45 are nodes IP addresses and will use SSK-key generated in step 1
 
@@ -103,22 +90,17 @@ EOF
 7. Create an environment file on the master node for the cluster
 
  ```bash
-(k8s-master)> set -xe
-
-(k8s-master)> function net_default_iface {
- sudo ip -4 route list 0/0 | awk '{ print $5; exit }'
-}
-
 (k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
 kubernetes:
   network:
-    default_device: $(net_default_iface)
   cluster:
     cni: calico
     pod_subnet: 192.168.0.0/16
     domain: cluster.local
 EOF
  ```
+
+Note: In above example all interfaces configrued with defualt route will be used for k8s cluster creation.
 
 8. Run the playbooks on master node
 
@@ -130,22 +112,6 @@ EOF
  ```
 
 9. Verify kube-dns connection from all nodes.
-
-Add kube-dns svc IP as one of your dns server also add k8s cluster domain as search domain.
-
-Note: Install nslookup if it's not installed already
-
- ```bash
- (k8s-all-nodes)> apt-get install dnsutils -y
- ```
-
-```bash
-  # Example
-  # cat /etc/resolv.conf
-  nameserver 10.96.0.10
-  nameserver 10.84.5.100
-  search openstack.svc.cluster.local svc.cluster.local contrail.juniper.netjuniper.netjnpr.net
-```
 
 Use `nslookup` to verify that you are able to resolve k8s cluster specific names
 
@@ -161,6 +127,19 @@ Use `nslookup` to verify that you are able to resolve k8s cluster specific names
 ```
 
 ### Installation of OpenStack Helm Charts
+
+All nodes by default labeled with "openstack-control-plane" and "openstack-compute-node" labels, you can use following commands to check opesnatck labels. With this default config OSH pods will be created on all the nodes.
+
+```bash
+(k8s-master)>  kubectl get nodes -o wide -l openstack-control-plane=enabled
+(k8s-master)> kubectl get nodes -o wide -l openstack-compute-node=enabled
+```
+
+* **Note**: If requried please disable openstack labels using following commands to restrict OSH pods creation on specific nodes. In following example "openstack-compute-node" lable is disabled on "ubuntu-contrail-9" node.
+
+```bash
+(k8s-master)> kubectl label node ubuntu-contrail-9 --overwrite openstack-compute-node=disabled
+```
 
 1. Deploy OpenStack Helm charts using following commands.
 
@@ -250,7 +229,7 @@ contrail_env:
   BGP_PORT: 1179
 ```
 
-* **contrail-controller/values.yaml**
+* **contrail-analytics/values.yaml**
 
 ```Text
 contrail_env:
