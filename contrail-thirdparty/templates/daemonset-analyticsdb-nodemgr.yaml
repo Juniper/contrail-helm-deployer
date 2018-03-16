@@ -54,6 +54,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-database
       volumes:
       - name: docker-unix-socket
         hostPath:
@@ -64,4 +66,7 @@ spec:
       - name: contrail-log
         hostPath:
           path: /var/log/contrail/analyticsdb/
+      - name: var-crashes-database
+        hostPath:
+          path: /var/crashes/contrail/database
 {{- end }}
