@@ -8,10 +8,10 @@ kind: ConfigMap
 metadata:
   name: configmap-vrouter-kernel
 data:
-  {{- range $key, $value := .Values.contrail_env.vrouter_common }}
+  {{- range $key, $value := .Values.contrail_env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
-  {{- range $key, $value := .Values.contrail_env.vrouter_kernel }}
+  {{- range $key, $value := .Values.contrail_env_vrouter_kernel }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
 
@@ -21,10 +21,10 @@ kind: ConfigMap
 metadata:
   name: configmap-vrouter-dpdk
 data:
-  {{- range $key, $value := .Values.contrail_env.vrouter_common }}
+  {{- range $key, $value := .Values.contrail_env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
-  {{- range $key, $value := .Values.contrail_env.vrouter_dpdk }}
+  {{- range $key, $value := .Values.contrail_env_vrouter_dpdk }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
 
