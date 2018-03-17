@@ -34,6 +34,7 @@ contrail_env:
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
+    METADATA_PROXY_SECRET: "password"
     #CONTROL_DATA_NET_LIST: 8.0.0.0/24
     #VROUTER_GATEWAY: 8.0.0.254
   vrouter_kernel:
