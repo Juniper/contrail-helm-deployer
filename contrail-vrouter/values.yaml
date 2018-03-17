@@ -28,24 +28,29 @@ dependencies:
     - contrail-config
     - contrail-control
 
+# common section for all vrouter variants
+# this section is commonized with other Contrails' services
 contrail_env:
-  vrouter_common:
-    CONTROLLER_NODES: 10.87.65.248
-    LOG_LEVEL: SYS_NOTICE
-    CLOUD_ORCHESTRATOR: openstack
-    AAA_MODE: cloud-admin
-    # this value should be the same as nova/conf.nova.neutron.metadata_proxy_shared_secret
-    METADATA_PROXY_SECRET: password
-    #CONTROL_DATA_NET_LIST: 8.0.0.0/24
-    #VROUTER_GATEWAY: 8.0.0.254
-  vrouter_kernel:
-    #AGENT_MODE: nic
-  vrouter_dpdk:
-    #CPU_CORE_MASK: "0xf"
-    #DPDK_UIO_DRIVER: uio_pci_generic
-    #HUGE_PAGES: 32000
-    #AGENT_MODE: dpdk
-    #HUGE_PAGES_DIR: /hugepages
+  CONTROLLER_NODES: 10.87.65.248
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: openstack
+  AAA_MODE: cloud-admin
+  # this value should be the same as nova/conf.nova.neutron.metadata_proxy_shared_secret
+  METADATA_PROXY_SECRET: password
+  #CONTROL_DATA_NET_LIST: 8.0.0.0/24
+  #VROUTER_GATEWAY: 8.0.0.254
+
+# section of vrouter template for kernel mode
+contrail_env_vrouter_kernel:
+  #AGENT_MODE: nic
+
+# section of vrouter template for dpdk mode
+contrail_env_vrouter_dpdk:
+  #CPU_CORE_MASK: "0xf"
+  #DPDK_UIO_DRIVER: uio_pci_generic
+  #HUGE_PAGES: 32000
+  #AGENT_MODE: dpdk
+  #HUGE_PAGES_DIR: /hugepages
 
 
 node:

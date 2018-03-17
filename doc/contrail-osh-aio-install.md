@@ -108,10 +108,10 @@ Install below packages on your setup
   # Edit contrail-vrouter/values.yaml and make sure that images.tags.vrouter_kernel_init is right. Image tag name will be different depending upon your linux. Also set the conf.host_os to ubuntu or centos depending on your system
 
   helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
-  --namespace=contrail --set contrail_env.vrouter_common.CONTROLLER_NODES=172.17.0.1 \
-  --set contrail_env.vrouter_common.CONTROL_NODES=${CONTROL_NODES} \
-  --set contrail_env.vrouter_common.CONTROL_DATA_NET_LIST=${CONTROL_DATA_NET_LIST} \
-  --set contrail_env.vrouter_common.VROUTER_GATEWAY=${VROUTER_GATEWAY}
+  --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1 \
+  --set contrail_env.CONTROL_NODES=${CONTROL_NODES} \
+  --set contrail_env.CONTROL_DATA_NET_LIST=${CONTROL_DATA_NET_LIST} \
+  --set contrail_env.VROUTER_GATEWAY=${VROUTER_GATEWAY}
   ```
 
 6. Deploy heat charts
