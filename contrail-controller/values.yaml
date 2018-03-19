@@ -88,6 +88,21 @@ endpoints:
     host_fqdn_override:
        default: null
     namespace: openstack
+  nova_metadata:
+    name: nova
+    hosts:
+      default: metadata
+    host_fqdn_override:
+      default: null
+    path:
+      default: /
+    scheme:
+      default: 'http'
+    port:
+      metadata:
+        default: 8775
+        public: 80
+    namespace: openstack
 
 # Service related inputs are defined here
 service:
