@@ -83,6 +83,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-vrouter
       - name: contrail-agent-nodemgr
         image: {{ .Values.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
@@ -108,6 +110,8 @@ spec:
           name: contrail-log
         - mountPath: /etc/contrail/
           name: etc-contrail
+        - mountPath: /var/crashes
+          name: var-crashes-vrouter
       volumes:
 {{- if eq $host_os "ubuntu"}}
       - name: usr-src
@@ -133,4 +137,7 @@ spec:
       - name: contrail-log
         hostPath:
           path: /var/log/contrail/vrouter/
+      - name: var-crashes-vrouter
+        hostPath:
+          path: /var/crashes/contrail/vrouter
 {{- end }}
