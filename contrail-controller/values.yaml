@@ -1,17 +1,24 @@
-images:
-  tags:
-    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
-    contrail_control: "docker.io/opencontrailnightly/contrail-controller-control-control:ocata-master-17"
-    control_dns: "docker.io/opencontrailnightly/contrail-controller-control-dns:ocata-master-17"
-    control_named: "docker.io/opencontrailnightly/contrail-controller-control-named:ocata-master-17"
-    config_api: "docker.io/opencontrailnightly/contrail-controller-config-api:ocata-master-17"
-    config_devicemgr: "docker.io/opencontrailnightly/contrail-controller-config-devicemgr:ocata-master-17"
-    config_schema_transformer: "docker.io/opencontrailnightly/contrail-controller-config-schema:ocata-master-17"
-    config_svcmonitor: "docker.io/opencontrailnightly/contrail-controller-config-svcmonitor:ocata-master-17"
-    webui_middleware: "docker.io/opencontrailnightly/contrail-controller-webui-job:ocata-master-17"
-    webui: "docker.io/opencontrailnightly/contrail-controller-webui-web:ocata-master-17"
-    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
-  imagePullPolicy: "IfNotPresent"
+global:
+  images:
+    tags:
+      nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
+      contrail_control: "docker.io/opencontrailnightly/contrail-controller-control-control:ocata-master-17"
+      control_dns: "docker.io/opencontrailnightly/contrail-controller-control-dns:ocata-master-17"
+      control_named: "docker.io/opencontrailnightly/contrail-controller-control-named:ocata-master-17"
+      config_api: "docker.io/opencontrailnightly/contrail-controller-config-api:ocata-master-17"
+      config_devicemgr: "docker.io/opencontrailnightly/contrail-controller-config-devicemgr:ocata-master-17"
+      config_schema_transformer: "docker.io/opencontrailnightly/contrail-controller-config-schema:ocata-master-17"
+      config_svcmonitor: "docker.io/opencontrailnightly/contrail-controller-config-svcmonitor:ocata-master-17"
+      webui_middleware: "docker.io/opencontrailnightly/contrail-controller-webui-job:ocata-master-17"
+      webui: "docker.io/opencontrailnightly/contrail-controller-webui-web:ocata-master-17"
+      dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+    imagePullPolicy: "IfNotPresent"
+
+  contrail_env:
+    CONTROLLER_NODES: 10.87.65.248
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
 
 labels:
   control:
@@ -38,12 +45,6 @@ dependencies:
     daemonset:
     - contrail-config
     - contrail-redis
-
-contrail_env:
-  CONTROLLER_NODES: 10.87.65.248
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: openstack
-  AAA_MODE: cloud-admin
 
 
 # typically overriden by environmental
@@ -109,7 +110,9 @@ service:
   config_api_public_port: ""
 
 manifests:
-  configmap_env: true
+  configmap_controller_env: true
+  configmap_controller_keystone: true
+  configmap_controller_rabbitmq: true
   daemonset_config: true
   daemonset_control: true
   daemonset_control_only: false

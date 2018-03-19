@@ -1,4 +1,5 @@
 {{- if .Values.manifests.daemonset_webui }}
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
@@ -30,18 +31,18 @@ spec:
 {{ tuple $context .Values.dependencies.webui nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-webui-middleware
-        image: {{ .Values.images.tags.webui_middleware | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.webui_middleware | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         ports:
         - name: http-port
-          containerPort: {{ .Values.contrail_env.WEBUI_HTTP_LISTEN_PORT | default 8080 }}
+          containerPort: {{ .Values.global.contrail_env.WEBUI_HTTP_LISTEN_PORT | default 8080 }}
         - name: https-port
-          containerPort: {{ .Values.contrail_env.WEBUI_HTTPS_LISTEN_PORT | default 8143 }}
+          containerPort: {{ .Values.global.contrail_env.WEBUI_HTTPS_LISTEN_PORT | default 8143 }}
         envFrom:
         - configMapRef:
-            name: configmap-controller
+            name: contrail-controller-env
         - configMapRef:
-            name: configmap-controller-auth
+            name: contrail-controller-keystone
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -50,13 +51,13 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-webui
       - name: contrail-webui
-        image: {{ .Values.images.tags.webui | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.webui | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-controller
+            name: contrail-controller-env
         - configMapRef:
-            name: configmap-controller-auth
+            name: contrail-controller-keystone
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log

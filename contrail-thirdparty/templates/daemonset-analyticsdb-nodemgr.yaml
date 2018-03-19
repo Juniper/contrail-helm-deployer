@@ -1,4 +1,5 @@
 {{- if .Values.manifests.daemonset_analyticsdb_nodemgr }}
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
@@ -30,13 +31,13 @@ spec:
 {{ tuple $context .Values.dependencies.analyticsdb_nodemgr nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-analyticsdb-nodemgr
-        image: {{ .Values.images.tags.nodemgr | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.nodemgr | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: contrail-thirdparty-auth
+            name: contrail-thirdparty-env
         - configMapRef:
-            name: contrail-thirdparty
+            name: contrail-thirdparty-keystone
         env:
         - name: NODE_TYPE
           value: database

@@ -1,8 +1,9 @@
 {{- if .Values.manifests.daemonset_dpdk }}
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
 # host_os is a mandatory field
-{{- $_ := required ".Values.node.host_os must be specified, valid values are ubuntu, centos" .Values.node.host_os }}
-{{- $host_os := .Values.node.host_os }}
+{{- $_ := required ".Values.global.node.host_os must be specified, valid values are ubuntu, centos" .Values.global.node.host_os }}
+{{- $host_os := .Values.global.node.host_os }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -33,15 +34,15 @@ spec:
       initContainers:
 {{ tuple $context .Values.dependencies.vrouter_agent_dpdk nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: contrail-init-dpdk
-          image: {{ .Values.images.tags.vrouter_init_dpdk | quote }}
-          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          image: {{ .Values.global.images.tags.vrouter_init_dpdk | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
             privileged: true
           envFrom:
           - configMapRef:
-              name: configmap-vrouter-dpdk
+              name: contrail-vrouter-dpdk
           - configMapRef:
-              name: configmap-vrouter-auth
+              name: contrail-vrouter-keystone
           volumeMounts:
           - mountPath: /lib/modules
             name: lib-modules
@@ -51,19 +52,19 @@ spec:
             name: os-release
           - mountPath: /etc/lsb-release
             name: lsb-release
-          - mountPath: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+          - mountPath: {{ .Values.global.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
             name: hugepages
       containers:
         - name: contrail-vrouter-dpdk
-          image: {{ .Values.images.tags.vrouter_dpdk | quote }}
-          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          image: {{ .Values.global.images.tags.vrouter_dpdk | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
             privileged: true
           envFrom:
           - configMapRef:
-              name: configmap-vrouter-dpdk
+              name: contrail-vrouter-dpdk
           - configMapRef:
-              name: configmap-vrouter-auth
+              name: contrail-vrouter-keystone
           volumeMounts:
           - mountPath: /etc/
             name: mount-etc
@@ -79,20 +80,20 @@ spec:
             name: os-release
           - mountPath: /etc/lsb-release
             name: lsb-release
-          - mountPath: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+          - mountPath: {{ .Values.global.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
             name: hugepages
           - mountPath: /var/crashes
             name: var-crashes-vrouter
         - name: contrail-dpdk-watchdog
-          image: {{ .Values.images.tags.dpdk_watchdog | quote }}
-          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          image: {{ .Values.global.images.tags.dpdk_watchdog | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
             privileged: true
           envFrom:
           - configMapRef:
-              name: configmap-vrouter-dpdk
+              name: contrail-vrouter-dpdk
           - configMapRef:
-              name: configmap-vrouter-auth
+              name: contrail-vrouter-keystone
           volumeMounts:
 {{- if eq $host_os "centos"}}
           - mountPath: /etc/sysconfig/network-scripts
@@ -105,15 +106,15 @@ spec:
           - mountPath: /host/bin
             name: host-bin
         - name: contrail-vrouter-dpdk-agent
-          image: {{ .Values.images.tags.vrouter_agent | quote }}
-          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          image: {{ .Values.global.images.tags.vrouter_agent | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
             privileged: true
           envFrom:
           - configMapRef:
-              name: configmap-vrouter-dpdk
+              name: contrail-vrouter-dpdk
           - configMapRef:
-              name: configmap-vrouter-auth
+              name: contrail-vrouter-keystone
           volumeMounts:
           - mountPath: /var/lib/contrail/
             name: var-lib-contrail
@@ -123,7 +124,7 @@ spec:
             name: etc-contrail
           - mountPath: /var/run/
             name: var-run
-          - mountPath: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+          - mountPath: {{ .Values.global.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
             name: hugepages
           - mountPath: /var/crashes
             name: var-crashes-vrouter
@@ -134,13 +135,13 @@ spec:
             name: network-scripts
 {{- end }}
         - name: contrail-agent-nodemgr
-          image: {{ .Values.images.tags.nodemgr | quote }}
-          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          image: {{ .Values.global.images.tags.nodemgr | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           envFrom:
           - configMapRef:
-              name: configmap-vrouter-dpdk
+              name: contrail-vrouter-dpdk
           - configMapRef:
-              name: configmap-vrouter-auth
+              name: contrail-vrouter-keystone
           env:
           - name: NODE_TYPE
             value: vrouter
@@ -198,7 +199,7 @@ spec:
           path: /etc
       - name: hugepages
         hostPath:
-          path: {{ .Values.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+          path: {{ .Values.global.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
       - name: var-crashes-vrouter
         hostPath:
           path: /var/crashes/contrail/vrouter

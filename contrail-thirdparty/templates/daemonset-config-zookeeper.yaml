@@ -1,4 +1,5 @@
 {{- if .Values.manifests.daemonset_config_zookeeper }}
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
@@ -30,8 +31,8 @@ spec:
 {{ tuple $context .Values.dependencies.config_zookeeper nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: zookeeper
-        image: {{ .Values.images.tags.zookeeper | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.zookeeper | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
             name: contrail-config-zookeeper

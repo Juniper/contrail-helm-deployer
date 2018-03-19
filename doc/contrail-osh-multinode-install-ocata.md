@@ -210,48 +210,52 @@ Here are each chart **"contrail_env"** reference values.yaml file (**FYI**)
 * **contrail-thirdparty/values.yaml**
 
 ```Text
-contrail_env:
-  CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: openstack
-  AAA_MODE: cloud-admin
+global:
+  contrail_env:
+    CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
 ```
 
 * **contrail-controller/values.yaml**
 
 ```Text
-contrail_env:
-  CONTROL_NODES: 192.168.1.237,192.168.1.238,192.168.1.239
-  CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: openstack
-  AAA_MODE: cloud-admin
-  BGP_PORT: 1179
+global:
+  contrail_env:
+    CONTROL_NODES: 192.168.1.237,192.168.1.238,192.168.1.239
+    CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
+    BGP_PORT: 1179
 ```
 
 * **contrail-analytics/values.yaml**
 
 ```Text
-contrail_env:
-  CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: openstack
-  AAA_MODE: cloud-admin
+global:
+  contrail_env:
+    CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
 ```
 
 * **contrail-vrouter/values.yaml**
 
 ```Text
-contrail_env:
-  CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
-  CONTROL_NODES: 192.168.1.237,192.168.1.238,192.168.1.239
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: openstack
-  AAA_MODE: cloud-admin
-  CONTROL_DATA_NET_LIST: 192.168.1.0/24
-  VROUTER_GATEWAY: 192.168.1.1
-contrail_env_vrouter_kernel:
-  AGENT_MODE: nic
+global:
+  contrail_env:
+    CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+    CONTROL_NODES: 192.168.1.237,192.168.1.238,192.168.1.239
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
+    CONTROL_DATA_NET_LIST: 192.168.1.0/24
+    VROUTER_GATEWAY: 192.168.1.1
+  contrail_env_vrouter_kernel:
+    AGENT_MODE: nic
 ```
 
 Here are helm install commands to deploy Contrail helm chart after setting configuration parameters in "values.yaml" files.
