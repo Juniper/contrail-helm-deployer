@@ -1,6 +1,6 @@
 
 HELM := helm
-FILTER_CHARTS := helm-toolkit
+FILTER_CHARTS := helm-toolkit-contrail
 CONTRAIL_CHARTS := $(FILTER_CHARTS) $(filter-out $(FILTER_CHARTS), $(patsubst %/Chart.yaml, %, $(wildcard */Chart.yaml)))
 BUILD_CHARTS := $(foreach chart, $(CONTRAIL_CHARTS), build-$(chart))
 

@@ -13,6 +13,6 @@
 # limitations under the License.
 
 apiVersion: v1
-description: OpenStack-Helm Helm-Toolkit
-name: helm-toolkit
+description: OpenStack-Helm Helm-Toolkit for contrail
+name: helm-toolkit-contrail
 version: 0.1.0
