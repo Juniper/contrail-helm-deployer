@@ -1,4 +1,5 @@
 {{- if .Values.manifests.daemonset_control }}
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
@@ -31,15 +32,15 @@ spec:
 {{ tuple $context .Values.dependencies.control nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-control
-        image: {{ .Values.images.tags.contrail_control | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.contrail_control | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-controller
+            name: contrail-controller-env
         - configMapRef:
-            name: configmap-controller-auth
+            name: contrail-controller-keystone
         - configMapRef:
-            name: configmap-controller-rabbitmq
+            name: contrail-controller-rabbitmq
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -48,15 +49,15 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-control
       - name: contrail-dns
-        image: {{ .Values.images.tags.control_dns | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.control_dns | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-controller
+            name: contrail-controller-env
         - configMapRef:
-            name: configmap-controller-auth
+            name: contrail-controller-keystone
         - configMapRef:
-            name: configmap-controller-rabbitmq
+            name: contrail-controller-rabbitmq
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -65,17 +66,17 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-control
       - name: contrail-named
-        image: {{ .Values.images.tags.control_named | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.control_named | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         securityContext:
           privileged: true
         envFrom:
         - configMapRef:
-            name: configmap-controller
+            name: contrail-controller-env
         - configMapRef:
-            name: configmap-controller-auth
+            name: contrail-controller-keystone
         - configMapRef:
-            name: configmap-controller-rabbitmq
+            name: contrail-controller-rabbitmq
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -84,13 +85,13 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-control
       - name: contrail-control-nodemgr
-        image: {{ .Values.images.tags.nodemgr | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.nodemgr | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-controller
+            name: contrail-controller-env
         - configMapRef:
-            name: configmap-controller-auth
+            name: contrail-controller-keystone
         env:
         - name: NODE_TYPE
           value: control

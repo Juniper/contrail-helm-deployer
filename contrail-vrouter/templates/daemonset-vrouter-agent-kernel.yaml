@@ -1,8 +1,9 @@
 {{- if .Values.manifests.daemonset_kernel }}
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
 # host_os is a mandatory field
-{{- $_ := required ".Values.node.host_os must be specified, valid values are ubuntu, centos" .Values.node.host_os }}
-{{- $host_os := .Values.node.host_os }}
+{{- $_ := required ".Values.global.node.host_os must be specified, valid values are ubuntu, centos" .Values.global.node.host_os }}
+{{- $host_os := .Values.global.node.host_os }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -35,15 +36,15 @@ spec:
 {{ tuple $context .Values.dependencies.vrouter_agent_kernel nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
 {{- if eq $host_os "ubuntu"}}
         - name: contrail-init-kernel
-          image: {{ .Values.images.tags.build_driver_init | quote }}
-          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          image: {{ .Values.global.images.tags.build_driver_init | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
             privileged: true
           envFrom:
           - configMapRef:
-              name: configmap-vrouter-kernel
+              name: contrail-vrouter-kernel
           - configMapRef:
-              name: configmap-vrouter-auth
+              name: contrail-vrouter-keystone
           volumeMounts:
           - mountPath: /usr/src
             name: usr-src
@@ -53,15 +54,15 @@ spec:
             name: host-bin
 {{- else if $host_os "centos" }}
         - name: contrail-init-kernel
-          image: {{ .Values.images.tags.vrouter_init_kernel | quote }}
-          imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+          image: {{ .Values.global.images.tags.vrouter_init_kernel | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
             privileged: true
           envFrom:
           - configMapRef:
               name: configmap-vrouter
           - configMapRef:
-              name: configmap-vrouter-auth
+              name: contrail-vrouter-keystone
           volumeMounts:
           - mountPath: /etc/sysconfig/network-scripts
             name: network-scripts
@@ -70,15 +71,15 @@ spec:
 {{- end }}
       containers:
       - name: contrail-vrouter-kernel-agent
-        image: {{ .Values.images.tags.vrouter_agent | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.vrouter_agent | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         securityContext:
           privileged: true
         envFrom:
         - configMapRef:
-            name: configmap-vrouter-kernel
+            name: contrail-vrouter-kernel
         - configMapRef:
-            name: configmap-vrouter-auth
+            name: contrail-vrouter-keystone
         volumeMounts:
 {{- if eq $host_os "centos"}}
         - mountPath: /etc/sysconfig/network-scripts
@@ -95,13 +96,13 @@ spec:
         - mountPath: /host/bin
           name: host-bin
       - name: contrail-agent-nodemgr
-        image: {{ .Values.images.tags.nodemgr | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.nodemgr | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-vrouter-kernel
+            name: contrail-vrouter-kernel
         - configMapRef:
-            name: configmap-vrouter-auth
+            name: contrail-vrouter-keystone
         env:
         - name: NODE_TYPE
           value: vrouter

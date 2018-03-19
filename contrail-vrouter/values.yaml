@@ -1,14 +1,42 @@
-images:
-  tags:
-    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
-    build_driver_init: "docker.io/opencontrailnightly/contrail-vrouter-kernel-build-init:ocata-master-17"
-    vrouter_agent: "docker.io/opencontrailnightly/contrail-vrouter-agent:ocata-master-17"
-    vrouter_init_kernel: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init:ocata-master-17"
-    vrouter_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-agent-dpdk:ocata-master-17"
-    vrouter_init_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init-dpdk:ocata-master-17"
-    dpdk_watchdog: "docker.io/opencontrailnightly/contrail-vrouter-net-watchdog:ocata-master-17"
-    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
-  imagePullPolicy: "IfNotPresent"
+global:
+  images:
+    tags:
+      nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
+      build_driver_init: "docker.io/opencontrailnightly/contrail-vrouter-kernel-build-init:ocata-master-17"
+      vrouter_agent: "docker.io/opencontrailnightly/contrail-vrouter-agent:ocata-master-17"
+      vrouter_init_kernel: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init:ocata-master-17"
+      vrouter_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-agent-dpdk:ocata-master-17"
+      vrouter_init_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init-dpdk:ocata-master-17"
+      dpdk_watchdog: "docker.io/opencontrailnightly/contrail-vrouter-net-watchdog:ocata-master-17"
+      dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+    imagePullPolicy: "IfNotPresent"
+
+  # common section for all vrouter variants
+  # this section is commonized with other Contrails' services
+  contrail_env:
+    CONTROLLER_NODES: 10.87.65.248
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
+    # this value should be the same as nova/conf.nova.neutron.metadata_proxy_shared_secret
+    METADATA_PROXY_SECRET: password
+    #CONTROL_DATA_NET_LIST: 8.0.0.0/24
+    #VROUTER_GATEWAY: 8.0.0.254
+
+  # section of vrouter template for kernel mode
+  contrail_env_vrouter_kernel:
+    #AGENT_MODE: nic
+
+  # section of vrouter template for dpdk mode
+  contrail_env_vrouter_dpdk:
+    #CPU_CORE_MASK: "0xf"
+    #DPDK_UIO_DRIVER: uio_pci_generic
+    #HUGE_PAGES: 32000
+    #AGENT_MODE: dpdk
+    #HUGE_PAGES_DIR: /hugepages
+
+  node:
+    host_os: ubuntu
 
 labels:
   vrouter_agent_kernel:
@@ -27,34 +55,6 @@ dependencies:
     daemonset:
     - contrail-config
     - contrail-control
-
-# common section for all vrouter variants
-# this section is commonized with other Contrails' services
-contrail_env:
-  CONTROLLER_NODES: 10.87.65.248
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: openstack
-  AAA_MODE: cloud-admin
-  # this value should be the same as nova/conf.nova.neutron.metadata_proxy_shared_secret
-  METADATA_PROXY_SECRET: password
-  #CONTROL_DATA_NET_LIST: 8.0.0.0/24
-  #VROUTER_GATEWAY: 8.0.0.254
-
-# section of vrouter template for kernel mode
-contrail_env_vrouter_kernel:
-  #AGENT_MODE: nic
-
-# section of vrouter template for dpdk mode
-contrail_env_vrouter_dpdk:
-  #CPU_CORE_MASK: "0xf"
-  #DPDK_UIO_DRIVER: uio_pci_generic
-  #HUGE_PAGES: 32000
-  #AGENT_MODE: dpdk
-  #HUGE_PAGES_DIR: /hugepages
-
-
-node:
-  host_os: ubuntu
 
 # typically overriden by environmental
 # values, but should include all endpoints
@@ -85,6 +85,8 @@ endpoints:
     namespace: openstack
 
 manifests:
-  configmap_env: true
+  configmap_vrouter_kernel: true
+  configmap_vrouter_keystone: true
+  configmap_vrouter_dpdk: false
   daemonset_kernel: true
   daemonset_dpdk: false

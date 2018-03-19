@@ -3,7 +3,7 @@ name: contrail-thirdparty
 description: Helm chart for Contrail thirdparty components
 version: 0.1.0
 appVersion: Contrail 5.0.0
-home: https://github.com/Juniper/contrail-docker/
+home: https://github.com/Juniper/contrail-helm-deployer/
 sources:
   - https://github.com/Juniper/contrail-controller/
 tillerVersion: ">=2.4.0"

@@ -1,14 +1,21 @@
-images:
-  tags:
-    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
-    analytics_api: "docker.io/opencontrailnightly/contrail-analytics-api:ocata-master-17"
-    contrail_collector: "docker.io/opencontrailnightly/contrail-analytics-collector:ocata-master-17"
-    analytics_alarm_gen: "docker.io/opencontrailnightly/contrail-analytics-alarm-gen:ocata-master-17"
-    analytics_query_engine: "docker.io/opencontrailnightly/contrail-analytics-query-engine:ocata-master-17"
-    analytics_snmp_collector: "docker.io/opencontrailnightly/contrail-analytics-snmp-collector:ocata-master-17"
-    contrail_topology: "docker.io/opencontrailnightly/contrail-analytics-topology:ocata-master-17"
-    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
-  imagePullPolicy: "IfNotPresent"
+global:
+  images:
+    tags:
+      nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
+      analytics_api: "docker.io/opencontrailnightly/contrail-analytics-api:ocata-master-17"
+      contrail_collector: "docker.io/opencontrailnightly/contrail-analytics-collector:ocata-master-17"
+      analytics_alarm_gen: "docker.io/opencontrailnightly/contrail-analytics-alarm-gen:ocata-master-17"
+      analytics_query_engine: "docker.io/opencontrailnightly/contrail-analytics-query-engine:ocata-master-17"
+      analytics_snmp_collector: "docker.io/opencontrailnightly/contrail-analytics-snmp-collector:ocata-master-17"
+      contrail_topology: "docker.io/opencontrailnightly/contrail-analytics-topology:ocata-master-17"
+      dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+    imagePullPolicy: "IfNotPresent"
+
+  contrail_env:
+    CONTROLLER_NODES: 10.87.65.248
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
 
 labels:
   analytics:
@@ -21,12 +28,6 @@ dependencies:
     daemonset:
     - contrail-analyticsdb
     - contrail-config
-
-contrail_env:
-  CONTROLLER_NODES: 10.87.65.248
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: openstack
-  AAA_MODE: cloud-admin
 
 # typically overriden by environmental
 # values, but should include all endpoints
@@ -76,7 +77,9 @@ service:
   analytics_api_public_port: ""
 
 manifests:
-  configmap_env: true
+  configmap_analytics_env: true
+  configmap_analytics_keystone: true
+  configmap_analytics_rabbitmq: true
   daemonset_analytics: true
   service_analytics_api_server: true
   service_analytics_api_ingress: true
