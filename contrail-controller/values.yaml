@@ -104,6 +104,73 @@ endpoints:
         default: 8775
         public: 80
     namespace: openstack
+  nova:
+    name: nova
+    hosts:
+      default: nova-api
+      public: nova
+    host_fqdn_override:
+      default: null
+    path:
+      default: "/v2/%(tenant_id)s"
+    scheme:
+      default: 'http'
+    port:
+      api:
+        default: 8774
+        public: 80
+      novncproxy:
+        default: 6080
+    namespace: openstack
+  network:
+    name: neutron
+    hosts:
+      default: neutron-server
+      public: neutron
+    host_fqdn_override:
+      default: null
+    path:
+      default: null
+    scheme:
+      default: 'http'
+    port:
+      api:
+        default: 9696
+        public: 80
+    namespace: openstack
+  image:
+    name: glance
+    hosts:
+      default: glance-api
+      public: glance
+    host_fqdn_override:
+      default: null
+    path:
+      default: null
+    scheme:
+      default: http
+    port:
+      api:
+        default: 9292
+        public: 80
+    namespace: openstack
+  volume:
+    name: cinder
+    hosts:
+      default: cinder-api
+      public: cinder
+    host_fqdn_override:
+      default: null
+    path:
+      default: '/v1/%(tenant_id)s'
+    scheme:
+      default:  'http'
+    port:
+      api:
+        default: 8776
+        public: 80
+    namespace: openstack
+
 
 # Service related inputs are defined here
 service:
