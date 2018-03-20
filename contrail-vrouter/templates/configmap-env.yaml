@@ -1,38 +1,42 @@
-{{- if .Values.manifests.configmap_env }}
 {{- $context := . }}
 {{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
 
+{{- if .Values.manifests.configmap_vrouter_kernel }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: configmap-vrouter-kernel
+  name: contrail-vrouter-kernel
 data:
-  {{- range $key, $value := .Values.contrail_env }}
+  {{- range $key, $value := .Values.global.contrail_env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
-  {{- range $key, $value := .Values.contrail_env_vrouter_kernel }}
+  {{- range $key, $value := .Values.global.contrail_env_vrouter_kernel }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
+{{- end }}
 
+{{- if .Values.manifests.configmap_vrouter_dpdk }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: configmap-vrouter-dpdk
+  name: contrail-vrouter-dpdk
 data:
-  {{- range $key, $value := .Values.contrail_env }}
+  {{- range $key, $value := .Values.global.contrail_env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
-  {{- range $key, $value := .Values.contrail_env_vrouter_dpdk }}
+  {{- range $key, $value := .Values.global.contrail_env_vrouter_dpdk }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
+{{- end }}
 
+{{- if .Values.manifests.configmap_vrouter_keystone }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: configmap-vrouter-auth
+  name: contrail-vrouter-keystone
 data:
   KEYSTONE_AUTH_ADMIN_USER: {{ .Values.endpoints.keystone.auth.username }}
   KEYSTONE_AUTH_ADMIN_TENANT: {{ .Values.endpoints.keystone.auth.project_name }}

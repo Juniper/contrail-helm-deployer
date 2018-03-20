@@ -1,3 +1,4 @@
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- if .Values.manifests.daemonset_analytics }}
 {{- $context := . }}
 ---
@@ -30,18 +31,18 @@ spec:
 {{ tuple $context .Values.dependencies.analytics nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-analytics-api
-        image: {{ .Values.images.tags.analytics_api | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.analytics_api | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         ports:
         - name: api-port
-          containerPort: {{ .Values.contrail_env.ANALYTICS_API_PORT | default 8081 }}
+          containerPort: {{ .Values.global.contrail_env.ANALYTICS_API_PORT | default 8081 }}
         - name: introspect-port
-          containerPort: {{ .Values.contrail_env.ANALYTICS_API_INTROSPECT_PORT | default 8090 }}
+          containerPort: {{ .Values.global.contrail_env.ANALYTICS_API_INTROSPECT_PORT | default 8090 }}
         envFrom:
         - configMapRef:
-            name: configmap-analytics
+            name: contrail-analytics-env
         - configMapRef:
-            name: configmap-analytics-auth
+            name: contrail-analytics-keystone
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -50,15 +51,15 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-collector
-        image: {{ .Values.images.tags.contrail_collector | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.contrail_collector | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-analytics
+            name: contrail-analytics-env
         - configMapRef:
-            name: configmap-analytics-auth
+            name: contrail-analytics-keystone
         - configMapRef:
-            name: configmap-analytics-rabbitmq
+            name: contrail-analytics-rabbitmq
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -67,15 +68,15 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-alarm-gen
-        image: {{ .Values.images.tags.analytics_alarm_gen | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.analytics_alarm_gen | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-analytics
+            name: contrail-analytics-env
         - configMapRef:
-            name: configmap-analytics-auth
+            name: contrail-analytics-keystone
         - configMapRef:
-            name: configmap-analytics-rabbitmq
+            name: contrail-analytics-rabbitmq
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -84,13 +85,13 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-query-engine
-        image: {{ .Values.images.tags.analytics_query_engine | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.analytics_query_engine | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-analytics
+            name: contrail-analytics-env
         - configMapRef:
-            name: configmap-analytics-auth
+            name: contrail-analytics-keystone
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -99,15 +100,15 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-snmp-collector
-        image: {{ .Values.images.tags.analytics_snmp_collector | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.analytics_snmp_collector | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-analytics
+            name: contrail-analytics-env
         - configMapRef:
-            name: configmap-analytics-auth
+            name: contrail-analytics-keystone
         - configMapRef:
-            name: configmap-analytics-rabbitmq
+            name: contrail-analytics-rabbitmq
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -116,15 +117,15 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-topology
-        image: {{ .Values.images.tags.contrail_topology | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.contrail_topology | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-analytics
+            name: contrail-analytics-env
         - configMapRef:
-            name: configmap-analytics-auth
+            name: contrail-analytics-keystone
         - configMapRef:
-            name: configmap-analytics-rabbitmq
+            name: contrail-analytics-rabbitmq
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -133,13 +134,13 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-analytics-nodemgr
-        image: {{ .Values.images.tags.nodemgr | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.nodemgr | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: configmap-analytics
+            name: contrail-analytics-env
         - configMapRef:
-            name: configmap-analytics-auth
+            name: contrail-analytics-keystone
         env:
         - name: NODE_TYPE
           value: analytics

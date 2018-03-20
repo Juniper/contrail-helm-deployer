@@ -1,4 +1,5 @@
 {{- if .Values.manifests.daemonset_analyticsdb }}
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
@@ -30,13 +31,13 @@ spec:
 {{ tuple $context .Values.dependencies.analyticsdb nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: contrail-analyticsdb
-        image: {{ .Values.images.tags.cassandra | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.cassandra | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
             name: contrail-analyticsdb
         - configMapRef:
-            name: contrail-thirdparty
+            name: contrail-thirdparty-env
         volumeMounts:
         - mountPath: /var/lib/cassandra
           name: analyticsdb-data

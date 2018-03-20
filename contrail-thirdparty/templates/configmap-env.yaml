@@ -1,44 +1,50 @@
-{{- if .Values.manifests.configmap_env }}
 {{- $context := . }}
-{{- $configdb_nodes := .Values.contrail_env.CONFIG_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
-{{- $analyticsdb_nodes := .Values.contrail_env.ANALYTICS_NODES | default .Values.contrail_env.CONTROLLER_NODES }}
+{{- $configdb_nodes := .Values.global.contrail_env.CONFIG_NODES | default .Values.global.contrail_env.CONTROLLER_NODES }}
+{{- $analyticsdb_nodes := .Values.global.contrail_env.ANALYTICS_NODES | default .Values.global.contrail_env.CONTROLLER_NODES }}
 {{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
 
+{{- if .Values.manifests.configmap_analytics_zookeeper }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: contrail-analytics-zookeeper
 data:
-  ZOOKEEPER_PORT: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_PORT | default 2182 | quote }}
+  ZOOKEEPER_PORT: {{ .Values.global.contrail_env.ZOOKEEPER_ANALYTICS_PORT | default 2182 | quote }}
   ZOOKEEPER_PORTS: "4888:5888"
-  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_ANALYTICS_NODES | default .Values.contrail_env.ANALYTICSDB_NODES | default $analyticsdb_nodes | quote }}
+  ZOOKEEPER_NODES: {{ .Values.global.contrail_env.ZOOKEEPER_ANALYTICS_NODES | default .Values.global.contrail_env.ANALYTICSDB_NODES | default $analyticsdb_nodes | quote }}
+{{- end }}
 
+{{- if .Values.manifests.configmap_config_zookeeper }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: contrail-config-zookeeper
 data:
-  ZOOKEEPER_PORT: {{ .Values.contrail_env.ZOOKEEPER_PORT | default 2181 | quote }}
+  ZOOKEEPER_PORT: {{ .Values.global.contrail_env.ZOOKEEPER_PORT | default 2181 | quote }}
   ZOOKEEPER_PORTS: "2888:3888"
-  ZOOKEEPER_NODES: {{ .Values.contrail_env.ZOOKEEPER_NODES | default .Values.contrail_env.CONFIGDB_NODES | default $configdb_nodes | quote }}
+  ZOOKEEPER_NODES: {{ .Values.global.contrail_env.ZOOKEEPER_NODES | default .Values.global.contrail_env.CONFIGDB_NODES | default $configdb_nodes | quote }}
+{{- end }}
 
+{{- if .Values.manifests.configmap_thirdparty_env }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: contrail-thirdparty
+  name: contrail-thirdparty-env
 data:
-  {{- range $key, $value := .Values.contrail_env }}
+  {{- range $key, $value := .Values.global.contrail_env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
+{{- end }}
 
+{{- if .Values.manifests.configmap_thirdparty_keystone }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: contrail-thirdparty-auth
+  name: contrail-thirdparty-keystone
 data:
   KEYSTONE_AUTH_ADMIN_USER: {{ .Values.endpoints.keystone.auth.username }}
   KEYSTONE_AUTH_ADMIN_TENANT: {{ .Values.endpoints.keystone.auth.project_name }}
@@ -51,7 +57,9 @@ data:
   KEYSTONE_AUTH_ADMIN_PORT: {{ .Values.endpoints.keystone.port.admin.default | quote }}
   KEYSTONE_AUTH_PUBLIC_PORT: {{ .Values.endpoints.keystone.port.api.default | quote }}
   KEYSTONE_AUTH_REGION_NAME: {{ .Values.endpoints.keystone.auth.region_name | quote }}
+{{- end }}
 
+{{- if .Values.manifests.configmap_configdb }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -59,28 +67,29 @@ metadata:
   name: contrail-configdb
 data:
   # TODO: fix seeds and listen address
-  CASSANDRA_SEEDS: {{ .Values.contrail_env.CONFIGDB_NODES | default $configdb_nodes | quote }}
+  CASSANDRA_SEEDS: {{ .Values.global.contrail_env.CONFIGDB_NODES | default $configdb_nodes | quote }}
   CASSANDRA_CLUSTER_NAME: ContrailConfigDB
   CASSANDRA_START_RPC: "true"
-  CASSANDRA_PORT: {{ .Values.contrail_env.CONFIGDB_PORT | default 9161 | quote }}
-  CASSANDRA_CQL_PORT: {{ .Values.contrail_env.CONFIGDB_CQL_PORT | default 9041 | quote }}
-  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7011 | quote }}
-  CASSANDRA_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_STORAGE_PORT | default 7010 | quote  }}
-  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.contrail_env.JMX_LOCAL_PORT | default 7200 | quote }}
+  CASSANDRA_PORT: {{ .Values.global.contrail_env.CONFIGDB_PORT | default 9161 | quote }}
+  CASSANDRA_CQL_PORT: {{ .Values.global.contrail_env.CONFIGDB_CQL_PORT | default 9041 | quote }}
+  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.global.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7011 | quote }}
+  CASSANDRA_STORAGE_PORT: {{ .Values.global.contrail_env.CONFIGDB_STORAGE_PORT | default 7010 | quote  }}
+  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.global.contrail_env.JMX_LOCAL_PORT | default 7200 | quote }}
+{{- end }}
 
+{{- if .Values.manifests.configmap_analyticsdb }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: contrail-analyticsdb
 data:
-  CASSANDRA_SEEDS: {{ .Values.contrail_env.ANALYTICSDB_NODES | default $analyticsdb_nodes | quote  }}
+  CASSANDRA_SEEDS: {{ .Values.global.contrail_env.ANALYTICSDB_NODES | default $analyticsdb_nodes | quote  }}
   CASSANDRA_CLUSTER_NAME: ContrailAnalyticsDB
   CASSANDRA_START_RPC: "true"
-  CASSANDRA_PORT: {{ .Values.contrail_env.CONFIGDB_PORT | default 9160 | quote }}
-  CASSANDRA_CQL_PORT: {{ .Values.contrail_env.CONFIGDB_CQL_PORT | default 9042 | quote }}
-  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7001 | quote }}
-  CASSANDRA_STORAGE_PORT: {{ .Values.contrail_env.CONFIGDB_STORAGE_PORT | default 7000 | quote  }}
-  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.contrail_env.JMX_LOCAL_PORT | default 7100 | quote }}
-
+  CASSANDRA_PORT: {{ .Values.global.contrail_env.CONFIGDB_PORT | default 9160 | quote }}
+  CASSANDRA_CQL_PORT: {{ .Values.global.contrail_env.CONFIGDB_CQL_PORT | default 9042 | quote }}
+  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.global.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7001 | quote }}
+  CASSANDRA_STORAGE_PORT: {{ .Values.global.contrail_env.CONFIGDB_STORAGE_PORT | default 7000 | quote  }}
+  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.global.contrail_env.JMX_LOCAL_PORT | default 7100 | quote }}
 {{- end }}

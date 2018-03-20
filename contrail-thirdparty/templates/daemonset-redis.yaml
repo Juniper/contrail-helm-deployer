@@ -1,4 +1,5 @@
 {{- if .Values.manifests.daemonset_redis }}
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
@@ -30,6 +31,6 @@ spec:
 {{ tuple $context .Values.dependencies.redis nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: redis
-        image: {{ .Values.images.tags.redis | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.redis | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
 {{- end }}

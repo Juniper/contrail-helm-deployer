@@ -1,4 +1,5 @@
 {{- if .Values.manifests.daemonset_kafka }}
+{{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
 ---
 apiVersion: extensions/v1beta1
@@ -30,9 +31,9 @@ spec:
 {{ tuple $context .Values.dependencies.kafka nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: kafka
-        image: {{ .Values.images.tags.kafka | quote }}
-        imagePullPolicy: {{ default "" .Values.images.imagePullPolicy | quote }}
+        image: {{ .Values.global.images.tags.kafka | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: contrail-thirdparty
+            name: contrail-thirdparty-env
 {{- end }}

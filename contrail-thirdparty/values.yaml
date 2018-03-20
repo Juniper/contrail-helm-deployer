@@ -1,11 +1,18 @@
-images:
-  tags:
-    kafka: "docker.io/opencontrailnightly/contrail-external-kafka:ocata-master-17"
-    cassandra: "docker.io/opencontrailnightly/contrail-external-cassandra:ocata-master-17"
-    redis: "redis:4.0.2"
-    zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:ocata-master-17"
-    nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
-    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+global:
+  images:
+    tags:
+      kafka: "docker.io/opencontrailnightly/contrail-external-kafka:ocata-master-17"
+      cassandra: "docker.io/opencontrailnightly/contrail-external-cassandra:ocata-master-17"
+      redis: "redis:4.0.2"
+      zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:ocata-master-17"
+      nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
+      dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+
+  contrail_env:
+    CONTROLLER_NODES: 10.87.65.248
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
 
 labels:
   configdb:
@@ -45,13 +52,6 @@ dependencies:
     daemonset:
     - contrail-analyticsdb
 
-
-contrail_env:
-  CONTROLLER_NODES: 10.87.65.248
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: openstack
-  AAA_MODE: cloud-admin
-
 endpoints:
   cluster_domain_suffix: cluster.local
   keystone:
@@ -78,7 +78,12 @@ endpoints:
     namespace: openstack
 
 manifests:
-  configmap_env: true
+  configmap_analytics_zookeeper: true
+  configmap_config_zookeeper: true
+  configmap_thirdparty_env: true
+  configmap_thirdparty_keystone: true
+  configmap_configdb: true
+  configmap_analyticsdb: true
   daemonset_configdb: true
   daemonset_analyticsdb: true
   daemonset_redis: true
