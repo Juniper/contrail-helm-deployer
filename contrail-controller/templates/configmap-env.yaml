@@ -1,7 +1,46 @@
 {{- $context := . }}
 {{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
 {{- $rabbitmq_host := tuple "rabbitmq" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
-{{- $metadata_host := tuple "nova_metadata" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
+
+{{- if empty .Values.global.contrail_env.IPFABRIC_SERVICE_HOST -}}
+{{- tuple "nova_metadata" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" | set .Values.global.contrail_env "IPFABRIC_SERVICE_HOST" | quote | trunc 0 -}}
+{{- end -}}
+
+{{- if empty .Values.global.contrail_env.IPFABRIC_SERVICE_PORT }}
+{{- $_ := set .Values.global.contrail_env "IPFABRIC_SERVICE_PORT" .Values.endpoints.nova_metadata.port.metadata.default -}}
+{{- end -}}
+
+{{- if empty .Values.global.contrail_env.networkManager_ip -}}
+{{- tuple "network" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" | set .Values.global.contrail_env "networkManager_ip" | quote | trunc 0 -}}
+{{- end -}}
+
+{{- if empty .Values.global.contrail_env.networkManager_port -}}
+{{- $_ := set .Values.global.contrail_env "networkManager_port" .Values.endpoints.network.port.api.default -}}
+{{- end -}}
+
+{{- if empty .Values.global.contrail_env.imageManager_ip -}}
+{{- tuple "image" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" | set .Values.global.contrail_env "imageManager_ip" | quote | trunc 0 -}}
+{{- end -}}
+
+{{- if empty .Values.global.contrail_env.imageManager_port -}}
+{{- $_ := set .Values.global.contrail_env "imageManager_port" .Values.endpoints.image.port.api.default -}}
+{{- end -}}
+
+{{- if empty .Values.global.contrail_env.computeManager_ip -}}
+{{- tuple "nova" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" | set .Values.global.contrail_env "computeManager_ip" | quote | trunc 0 -}}
+{{- end -}}
+
+{{- if empty .Values.global.contrail_env.computeManager_port -}}
+{{- $_ := set .Values.global.contrail_env "computeManager_port" .Values.endpoints.nova.port.api.default -}}
+{{- end -}}
+
+{{- if empty .Values.global.contrail_env.storageManager_ip -}}
+{{- tuple "volume" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" | set .Values.global.contrail_env "storageManager_ip" | quote | trunc 0 -}}
+{{- end -}}
+
+{{- if empty .Values.global.contrail_env.storageManager_port -}}
+{{- $_ := set .Values.global.contrail_env "storageManager_port" .Values.endpoints.volume.port.api.default -}}
+{{- end -}}
 
 {{- if .Values.manifests.configmap_controller_env }}
 ---
@@ -13,8 +52,7 @@ data:
   {{- range $key, $value := .Values.global.contrail_env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
-  IPFABRIC_SERVICE_HOST: {{ $metadata_host }}
-  IPFABRIC_SERVICE_PORT: {{ .Values.endpoints.nova_metadata.port.metadata.public | quote }}
+
 {{- end }}
 
 {{- if .Values.manifests.configmap_controller_keystone }}
@@ -35,7 +73,6 @@ data:
   KEYSTONE_AUTH_ADMIN_PORT: {{ .Values.endpoints.keystone.port.admin.default | quote }}
   KEYSTONE_AUTH_PUBLIC_PORT: {{ .Values.endpoints.keystone.port.api.default | quote }}
   KEYSTONE_AUTH_REGION_NAME: {{ .Values.endpoints.keystone.auth.region_name | quote }}
-  identityManager_apiVersion: '["v3"]'
 {{- end }}
 
 {{- if .Values.manifests.configmap_controller_rabbitmq }}

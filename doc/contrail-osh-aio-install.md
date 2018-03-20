@@ -98,7 +98,8 @@ Install below packages on your setup
   tee /tmp/contrail.yaml << EOF
   global:
     contrail_env:
-      CONTROLLER_NODES: ${CONTROL_NODES}
+      CONTROLLER_NODES: 172.17.0.1
+      CONTROL_NODES: ${CONTROL_NODES}
       LOG_LEVEL: SYS_NOTICE
       CLOUD_ORCHESTRATOR: openstack
       AAA_MODE: cloud-admin
