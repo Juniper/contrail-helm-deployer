@@ -33,7 +33,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.vrouter_agent_dpdk nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
-        - name: contrail-init-dpdk
+        - name: contrail-vrouter-init-dpdk
           image: {{ .Values.global.images.tags.vrouter_init_dpdk | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
@@ -52,7 +52,7 @@ spec:
             name: os-release
           - mountPath: /etc/lsb-release
             name: lsb-release
-          - mountPath: {{ .Values.global.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+          - mountPath: {{ .Values.global.contrail_env_vrouter_dpdk.HUGE_PAGES_DIR | default "/dev/hugepages" }}
             name: hugepages
       containers:
         - name: contrail-vrouter-dpdk
@@ -80,11 +80,11 @@ spec:
             name: os-release
           - mountPath: /etc/lsb-release
             name: lsb-release
-          - mountPath: {{ .Values.global.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+          - mountPath: {{ .Values.global.contrail_env_vrouter_dpdk.HUGE_PAGES_DIR | default "/dev/hugepages" }}
             name: hugepages
           - mountPath: /var/crashes
             name: var-crashes-vrouter
-        - name: contrail-dpdk-watchdog
+        - name: contrail-vrouter-watchdog
           image: {{ .Values.global.images.tags.dpdk_watchdog | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
@@ -105,7 +105,7 @@ spec:
             name: var-run
           - mountPath: /host/bin
             name: host-bin
-        - name: contrail-vrouter-dpdk-agent
+        - name: contrail-vrouter-agent
           image: {{ .Values.global.images.tags.vrouter_agent | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
@@ -124,7 +124,7 @@ spec:
             name: etc-contrail
           - mountPath: /var/run/
             name: var-run
-          - mountPath: {{ .Values.global.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+          - mountPath: {{ .Values.global.contrail_env_vrouter_dpdk.HUGE_PAGES_DIR | default "/dev/dev/hugepages" }}
             name: hugepages
           - mountPath: /var/crashes
             name: var-crashes-vrouter
@@ -134,7 +134,7 @@ spec:
           - mountPath: /etc/sysconfig/network-scripts
             name: network-scripts
 {{- end }}
-        - name: contrail-agent-nodemgr
+        - name: contrail-vrouter-nodemgr
           image: {{ .Values.global.images.tags.nodemgr | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           envFrom:
@@ -199,7 +199,7 @@ spec:
           path: /etc
       - name: hugepages
         hostPath:
-          path: {{ .Values.global.contrail_env.HUGE_PAGES_DIR | default "/hugepages" }}
+          path: {{ .Values.global.contrail_env_vrouter_dpdk.HUGE_PAGES_DIR | default "/dev/hugepages" }}
       - name: var-crashes-vrouter
         hostPath:
           path: /var/crashes/contrail/vrouter

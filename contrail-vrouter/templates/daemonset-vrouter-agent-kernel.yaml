@@ -35,7 +35,7 @@ spec:
       initContainers:
 {{ tuple $context .Values.dependencies.vrouter_agent_kernel nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
 {{- if eq $host_os "ubuntu"}}
-        - name: contrail-init-kernel
+        - name: contrail-vrouter-init-kernel
           image: {{ .Values.global.images.tags.build_driver_init | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
@@ -53,7 +53,7 @@ spec:
           - mountPath: /host/bin
             name: host-bin
 {{- else if $host_os "centos" }}
-        - name: contrail-init-kernel
+        - name: contrail-vrouter-init-kernel
           image: {{ .Values.global.images.tags.vrouter_init_kernel | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           securityContext:
@@ -70,7 +70,7 @@ spec:
             name: host-bin
 {{- end }}
       containers:
-      - name: contrail-vrouter-kernel-agent
+      - name: contrail-vrouter-agent
         image: {{ .Values.global.images.tags.vrouter_agent | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         securityContext:
@@ -95,7 +95,7 @@ spec:
           name: var-crashes-vrouter
         - mountPath: /host/bin
           name: host-bin
-      - name: contrail-agent-nodemgr
+      - name: contrail-vrouter-nodemgr
         image: {{ .Values.global.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:

@@ -33,7 +33,8 @@ global:
     #DPDK_UIO_DRIVER: uio_pci_generic
     #HUGE_PAGES: 32000
     #AGENT_MODE: dpdk
-    #HUGE_PAGES_DIR: /hugepages
+    #HUGE_PAGES_DIR: /dev/hugepages
+    #DPDK_MEM_PER_SOCKET: 1024
 
   node:
     host_os: ubuntu
