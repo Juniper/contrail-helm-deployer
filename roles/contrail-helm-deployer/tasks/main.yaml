@@ -1,0 +1,28 @@
+- name: Set variables
+  set_fact:
+    repos_dir: "{{ ansible_env.HOME }}/src/{{ zuul.project.canonical_hostname }}/Juniper"
+    contrail_registry: "{{ docker_registry.fqdn }}:{{ docker_registry.port }}"
+
+- name: copy local vars template to target machine
+  template:
+    src: templates/local-vars.yaml.j2
+    dest: "{{ repos_dir }}/openstack-helm-infra/tools/gate/devel/local-vars.yaml"
+    mode: 0644
+
+- name: copy deployment script to target machine
+  copy:
+    src: helm-deploy.sh
+    dest: "{{ ansible_env.HOME }}"
+    mode: 0755
+
+- name: run helm deployment script
+  command: ./helm-deploy.sh
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  environment:
+    BASE_DIR: "{{ repos_dir }}"
+    OSH_PATH: "{{ repos_dir }}/openstack-helm"
+    OSH_INFRA_PATH: "{{ repos_dir }}/openstack-helm-infra"
+    CHD_PATH: "{{ repos_dir }}/contrail-helm-deployer"
+    CONTRAIL_REGISTRY: "{{ contrail_registry }}"
+    CONTAINER_TAG: "{{ container_tag }}"
