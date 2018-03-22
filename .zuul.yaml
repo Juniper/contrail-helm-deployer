@@ -2,4 +2,5 @@
     name: Juniper/contrail-helm-deployer
     check:
       jobs:
+        - contrail-deploy-ubuntu1604-helm-ocata
         - zuul-jobs-linters
