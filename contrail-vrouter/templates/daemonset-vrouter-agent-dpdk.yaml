@@ -74,8 +74,6 @@ spec:
             name: var-run
           - mountPath: /var/log/contrail
             name: contrail-log
-          - mountPath: /etc/contrail/
-            name: etc-contrail-dpdk
           - mountPath: /etc/os-release
             name: os-release
           - mountPath: /etc/lsb-release
@@ -147,14 +145,9 @@ spec:
             value: vrouter
           - name: DOCKER_HOST
             value: "unix://mnt/docker.sock"
-# todo: there is type Socket in new kubernetes, it is possible to use full
-# path:
-# hostPath:
-#   path: /var/run/docker.sock and
-#   type: Socket
           volumeMounts:
-          - mountPath: /mnt
-            name: var-run
+          - mountPath: /mnt/docker.sock
+            name: docker-unix-socket
           - mountPath: /var/log/contrail/
             name: contrail-log
           - mountPath: /etc/contrail/
@@ -167,6 +160,10 @@ spec:
         hostPath:
           path: /etc/sysconfig/network-scripts
 {{- end }}
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
       - name: var-run
         hostPath:
           path: /var/run
@@ -179,15 +176,12 @@ spec:
       - name: var-lib-contrail
         hostPath:
           path: /var/lib/contrail
-      - name: etc-contrail-dpdk
-        hostPath:
-          path: /etc/contrail/vrouter/dpdk
       - name: etc-contrail
         hostPath:
-          path: /etc/contrail/vrouter
+          path: /etc/contrail
       - name: contrail-log
         hostPath:
-          path: /var/log/contrail/vrouter/
+          path: /var/log/contrail
       - name: os-release
         hostPath:
           path: /usr/lib/os-release

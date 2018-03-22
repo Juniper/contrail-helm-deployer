@@ -68,10 +68,10 @@ spec:
       volumes:
       - name: etc-contrail
         hostPath:
-          path: /etc/contrail/webui/
+          path: /etc/contrail
       - name: contrail-log
         hostPath:
-          path: /var/log/contrail/webui/
+          path: /var/log/contrail
       - name: var-crashes-webui
         hostPath:
           path: /var/crashes/contrail/webui

@@ -116,13 +116,8 @@ spec:
           value: config
         - name: DOCKER_HOST
           value: "unix://mnt/docker.sock"
-# todo: there is type Socket in new kubernetes, it is possible to use full
-# path:
-# hostPath:
-#   path: /var/run/docker.sock and
-#   type: Socket
         volumeMounts:
-        - mountPath: /mnt
+        - mountPath: /mnt/docker.sock
           name: docker-unix-socket
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -133,13 +128,14 @@ spec:
       volumes:
       - name: docker-unix-socket
         hostPath:
-          path: /var/run
+          path: /var/run/docker.sock
+          type: Socket
       - name: etc-contrail
         hostPath:
-          path: /etc/contrail/config/
+          path: /etc/contrail
       - name: contrail-log
         hostPath:
-          path: /var/log/contrail/config/
+          path: /var/log/contrail
       - name: var-crashes-config
         hostPath:
           path: /var/crashes/contrail/config
