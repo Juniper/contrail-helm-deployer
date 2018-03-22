@@ -7,7 +7,7 @@
 {{- end -}}
 
 {{- if empty .Values.global.contrail_env.IPFABRIC_SERVICE_PORT }}
-{{- $_ := set .Values.global.contrail_env "IPFABRIC_SERVICE_PORT" .Values.endpoints.nova_metadata.port.metadata.default -}}
+{{- $_ := set .Values.global.contrail_env "IPFABRIC_SERVICE_PORT" .Values.endpoints.nova_metadata.port.metadata.public -}}
 {{- end -}}
 
 {{- if empty .Values.global.contrail_env.networkManager_ip -}}

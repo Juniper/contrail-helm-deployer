@@ -101,7 +101,6 @@ endpoints:
       default: 'http'
     port:
       metadata:
-        default: 8775
         public: 80
     namespace: openstack
   nova:
