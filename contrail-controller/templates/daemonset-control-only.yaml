@@ -50,10 +50,10 @@ spec:
       volumes:
       - name: etc-contrail
         hostPath:
-          path: /etc/contrail/control/
+          path: /etc/contrail
       - name: contrail-log
         hostPath:
-          path: /var/log/contrail/control/
+          path: /var/log/contrail
       - name: var-crashes-control
         hostPath:
           path: /var/crashes/contrail/control
