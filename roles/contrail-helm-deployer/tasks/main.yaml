@@ -1,7 +1,10 @@
 - name: Set variables
   set_fact:
     repos_dir: "{{ ansible_env.HOME }}/src/{{ zuul.project.canonical_hostname }}/Juniper"
-    contrail_registry: "{{ docker_registry.fqdn }}:{{ docker_registry.port }}"
+
+- name: (Hack) Drop ansible facts for debugging
+  debug:
+    var: hostvars[inventory_hostname]
 
 - name: copy local vars template to target machine
   template:
@@ -15,6 +18,22 @@
     dest: "{{ ansible_env.HOME }}"
     mode: 0755
 
+- name: (Hack) Walkaround to check if change VM hostname will solve deployment issue
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^{{ ansible_default_ipv4.address }}"
+    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ ansible_domain }} {{ inventory_hostname }}"
+  when: ansible_hostname != inventory_hostname
+  become: True
+  become_user: root
+
+- name: (Hack) Walkaround to change hostname using ansible
+  hostname:
+    name: "{{ inventory_hostname }}"
+  when: ansible_hostname != inventory_hostname
+  become: True
+  become_user: root
+
 - name: run helm deployment script
   command: ./helm-deploy.sh
   args:
@@ -24,5 +43,5 @@
     OSH_PATH: "{{ repos_dir }}/openstack-helm"
     OSH_INFRA_PATH: "{{ repos_dir }}/openstack-helm-infra"
     CHD_PATH: "{{ repos_dir }}/contrail-helm-deployer"
-    CONTRAIL_REGISTRY: "{{ contrail_registry }}"
+    CONTRAIL_REGISTRY: "{{ contrail_docker_registry }}"
     CONTAINER_TAG: "{{ container_tag }}"
