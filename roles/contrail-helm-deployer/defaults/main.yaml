@@ -1,3 +1,3 @@
 deploy_subnet: "192.168.1.0/24"
 container_registry: "docker.io/opencontrailnightly"
-container_tag: "ocata-master-34"
+container_tag: "latest"
