@@ -15,6 +15,13 @@
     dest: "{{ ansible_env.HOME }}"
     mode: 0755
 
+- name: (Hack) Walkaround to check if change VM hostname will solve deployment issue
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ ansible_all_ipv4_addresses | ipaddr('192.168.1.0/24') }} {{ inventory_hostname }}"
+  become: True
+  become_user: root
+
 - name: run helm deployment script
   command: ./helm-deploy.sh
   args:
