@@ -5,7 +5,7 @@ version:
 
 docker:
   insecure_registries:
-    - "{{ docker_registry.fqdn }}:{{ docker_registry.port }}"
+    - "{{ docker_registry.fqdn }}:{{ registry_port }}"
 
 kubernetes:
   network:
