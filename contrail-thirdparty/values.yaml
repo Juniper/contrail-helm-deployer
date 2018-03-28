@@ -1,11 +1,11 @@
 global:
   images:
     tags:
-      kafka: "docker.io/opencontrailnightly/contrail-external-kafka:ocata-master-17"
-      cassandra: "docker.io/opencontrailnightly/contrail-external-cassandra:ocata-master-17"
+      kafka: "docker.io/opencontrailnightly/contrail-external-kafka:ocata-master-43"
+      cassandra: "docker.io/opencontrailnightly/contrail-external-cassandra:ocata-master-43"
       redis: "redis:4.0.2"
-      zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:ocata-master-17"
-      nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-17"
+      zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:ocata-master-43"
+      nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-43"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
 
   contrail_env:
