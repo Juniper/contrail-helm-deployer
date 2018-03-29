@@ -44,8 +44,6 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-control
       - name: contrail-dns
@@ -102,8 +100,6 @@ spec:
           name: docker-unix-socket
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-control
       volumes:
@@ -112,8 +108,7 @@ spec:
           path: /var/run/docker.sock
           type: Socket
       - name: etc-contrail
-        hostPath:
-          path: /etc/contrail
+        emptyDir: {}
       - name: contrail-log
         hostPath:
           path: /var/log/contrail
