@@ -89,8 +89,6 @@ spec:
           name: var-lib-contrail
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-vrouter
         - mountPath: /host/bin
@@ -113,8 +111,6 @@ spec:
           name: docker-unix-socket
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-vrouter
       volumes:
@@ -140,9 +136,6 @@ spec:
       - name: var-lib-contrail
         hostPath:
           path: /var/lib/contrail/
-      - name: etc-contrail
-        hostPath:
-          path: /etc/contrail
       - name: contrail-log
         hostPath:
           path: /var/log/contrail
