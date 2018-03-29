@@ -33,6 +33,9 @@ spec:
       - name: contrail-analyticsdb
         image: {{ .Values.global.images.tags.cassandra | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+        env:
+        - name: NODE_TYPE
+          value: database
         envFrom:
         - configMapRef:
             name: contrail-analyticsdb
