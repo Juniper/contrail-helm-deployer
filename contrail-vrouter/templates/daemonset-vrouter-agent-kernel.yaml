@@ -95,6 +95,8 @@ spec:
           name: var-crashes-vrouter
         - mountPath: /host/bin
           name: host-bin
+        - mountPath: /var/run/libvirt
+          name: var-run-libvirt
       - name: contrail-vrouter-nodemgr
         image: {{ .Values.global.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
@@ -152,4 +154,7 @@ spec:
       - name: host-bin
         hostPath:
           path: /bin
+      - name: var-run-libvirt
+        hostPath:
+          path: /var/run/libvirt
 {{- end }}
