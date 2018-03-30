@@ -1,16 +1,16 @@
 global:
   images:
     tags:
-      nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-43"
-      contrail_control: "docker.io/opencontrailnightly/contrail-controller-control-control:ocata-master-43"
-      control_dns: "docker.io/opencontrailnightly/contrail-controller-control-dns:ocata-master-43"
-      control_named: "docker.io/opencontrailnightly/contrail-controller-control-named:ocata-master-43"
-      config_api: "docker.io/opencontrailnightly/contrail-controller-config-api:ocata-master-43"
-      config_devicemgr: "docker.io/opencontrailnightly/contrail-controller-config-devicemgr:ocata-master-43"
-      config_schema_transformer: "docker.io/opencontrailnightly/contrail-controller-config-schema:ocata-master-43"
-      config_svcmonitor: "docker.io/opencontrailnightly/contrail-controller-config-svcmonitor:ocata-master-43"
-      webui_middleware: "docker.io/opencontrailnightly/contrail-controller-webui-job:ocata-master-43"
-      webui: "docker.io/opencontrailnightly/contrail-controller-webui-web:ocata-master-43"
+      nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-46"
+      contrail_control: "docker.io/opencontrailnightly/contrail-controller-control-control:ocata-master-46"
+      control_dns: "docker.io/opencontrailnightly/contrail-controller-control-dns:ocata-master-46"
+      control_named: "docker.io/opencontrailnightly/contrail-controller-control-named:ocata-master-46"
+      config_api: "docker.io/opencontrailnightly/contrail-controller-config-api:ocata-master-46"
+      config_devicemgr: "docker.io/opencontrailnightly/contrail-controller-config-devicemgr:ocata-master-46"
+      config_schema_transformer: "docker.io/opencontrailnightly/contrail-controller-config-schema:ocata-master-46"
+      config_svcmonitor: "docker.io/opencontrailnightly/contrail-controller-config-svcmonitor:ocata-master-46"
+      webui_middleware: "docker.io/opencontrailnightly/contrail-controller-webui-job:ocata-master-46"
+      webui: "docker.io/opencontrailnightly/contrail-controller-webui-web:ocata-master-46"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"
 
