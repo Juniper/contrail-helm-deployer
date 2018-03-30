@@ -82,27 +82,6 @@ spec:
             name: hugepages
           - mountPath: /var/crashes
             name: var-crashes-vrouter
-        - name: contrail-vrouter-watchdog
-          image: {{ .Values.global.images.tags.dpdk_watchdog | quote }}
-          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
-          securityContext:
-            privileged: true
-          envFrom:
-          - configMapRef:
-              name: contrail-vrouter-dpdk
-          - configMapRef:
-              name: contrail-vrouter-keystone
-          volumeMounts:
-{{- if eq $host_os "centos"}}
-          - mountPath: /etc/sysconfig/network-scripts
-            name: network-scripts
-{{- end }}
-          - mountPath: /lib/modules/
-            name: lib-modules
-          - mountPath: /var/run/
-            name: var-run
-          - mountPath: /host/bin
-            name: host-bin
         - name: contrail-vrouter-agent
           image: {{ .Values.global.images.tags.vrouter_agent | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}

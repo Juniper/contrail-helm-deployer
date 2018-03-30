@@ -28,7 +28,6 @@ global:
       vrouter_init_kernel: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init:ocata-master-43"
       vrouter_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-agent-dpdk:ocata-master-43"
       vrouter_init_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init-dpdk:ocata-master-43"
-      dpdk_watchdog: "docker.io/opencontrailnightly/contrail-vrouter-net-watchdog:ocata-master-43"
       nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-43"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"
