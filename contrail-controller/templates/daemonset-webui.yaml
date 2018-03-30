@@ -46,8 +46,6 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-webui
       - name: contrail-webui
@@ -61,14 +59,9 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-webui
       volumes:
-      - name: etc-contrail
-        hostPath:
-          path: /etc/contrail
       - name: contrail-log
         hostPath:
           path: /var/log/contrail

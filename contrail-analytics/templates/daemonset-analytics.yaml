@@ -46,8 +46,6 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-collector
@@ -63,8 +61,6 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-alarm-gen
@@ -80,8 +76,6 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-query-engine
@@ -95,8 +89,6 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-snmp-collector
@@ -112,8 +104,6 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-topology
@@ -129,8 +119,6 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-analytics
       - name: contrail-analytics-nodemgr
@@ -149,8 +137,6 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /etc/contrail/
-          name: etc-contrail
         - mountPath: /var/crashes
           name: var-crashes-analytics
         - mountPath: /mnt/docker.sock
@@ -160,9 +146,6 @@ spec:
         hostPath:
           path: /var/run/docker.sock
           type: Socket
-      - name: etc-contrail
-        hostPath:
-          path: /etc/contrail
       - name: contrail-log
         hostPath:
           path: /var/log/contrail
