@@ -34,6 +34,20 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.vrouter_agent_kernel nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+        - name: contrail-node-init
+          image: {{ .Values.global.images.tags.node_init | quote }}
+          imagePullPolicy: ""
+          securityContext:
+            privileged: true
+          env:
+          - name: CONTRAIL_STATUS_IMAGE
+            value: {{ .Values.global.images.tags.contrail_status | quote }}
+          envFrom:
+          - configMapRef:
+              name: contrail-vrouter-kernel
+          volumeMounts:
+          - mountPath: /host/usr/bin
+            name: host-usr-bin
 {{- if eq $host_os "ubuntu"}}
         - name: contrail-vrouter-init-kernel
           image: {{ .Values.global.images.tags.build_driver_init | quote }}
@@ -143,11 +157,14 @@ spec:
           path: /var/log/contrail
       - name: var-crashes-vrouter
         hostPath:
-          path: /var/crashes/contrail/vrouter
+          path: /var/crashes
       - name: host-bin
         hostPath:
           path: /bin
       - name: var-run-libvirt
         hostPath:
           path: /var/run/libvirt
+      - name: host-usr-bin
+        hostPath:
+          path: /usr/bin
 {{- end }}
