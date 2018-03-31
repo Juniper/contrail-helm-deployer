@@ -29,6 +29,20 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.control_only nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+        - name: contrail-node-init
+          image: {{ .Values.global.images.tags.node_init | quote }}
+          imagePullPolicy: ""
+          securityContext:
+            privileged: true
+          env:
+          - name: CONTRAIL_STATUS_IMAGE
+            value: {{ .Values.global.images.tags.contrail_status | quote }}
+          envFrom:
+          - configMapRef:
+              name: contrail-controller-env
+          volumeMounts:
+          - mountPath: /host/usr/bin
+            name: host-usr-bin
       containers:
       - name: contrail-control
         image: {{ .Values.global.images.tags.contrail_control | quote }}
@@ -51,5 +65,8 @@ spec:
           path: /var/log/contrail
       - name: var-crashes-control
         hostPath:
-          path: /var/crashes/contrail/control
+          path: /var/crashes
+      - name: host-usr-bin
+        hostPath:
+          path: /usr/bin
 {{- end }}
