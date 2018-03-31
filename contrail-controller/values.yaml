@@ -2,6 +2,8 @@ global:
   images:
     tags:
       nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:ocata-master-46"
+      contrail_status: "docker.io/opencontrailnightly/contrail-status:ocata-master-46"
+      node_init: "docker.io/opencontrailnightly/contrail-node-init:ocata-master-46"
       contrail_control: "docker.io/opencontrailnightly/contrail-controller-control-control:ocata-master-46"
       control_dns: "docker.io/opencontrailnightly/contrail-controller-control-dns:ocata-master-46"
       control_named: "docker.io/opencontrailnightly/contrail-controller-control-named:ocata-master-46"
