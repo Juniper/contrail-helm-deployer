@@ -33,6 +33,20 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
 {{ tuple $context .Values.dependencies.vrouter_agent_dpdk nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+        - name: contrail-node-init
+          image: {{ .Values.global.images.tags.node_init | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          env:
+          - name: CONTRAIL_STATUS_IMAGE
+            value: {{ .Values.global.images.tags.contrail_status | quote }}
+          envFrom:
+          - configMapRef:
+              name: contrail-vrouter-dpdk
+          volumeMounts:
+          - mountPath: /host/usr/bin
+            name: host-usr-bin
         - name: contrail-vrouter-init-dpdk
           image: {{ .Values.global.images.tags.vrouter_init_dpdk | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
@@ -189,8 +203,11 @@ spec:
           path: {{ .Values.global.contrail_env_vrouter_dpdk.HUGE_PAGES_DIR | default "/dev/hugepages" }}
       - name: var-crashes-vrouter
         hostPath:
-          path: /var/crashes/contrail/vrouter
+          path: /var/crashes
       - name: host-bin
         hostPath:
           path: /bin
+      - name: host-usr-bin
+        hostPath:
+          path: /usr/bin
 {{- end }}
