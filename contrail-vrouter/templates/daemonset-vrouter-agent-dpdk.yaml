@@ -86,6 +86,8 @@ spec:
             name: lib-modules
           - mountPath: /var/run
             name: var-run
+          - mountPath: /var/lib/contrail
+            name: var-lib-contrail
           - mountPath: /var/log/contrail
             name: contrail-log
           - mountPath: /etc/os-release
