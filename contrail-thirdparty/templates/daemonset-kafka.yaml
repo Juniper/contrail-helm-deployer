@@ -39,4 +39,16 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-thirdparty-env
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.global.contrail_env.KAFKA_PORT | default 9092 }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.global.contrail_env.KAFKA_PORT | default 9092 }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
 {{- end }}
