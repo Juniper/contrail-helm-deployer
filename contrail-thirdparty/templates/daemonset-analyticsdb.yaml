@@ -41,11 +41,30 @@ spec:
             name: contrail-analyticsdb
         - configMapRef:
             name: contrail-thirdparty-env
+        readinessProbe:
+          exec:
+            command: ["/cassandra_health.sh"]
+          initialDelaySeconds: 90
+          periodSeconds: 30
+        # Not checking if status is up because of:
+        # https://github.com/kubernetes/charts/pull/1227
+        livenessProbe:
+          exec:
+            command: ["/bin/sh", "-c", "nodetool status -p ${CASSANDRA_JMX_LOCAL_PORT}"]
+          initialDelaySeconds: 90
+          periodSeconds: 30
         volumeMounts:
         - mountPath: /var/lib/cassandra
           name: analyticsdb-data
+        - mountPath: /cassandra_health.sh
+          name: contrail-thirdparty-bin
+          subPath: cassandra_health.sh
       volumes:
       - name: analyticsdb-data
         hostPath:
           path: /var/lib/analyticsdb
+      - name: contrail-thirdparty-bin
+        configMap:
+          name: contrail-thirdparty-bin
+          defaultMode: 0555
 {{- end }}

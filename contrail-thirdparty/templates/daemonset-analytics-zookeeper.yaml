@@ -39,11 +39,24 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-zookeeper
+        readinessProbe:
+          exec:
+            command: ["/zookeeper_health.sh"]
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          exec:
+            command: ["/zookeeper_health.sh"]
+          initialDelaySeconds: 10
+          periodSeconds: 5
         volumeMounts:
         - mountPath: /data
           name: analytics-zookeeper-data
         - mountPath: /datalog
           name: analytics-zookeeper-datalog
+        - mountPath: /zookeeper_health.sh
+          name: contrail-thirdparty-bin
+          subPath: zookeeper_health.sh
       volumes:
       - name: analytics-zookeeper-data
         hostPath:
@@ -51,4 +64,8 @@ spec:
       - name: analytics-zookeeper-datalog
         hostPath:
           path: /var/lib/analytics_zookeeper_datalog
+      - name: contrail-thirdparty-bin
+        configMap:
+          name: contrail-thirdparty-bin
+          defaultMode: 0555
 {{- end }}

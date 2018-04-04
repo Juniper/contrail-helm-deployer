@@ -1,0 +1,14 @@
+{{- if .Values.manifests.configmap_bin }}
+{{- $envAll := . }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-thirdparty-bin
+data:
+  cassandra_health.sh: |
+{{ tuple "bin/_cassandra_health.sh.tpl" . | include "helm-toolkit.utils.template" | indent 4 }}
+  zookeeper_health.sh: |
+{{ tuple "bin/_zookeeper_health.sh.tpl" . | include "helm-toolkit.utils.template" | indent 4 }}
+
+{{- end }}
