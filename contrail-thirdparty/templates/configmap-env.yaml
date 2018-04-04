@@ -74,7 +74,7 @@ data:
   CASSANDRA_CQL_PORT: {{ .Values.global.contrail_env.CONFIGDB_CQL_PORT | default 9041 | quote }}
   CASSANDRA_SSL_STORAGE_PORT: {{ .Values.global.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7011 | quote }}
   CASSANDRA_STORAGE_PORT: {{ .Values.global.contrail_env.CONFIGDB_STORAGE_PORT | default 7010 | quote  }}
-  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.global.contrail_env.JMX_LOCAL_PORT | default 7200 | quote }}
+  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.global.contrail_env.CONFIGDB_JMX_LOCAL_PORT | default 7200 | quote }}
 {{- end }}
 
 {{- if .Values.manifests.configmap_analyticsdb }}
@@ -87,9 +87,9 @@ data:
   CASSANDRA_SEEDS: {{ .Values.global.contrail_env.ANALYTICSDB_NODES | default $analyticsdb_nodes | quote  }}
   CASSANDRA_CLUSTER_NAME: ContrailAnalyticsDB
   CASSANDRA_START_RPC: "true"
-  CASSANDRA_PORT: {{ .Values.global.contrail_env.CONFIGDB_PORT | default 9160 | quote }}
-  CASSANDRA_CQL_PORT: {{ .Values.global.contrail_env.CONFIGDB_CQL_PORT | default 9042 | quote }}
-  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.global.contrail_env.CONFIGDB_SSL_STORAGE_PORT | default 7001 | quote }}
-  CASSANDRA_STORAGE_PORT: {{ .Values.global.contrail_env.CONFIGDB_STORAGE_PORT | default 7000 | quote  }}
-  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.global.contrail_env.JMX_LOCAL_PORT | default 7100 | quote }}
+  CASSANDRA_PORT: {{ .Values.global.contrail_env.ANALYTICSDB_PORT | default 9160 | quote }}
+  CASSANDRA_CQL_PORT: {{ .Values.global.contrail_env.ANALYTICSDB_CQL_PORT | default 9042 | quote }}
+  CASSANDRA_SSL_STORAGE_PORT: {{ .Values.global.contrail_env.ANALYTICSDB_SSL_STORAGE_PORT | default 7001 | quote }}
+  CASSANDRA_STORAGE_PORT: {{ .Values.global.contrail_env.ANALYTICSDB_STORAGE_PORT | default 7000 | quote  }}
+  CASSANDRA_JMX_LOCAL_PORT: {{ .Values.global.contrail_env.ANALYTICSDB_JMX_LOCAL_PORT | default 7100 | quote }}
 {{- end }}

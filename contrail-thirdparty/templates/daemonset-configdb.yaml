@@ -1,6 +1,7 @@
 {{- if .Values.manifests.daemonset_configdb }}
 {{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
+{{- $configdb_jmx_port := .Values.global.contrail_env.JMX_LOCAL_PORT | default 7200 | quote }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -41,6 +42,18 @@ spec:
             name: contrail-configdb
         - configMapRef:
             name: contrail-thirdparty-env
+        readinessProbe:
+          exec:
+            command: ["/cassandra-health.sh"]
+          initialDelaySeconds: 90
+          periodSeconds: 30
+        # Not checking if status is up because of:
+        # https://github.com/kubernetes/charts/pull/1227
+        livenessProbe:
+          exec:
+            command: ["/bin/sh", "-c", "nodetool status -p ${CASSANDRA_JMX_LOCAL_PORT}"]
+          initialDelaySeconds: 90
+          periodSeconds: 30
         volumeMounts:
         - mountPath: /var/lib/cassandra
           name: configdb-data
