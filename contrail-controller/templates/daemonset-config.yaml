@@ -122,6 +122,10 @@ spec:
           value: config
         - name: DOCKER_HOST
           value: "unix://mnt/docker.sock"
+        - name: CASSANDRA_CQL_PORT
+          value: {{ .Values.global.contrail_env.CONFIGDB_CQL_PORT | default 9041 | quote }}
+        - name: CASSANDRA_JMX_LOCAL_PORT
+          value: {{ .Values.global.contrail_env.CONFIGDB_JMX_LOCAL_PORT | default 7200 | quote }}
         volumeMounts:
         - mountPath: /mnt/docker.sock
           name: docker-unix-socket
