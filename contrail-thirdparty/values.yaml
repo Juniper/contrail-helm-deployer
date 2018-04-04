@@ -86,6 +86,7 @@ manifests:
   configmap_thirdparty_keystone: true
   configmap_configdb: true
   configmap_analyticsdb: true
+  configmap_bin: true
   daemonset_configdb: true
   daemonset_analyticsdb: true
   daemonset_redis: true
