@@ -44,6 +44,9 @@ spec:
           name: config-zookeeper-data
         - mountPath: /datalog
           name: config-zookeeper-datalog
+        - mountPath: /zookeeper_health.sh
+          name: contrail-thirdparty-bin
+          subPath: zookeeper_health.sh
       volumes:
       - name: config-zookeeper-data
         hostPath:
@@ -51,4 +54,8 @@ spec:
       - name: config-zookeeper-datalog
         hostPath:
           path: /var/lib/config_zookeeper_datalog
+      - name: contrail-thirdparty-bin
+        configMap:
+          name: contrail-thirdparty-bin
+          defaultMode: 0555
 {{- end }}
