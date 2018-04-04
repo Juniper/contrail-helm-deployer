@@ -44,6 +44,18 @@ global:
     CONTROL_DATA_NET_LIST: 6.6.6.0/24
     VROUTER_GATEWAY: 6.6.6.1
 
+    # such defaults should be available for all dependent components and should be at the top of definitions
+    CONFIGDB_PORT: 9161
+    CONFIGDB_CQL_PORT: 9041
+    CONFIGDB_SSL_STORAGE_PORT: 7011
+    CONFIGDB_STORAGE_PORT: 7010
+    CONFIGDB_JMX_LOCAL_PORT: 7200
+    ANALYTICSDB_PORT: 9160
+    ANALYTICSDB_CQL_PORT: 9042
+    ANALYTICSDB_SSL_STORAGE_PORT: 7001
+    ANALYTICSDB_STORAGE_PORT: 7000
+    ANALYTICSDB_JMX_LOCAL_PORT: 7100
+
   # section of vrouter template for kernel mode
   contrail_env_vrouter_kernel:
     #AGENT_MODE: nic

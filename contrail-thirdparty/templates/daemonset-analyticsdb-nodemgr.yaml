@@ -57,6 +57,10 @@ spec:
           value: database
         - name: DOCKER_HOST
           value: "unix://mnt/docker.sock"
+        - name: CASSANDRA_CQL_PORT
+          value: {{ .Values.global.contrail_env.ANALYTICSDB_CQL_PORT | quote }}
+        - name: CASSANDRA_JMX_LOCAL_PORT
+          value: {{ .Values.global.contrail_env.ANALYTICSDB_JMX_LOCAL_PORT | quote }}
         volumeMounts:
         - mountPath: /mnt/docker.sock
           name: docker-unix-socket
