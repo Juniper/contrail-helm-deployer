@@ -41,15 +41,20 @@ global:
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
-    CONTROL_DATA_NET_LIST: 6.6.6.0/24
     VROUTER_GATEWAY: 6.6.6.1
 
   # section of vrouter template for kernel mode
   contrail_env_vrouter_kernel:
     #AGENT_MODE: nic
+    # [Tmp-Fix for bug]: https://bugs.launchpad.net/juniperopenstack/+bug/1760694
+    # [TO-DO]: Move CONTROL_DATA_NET_LIST to .Values.global.contrail_env
+    CONTROL_DATA_NET_LIST: 6.6.6.0/24
 
   # section of vrouter template for dpdk mode
   contrail_env_vrouter_dpdk:
+    # [Tmp-Fix for bug]: https://bugs.launchpad.net/juniperopenstack/+bug/1760694
+    # [TO-DO]: Move CONTROL_DATA_NET_LIST to .Values.global.contrail_env
+    CONTROL_DATA_NET_LIST: 6.6.6.0/24
     #CPU_CORE_MASK: "0xf"
     #DPDK_UIO_DRIVER: uio_pci_generic
     #HUGE_PAGES: 32000
