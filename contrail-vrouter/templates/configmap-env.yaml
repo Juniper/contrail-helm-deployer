@@ -1,6 +1,14 @@
 {{- $context := . }}
 {{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
 
+{{- if not .Values.global.contrail_env_vrouter_kernel -}}
+{{- $_ := set .Values.global "contrail_env_vrouter_kernel" dict -}}
+{{- end -}}
+
+{{- if not .Values.global.contrail_env_vrouter_dpdk -}}
+{{- $_ := set .Values.global "contrail_env_vrouter_dpdk" dict -}}
+{{- end -}}
+
 {{- if .Values.manifests.configmap_vrouter_kernel }}
 ---
 apiVersion: v1

@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
 {{ tuple $context "opencontrail" "analytics-zookeeper" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+      annotations:
+        configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
     spec:
       affinity:
         nodeAffinity:
