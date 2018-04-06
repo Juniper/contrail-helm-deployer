@@ -78,6 +78,39 @@ endpoints:
     host_fqdn_override:
        default: null
     namespace: openstack
+pod:
+  lifecycle:
+    upgrades:
+      daemonsets:
+        pod_replacement_strategy: RollingUpdate
+        configdb:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        analyticsdb:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        analytics_zookeeper:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        config_zookeeper:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        redis:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        kafka:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        analyticsdb_nodemgr:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
 
 manifests:
   configmap_analytics_zookeeper: true

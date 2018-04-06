@@ -74,6 +74,16 @@ endpoints:
        default: null
     namespace: openstack
 
+pod:
+  lifecycle:
+    upgrades:
+      daemonsets:
+        pod_replacement_strategy: RollingUpdate
+        analytics:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+
 # Service related inputs are defined here
 service:
   analytics_api_public_port: ""
