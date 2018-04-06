@@ -86,6 +86,20 @@ endpoints:
        default: null
     namespace: openstack
 
+pod:
+  lifecycle:
+    upgrades:
+      daemonsets:
+        pod_replacement_strategy: RollingUpdate
+        vrouter_agent_kernel:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        vrouter_agent_dpdk:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+
 manifests:
   configmap_vrouter_kernel: true
   configmap_vrouter_keystone: true

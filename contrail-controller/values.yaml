@@ -172,6 +172,27 @@ endpoints:
         public: 80
     namespace: openstack
 
+pod:
+  lifecycle:
+    upgrades:
+      daemonsets:
+        pod_replacement_strategy: RollingUpdate
+        control:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        control_only:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        config:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
+        webui:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
 
 # Service related inputs are defined here
 service:

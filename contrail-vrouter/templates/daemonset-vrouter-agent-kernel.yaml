@@ -10,6 +10,7 @@ kind: DaemonSet
 metadata:
   name: contrail-vrouter-agent-kernel
 spec:
+{{ tuple $context "vrouter_agent_kernel" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
   template:
     metadata:
       labels:
