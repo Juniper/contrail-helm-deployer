@@ -39,6 +39,16 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-config-zookeeper
+        readinessProbe:
+          exec:
+            command: ["/readiness.sh"]
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          exec:
+            command: ["/liveness.sh"]
+          initialDelaySeconds: 10
+          periodSeconds: 5
         volumeMounts:
         - mountPath: /data
           name: config-zookeeper-data
