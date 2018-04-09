@@ -81,6 +81,8 @@ spec:
           - configMapRef:
               name: contrail-vrouter-keystone
           volumeMounts:
+          - mountPath: /lib/modules
+            name: lib-modules
           - mountPath: /etc/sysconfig/network-scripts
             name: network-scripts
           - mountPath: /host/bin
@@ -102,6 +104,8 @@ spec:
         - mountPath: /etc/sysconfig/network-scripts
           name: network-scripts
 {{- end }}
+        - mountPath: /lib/modules
+          name: lib-modules
         - mountPath: /var/lib/contrail/
           name: var-lib-contrail
         - mountPath: /var/log/contrail/
@@ -137,14 +141,14 @@ spec:
       - name: usr-src
         hostPath:
           path: /usr/src
-      - name: lib-modules
-        hostPath:
-          path: /lib/modules
 {{- else if $host_os "centos" }}
       - name: network-scripts
         hostPath:
           path: /etc/sysconfig/network-scripts
 {{- end }}
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
       - name: docker-unix-socket
         hostPath:
           path: /var/run/docker.sock
