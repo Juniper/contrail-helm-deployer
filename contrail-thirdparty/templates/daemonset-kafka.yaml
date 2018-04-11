@@ -49,9 +49,11 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
         livenessProbe:
-          tcpSocket:
-            port: {{ .Values.global.contrail_env.KAFKA_PORT | default 9092 }}
+          exec:
+            command:
+              - sh
+              - -ec
+              - /usr/bin/jps | /bin/grep -q Kafka
           initialDelaySeconds: 30
-          periodSeconds: 10
           timeoutSeconds: 5
 {{- end }}
