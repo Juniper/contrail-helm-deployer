@@ -124,6 +124,8 @@ spec:
             name: var-crashes-vrouter
           - mountPath: /host/bin
             name: host-bin
+          - mountPath: /dev/log
+            name: host-dev-log
 {{- if eq $host_os "centos"}}
           - mountPath: /etc/sysconfig/network-scripts
             name: network-scripts
@@ -194,4 +196,7 @@ spec:
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
+      - name: host-dev-log
+        hostPath:
+          path: /dev/log
 {{- end }}

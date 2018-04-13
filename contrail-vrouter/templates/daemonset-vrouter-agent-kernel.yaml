@@ -114,6 +114,8 @@ spec:
           name: var-crashes-vrouter
         - mountPath: /host/bin
           name: host-bin
+        - mountPath: /dev/log
+          name: host-dev-log
         - mountPath: /var/run/libvirt
           name: var-run-libvirt
       - name: contrail-vrouter-nodemgr
@@ -174,4 +176,7 @@ spec:
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
+      - name: host-dev-log
+        hostPath:
+          path: /dev/log
 {{- end }}
