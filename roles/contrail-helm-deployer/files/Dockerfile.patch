@@ -1,0 +1,13 @@
+--- Dockerfile.orig	2018-04-15 20:40:15.492000000 +0000
++++ Dockerfile	2018-04-15 20:42:44.548000000 +0000
+@@ -40,8 +40,9 @@
+         ca-certificates \
+         curl \
+         jq \
+-        python-pip \
++        python-setuptools\
+         gawk ;\
++    easy_install pip;\
+     pip --no-cache-dir install --upgrade pip ;\
+     pip --no-cache-dir install setuptools ;\
+     pip --no-cache-dir install kubernetes ;\

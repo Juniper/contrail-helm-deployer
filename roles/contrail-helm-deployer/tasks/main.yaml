@@ -3,6 +3,13 @@
     repos_dir: "{{ ansible_env.HOME }}/src/{{ zuul.project.canonical_hostname }}/Juniper"
     contrail_registry: "{{ docker_registry.fqdn }}:{{ docker_registry.port }}"
 
+# Walkaround for Kubeadm-AIO container image build fail reported here:
+# https://answers.launchpad.net/openstack-helm/+question/667931
+- name: (HACK) apply Dockerfile patch for Kubeadm-AIO image
+  patch:
+    src: files/Dockerfile.patch
+    dest: "{{ repos_dir }}/openstack-helm-infra/tools/images/kubeadm-aio/Dockerfile"
+
 - name: copy local vars template to target machine
   template:
     src: templates/local-vars.yaml.j2
