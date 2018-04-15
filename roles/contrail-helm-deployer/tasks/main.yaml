@@ -15,6 +15,13 @@
     dest: "{{ ansible_env.HOME }}"
     mode: 0755
 
+# Walkaround for Kubeadm-AIO container image build reported here:
+# https://answers.launchpad.net/openstack-helm/+question/667931
+- name: (HACK) Apply Dockerfile patch for Kubeadm-AIO image
+  patch:
+    src: files/Dockerfile.patch
+    dest: "{{ repos_dir }}/openstack-helm-infra/tools/images/kubeadm-aio/Dockerfile"
+
 - name: run helm deployment script
   command: ./helm-deploy.sh
   args:
