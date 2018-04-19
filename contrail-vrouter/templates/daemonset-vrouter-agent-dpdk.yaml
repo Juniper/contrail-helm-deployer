@@ -69,7 +69,7 @@ spec:
             name: os-release
           - mountPath: /etc/lsb-release
             name: lsb-release
-          - mountPath: {{ .Values.global.contrail_env_vrouter_dpdk.HUGE_PAGES_DIR | default "/dev/hugepages" }}
+          - mountPath: /dev/hugepages
             name: hugepages
       containers:
         - name: contrail-vrouter-dpdk
@@ -97,7 +97,7 @@ spec:
             name: os-release
           - mountPath: /etc/lsb-release
             name: lsb-release
-          - mountPath: {{ .Values.global.contrail_env_vrouter_dpdk.HUGE_PAGES_DIR | default "/dev/hugepages" }}
+          - mountPath: /dev/hugepages
             name: hugepages
           - mountPath: /var/crashes
             name: var-crashes-vrouter
@@ -118,7 +118,7 @@ spec:
             name: contrail-log
           - mountPath: /var/run/
             name: var-run
-          - mountPath: {{ .Values.global.contrail_env_vrouter_dpdk.HUGE_PAGES_DIR | default "/dev/dev/hugepages" }}
+          - mountPath: /dev/hugepages
             name: hugepages
           - mountPath: /var/crashes
             name: var-crashes-vrouter
@@ -186,7 +186,7 @@ spec:
           path: /etc
       - name: hugepages
         hostPath:
-          path: {{ .Values.global.contrail_env_vrouter_dpdk.HUGE_PAGES_DIR | default "/dev/hugepages" }}
+          path: /dev/hugepages
       - name: var-crashes-vrouter
         hostPath:
           path: /var/crashes
