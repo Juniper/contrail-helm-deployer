@@ -1,41 +1,151 @@
-# Installation guide for Contrail HA and Openstack-Helm
+# Installation guide for Contrail HA and Openstack-Helm Ocata
+
+![Web Console](images/OpenContrail-Helm.png)
+This installation procedure will use Juniper OpenStack Helm infra and OpenStack Helm repo for OpenStack/OpenContrail Ocata clsuter Multi-node deployment.
 
 ### Tested with
 
 1. Operating system: Ubuntu 16.04.3 LTS
 2. Kernel: 4.4.0-87-generic
-3. docker: 1.13.1
+3. docker: 1.13.1-cs9
 4. helm: v2.7.2
-5. kubernetes: v1.8.3
-6. openstack: newton
+5. kubernetes: v1.9.3
+6. openstack: Ocata
 
+### Multinode Topology Diagram
+![Web Console](images/OSH-Contrail-MN-Topology.png)
 ### Pre-requisites
 
-1. Have a kubernetes cluster up and running ([Quickstart steps to bring up a k8s cluster](installing_k8s.md))
+1. Generate SSH key on master node and copy to all nodes, in below example three nodes with IP addresses 10.13.82.43, 10.13.82.44 & 10.13.82.45 is used.
 
-2. Have helm installed and intitialized ([Steps to install and initialize helm](installing_helm.md))
+ ```bash
+(k8s-master)> ssh-keygen
 
-3. Install below software's on all nodes
+(k8s-master)> ssh-copy-id -i ~/.ssh/id_rsa.pub 10.13.82.43
+(k8s-master)> ssh-copy-id -i ~/.ssh/id_rsa.pub 10.13.82.44
+(k8s-master)> ssh-copy-id -i ~/.ssh/id_rsa.pub 10.13.82.45
+ ```
+
+2. Please make sure in all nodes NTP is configured and each node is sync to time-server as per your environment. In below example NTP server IP is "10.84.5.100".
+
+```bash
+ (k8s-all-nodes)> ntpq -p
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+*10.84.5.100     66.129.255.62    2 u   15   64  377   72.421  -22.686   2.628
+```
+
+3. Git clone the necessary repo's using below command on **all Nodes**
+
   ```bash
-  sudo apt-get install -y ceph-common \
-        make \
-        git \
-        linux-headers-$(uname -r)
+  # Download openstack-helm code
+  (k8s-all-nodes)> git clone https://github.com/Juniper/openstack-helm.git /opt/openstack-helm
+  # Download openstack-helm-infra code
+  (k8s-all-nodes)> git clone https://github.com/Juniper/openstack-helm-infra.git /opt/openstack-helm-infra
+  # Download contrail-helm-deployer code
+  (k8s-all-nodes)> git clone https://github.com/Juniper/contrail-helm-deployer.git /opt/contrail-helm-deployer
   ```
 
-4. Add kube-dns svc IP as one of your dns server also add k8s cluster domain as search domain
+4. Export variables needed by below procedure
 
   ```bash
-  # Example
-  root@b7s32:~# cat /etc/resolv.conf
-  nameserver 10.96.0.10
-  nameserver 10.84.5.100
-  search openstack.svc.cluster.local svc.cluster.local contrail.juniper.netjuniper.netjnpr.net
+  (k8s-master)> cd /opt
+  (k8s-master)> export BASE_DIR=$(pwd)
+  (k8s-master)> export OSH_PATH=${BASE_DIR}/openstack-helm
+  (k8s-master)> export OSH_INFRA_PATH=${BASE_DIR}/openstack-helm-infra
+  (k8s-master)> export CHD_PATH=${BASE_DIR}/contrail-helm-deployer
   ```
 
-  Use `nslookup` to verify that you are able to resolve k8s cluster specific names
+5. Installing necessary packages.
+
   ```bash
-  root@b7s32:~# nslookup
+  (k8s-master)> cd ${OSH_PATH}
+  (k8s-master)> ./tools/deployment/developer/common/001-install-packages-opencontrail.sh
+  ```
+
+6. Create an inventory file on the master node for ansible base provisoning, please note in below output 10.13.82.43/.44/.45 are nodes IP addresses and will use SSK-key generated in step 1
+
+ ```bash
+ #!/bin/bash
+(k8s-master)> set -xe
+(k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-inventory.yaml <<EOF
+all:
+  children:
+    primary:
+      hosts:
+        node_one:
+          ansible_port: 22
+          ansible_host: 10.13.82.43
+          ansible_user: root
+          ansible_ssh_private_key_file: /root/.ssh/id_rsa
+          ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+    nodes:
+      hosts:
+        node_two:
+          ansible_port: 22
+          ansible_host: 10.13.82.44
+          ansible_user: root
+          ansible_ssh_private_key_file: /root/.ssh/id_rsa
+          ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+        node_three:
+          ansible_port: 22
+          ansible_host: 10.13.82.45
+          ansible_user: root
+          ansible_ssh_private_key_file: /root/.ssh/id_rsa
+          ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+EOF
+ ```
+
+7. Create an environment file on the master node for the cluster. Edit `${OSH_INFRA_PATH}/tools/gate/devel/multinode-vars.yaml` if you would want to install a different version of kubernetes, cni or calico then overrides the default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`
+
+ ```bash
+(k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
+kubernetes:
+  network:
+  cluster:
+    cni: calico
+    pod_subnet: 192.168.0.0/16
+    domain: cluster.local
+EOF
+ ```
+
+**Note-1**: In above example all interfaces configrued with defualt route will be used for k8s cluster creation.
+
+**Note-2**: If you would like to use another interface "enp0s8" for k8s clsuter and internal insecure Docker registry please add following to "multinode-vars.yaml" file
+
+ ```bash
+(k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
+version:
+ kubernetes: v1.9.3
+ helm: v2.7.2
+ cni: v0.6.0
+   network:
+     default_device: enp0s8
+   cluster:
+     cni: calico
+     pod_subnet: 192.168.0.0/16
+     domain: cluster.local
+ docker:
+  insecure_registries:
+    - 10.84.5.81:5000
+EOF
+ ```
+
+8. Run the playbooks on master node
+
+  ```bash
+(k8s-master)> set -xe
+(k8s-master)> cd ${OSH_INFRA_PATH}
+(k8s-master)> make dev-deploy setup-host multinode
+(k8s-master)> make dev-deploy k8s multinode
+ ```
+
+9. Verify kube-dns connection from all nodes.
+
+Use `nslookup` to verify that you are able to resolve k8s cluster specific names
+
+```bash
+  (k8s-all-nodes)> nslookup
   > kubernetes.default.svc.cluster.local
   Server:         10.96.0.10
   Address:        10.96.0.10#53
@@ -43,224 +153,191 @@
   Non-authoritative answer:
   Name:   kubernetes.default.svc.cluster.local
   Address: 10.96.0.1
+```
+
+### Installation of OpenStack Helm Charts
+
+All nodes by default labeled with "openstack-control-plane" and "openstack-compute-node" labels, you can use following commands to check opesnatck labels. With this default config OSH pods will be created on all the nodes.
+
+```bash
+(k8s-master)>  kubectl get nodes -o wide -l openstack-control-plane=enabled
+(k8s-master)> kubectl get nodes -o wide -l openstack-compute-node=enabled
+```
+
+* **Note**: If requried please disable openstack labels using following commands to restrict OSH pods creation on specific nodes. In following example "openstack-compute-node" lable is disabled on "ubuntu-contrail-9" node.
+
+```bash
+(k8s-master)> kubectl label node ubuntu-contrail-9 --overwrite openstack-compute-node=disabled
+```
+
+1. Deploy OpenStack Helm charts using following commands.
+
+```bash
+  (k8s-master)> set -xe
+  (k8s-master)> cd ${OSH_PATH}
+
+  (k8s-master)> ./tools/deployment/multinode/010-setup-client.sh
+  (k8s-master)> ./tools/deployment/multinode/021-ingress-opencontrail.sh
+  (k8s-master)> ./tools/deployment/multinode/030-ceph.sh
+  (k8s-master)> ./tools/deployment/multinode/040-ceph-ns-activate.sh
+  (k8s-master)> ./tools/deployment/multinode/050-mariadb.sh
+  (k8s-master)> ./tools/deployment/multinode/060-rabbitmq.sh
+  (k8s-master)> ./tools/deployment/multinode/070-memcached.sh
+  (k8s-master)> ./tools/deployment/multinode/080-keystone.sh
+  (k8s-master)> ./tools/deployment/multinode/090-ceph-radosgateway.sh
+  (k8s-master)> ./tools/deployment/multinode/100-glance.sh
+  (k8s-master)> ./tools/deployment/multinode/110-cinder.sh
+  (k8s-master)> ./tools/deployment/multinode/131-libvirt-opencontrail.sh
+  (k8s-master)>./tools/deployment/multinode/141-compute-kit-opencontrail.sh
+
+Note: Optional Horizon
+(k8s-master)> ./tools/deployment/developer/ceph/100-horizon.sh
+```
+
+#### Installation of Contrail Helm charts
+
+1. All contrail pods will be deployed in Namespace "contrail". Lable Contrail Nodes using below command and following labels are used by Contrail
+
+* Control Nodes: opencontrail.org/controller
+* vRouter Kernel: opencontrail.org/vrouter-kernel
+* vRouter DPDK: opencontrail.org/vrouter-dpdk
+
+In following example "ubuntu-contrail-11" is DPDK and "ubuntu-contrail-10" is kernel vrouter.
+
+ ```bash
+(k8s-master)> kubectl label node  ubuntu-contrail-11 opencontrail.org/vrouter-dpdk=enabled
+(k8s-master)> kubectl label node ubuntu-contrail-10 opencontrail.org/vrouter-kernel=enabled
+(k8s-master)> kubectl label nodes ubuntu-contrail-9 ubuntu-contrail-10 ubuntu-contrail-11 opencontrail.org/controller=enabled
+ ```
+
+2. K8s clusterrolebinding for contrail
+
+ ```bash
+(k8s-master)> cd $CHD_PATH
+(k8s-master)> kubectl replace -f ${CHD_PATH}/rbac/cluster-admin.yaml
   ```
 
-5. Updating ClusterRole (This is needed by contrail pods for now)
+3. Now deploy opencontrail charts
 
-  ```bash
-  kubectl replace -f \
-  https://raw.githubusercontent.com/madhukar32/openstack-helm/contrail_5_0/tools/kubeadm-aio/assets/opt/rbac/dev.yaml
-  ```
+```bash
+ (k8s-master)> cd $CHD_PATH
+ (k8s-master)> make
 
+  # Set the IP of your CONTROLLER_NODES in each chart values.yaml and BGP port for multi-node setup (specify your control data ip, if you have one). Please note in below example 10.13.82.0/24 is MGMT & K8S clsuter host network and 192.168.1.0/24 is Contrail "Control-Data" network.
+  CONTROLLER_NODES=10.13.82.43,10.13.82.44,10.13.82.45
+  CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
+  BGP_PORT=1179
 
-#### Installation steps
+  # set the control data network cidr list separated by comma and set the respective gateway
+  CONTROL_DATA_NET_LIST=192.168.1.0/24
+  VROUTER_GATEWAY=192.168.1.1
+  AGENT_MODE: nic
+```
 
-1. Get openstack-helm and contrail-helm-deployer repo
+Here are each chart **"contrail_env"** reference values.yaml file (**FYI**)
 
-  ```bash
-  # Download openstack-helm code
-  git clone https://github.com/madhukar32/openstack-helm.git -b contrail_5_0
-  git clone https://github.com/Juniper/contrail-helm-deployer.git
+* **contrail-thirdparty/values.yaml**
 
-  # Exporting variables
-
-  export BASE_DIR=$(pwd)
-  export OSH_PATH=${BASE_DIR}/openstack-helm
-  export CHD_PATH=${BASE_DIR}/contrail-helm-deployer
-  ```
-
-2. Labelling nodes for openstack, contrail, ceph and compute
-
-  ```bash
-  # Here b7s32 b7s33 b7s34 b7s35 b7s36 are sample nodes
-  kubectl label nodes b7s32 openstack-control-plane=enabled
-  kubectl label nodes b7s32 b7s33 b7s34 ceph-mon=enabled
-  kubectl label nodes b7s32 b7s33 b7s34 ceph-osd=enabled
-  kubectl label nodes b7s32 b7s33 b7s34 ceph-mds=enabled
-  kubectl label nodes b7s32 b7s33 b7s34 ceph-rgw=enabled
-  kubectl label nodes b7s32 b7s33 b7s34 ceph-mgr=enabled
-  kubectl label nodes b7s35 b7s36 openstack-compute-node=enabled
-  kubectl label nodes b7s32 b7s33 b7s34 opencontrail.org/controller=enabled
-  ```
-
-4. Make all OSH charts
-
-  ```bash
-  cd ${OSH_PATH}
-  make
-  ```
-
-3. Deploying Ceph charts
-
-  ```bash
-  # 10.84.29.32/24 is a network on which your k8s cluster is running
-  export OSD_CLUSTER_NETWORK=10.84.29.32/24
-  export OSD_PUBLIC_NETWORK=10.84.29.32/24
-
-  cd ${OSH_PATH}
-  : ${CEPH_RGW_KEYSTONE_ENABLED:="true"}
-  helm install --namespace=ceph ${OSH_PATH}/ceph --name=ceph \
-    --set endpoints.identity.namespace=openstack \
-    --set endpoints.object_store.namespace=ceph \
-    --set endpoints.ceph_mon.namespace=ceph \
-    --set ceph.rgw_keystone_auth=${CEPH_RGW_KEYSTONE_ENABLED} \
-    --set network.public=${OSD_PUBLIC_NETWORK} \
-    --set network.cluster=${OSD_CLUSTER_NETWORK} \
-    --set deployment.storage_secrets=true \
-    --set deployment.ceph=true \
-    --set deployment.rbd_provisioner=true \
-    --set deployment.cephfs_provisioner=true \
-    --set deployment.client_secrets=false \
-    --set deployment.rgw_keystone_user_and_endpoints=false \
-    --set bootstrap.enabled=true
-  ```
-
-  Verifying all ceph pods are up
-
-  ```bash
-  kubectl get pods -n ceph
-  ```
-
-  Checking the health of ceph
-
-  ```bash
-  MON_POD=$(kubectl get pods \
-  --namespace=ceph \
-  --selector="application=ceph" \
-  --selector="component=mon" \
-  --no-headers | awk '{ print $1; exit }')
-  kubectl exec -n ceph ${MON_POD} -- ceph -s
-  ```
-
-  Activating control-plane namespace for ceph
-
-  ```bash
-  : ${CEPH_RGW_KEYSTONE_ENABLED:="true"}
-  helm install --namespace=openstack ${OSH_PATH}/ceph --name=ceph-openstack-config \
-  --set endpoints.identity.namespace=openstack \
-  --set endpoints.object_store.namespace=ceph \
-  --set endpoints.ceph_mon.namespace=ceph \
-  --set ceph.rgw_keystone_auth=${CEPH_RGW_KEYSTONE_ENABLED} \
-  --set network.public=${OSD_PUBLIC_NETWORK} \
-  --set network.cluster=${OSD_CLUSTER_NETWORK} \
-  --set deployment.storage_secrets=false \
-  --set deployment.ceph=false \
-  --set deployment.rbd_provisioner=false \
-  --set deployment.cephfs_provisioner=false \
-  --set deployment.client_secrets=true \
-  --set deployment.rgw_keystone_user_and_endpoints=false
-  ```
-
-4. Installing Mariadb chart
-
-  ```bash
-  helm install --name=mariadb ${OSH_PATH}/mariadb --namespace=openstack
-  ```
-
-5. Install rabbitmq, etcd, libvirt, ingress, memcached charts
-
-  ```bash
-  helm install --name=memcached ${OSH_PATH}/memcached --namespace=openstack
-  helm install --name=etcd-rabbitmq ${OSH_PATH}/etcd --namespace=openstack
-  helm install --name=rabbitmq ${OSH_PATH}/rabbitmq --namespace=openstack
-  helm install --name=ingress ${OSH_PATH}/ingress --namespace=openstack
-  helm install --name=libvirt ${OSH_PATH}/libvirt --namespace=openstack -f ${OSH_PATH}/tools/overrides/mvp/libvirt-opencontrail.yaml
-  ```
-
-6. Installing keystone chart
-
-  ```bash
-  helm install --namespace=openstack --name=keystone ${OSH_PATH}/keystone \
-  --set pod.replicas.api=1
-  ```
-
-7. Install Rados GW object storage
-
-  ```bash
-  helm install --namespace=openstack ${OSH_PATH}/ceph --name=radosgw-openstack \
-  --set endpoints.identity.namespace=openstack \
-  --set endpoints.object_store.namespace=ceph \
-  --set endpoints.ceph_mon.namespace=ceph \
-  --set ceph.rgw_keystone_auth=${CEPH_RGW_KEYSTONE_ENABLED} \
-  --set network.public=${OSD_PUBLIC_NETWORK} \
-  --set network.cluster=${OSD_CLUSTER_NETWORK} \
-  --set deployment.storage_secrets=false \
-  --set deployment.ceph=false \
-  --set deployment.rbd_provisioner=false \
-  --set deployment.client_secrets=false \
-  --set deployment.cephfs_provisioner=false \
-  --set deployment.rgw_keystone_user_and_endpoints=true
-  ```
-
-8. Install horizon
-
-  ```bash
-  helm install --namespace=openstack --name=horizon ${OSH_PATH}/horizon \
-  --set network.node_port.enabled=true
-  ```
-
-9. Install Glance
-
-  ```bash
-  : ${GLANCE_BACKEND:="radosgw"}
-  helm install --namespace=openstack --name=glance ${OSH_PATH}/glance \
-  --set pod.replicas.api=2 \
-  --set pod.replicas.registry=2 \
-  --set storage=${GLANCE_BACKEND}
-  ```
-
-10. Preparing contrail charts
-
-  ```bash
-  cd ${CHD_PATH}
-  #build all charts
-  make
-
-  # Edit contrail-thirdparty/values.yaml, contrail-controller/values.yaml,
-  # contrail-analytics/values.yaml, contrail-vrouter/values.yaml and
-  # add list of CONTROLLER_NODES IP seperated by comma
-  # sample
+```Text
+global:
   contrail_env:
-    CONTROLLER_NODES: 10.84.29.32,10.84.29.33,10.84.29.34
-  ```
+    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
+```
 
-11. Installing contrail charts
+* **contrail-controller/values.yaml**
+
+```Text
+global:
+  contrail_env:
+    CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
+    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
+    BGP_PORT: 1179
+```
+
+* **contrail-analytics/values.yaml**
+
+```Text
+global:
+  contrail_env:
+    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
+```
+
+* **contrail-vrouter/values.yaml**
+
+```Text
+global:
+  contrail_env:
+    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
+    CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
+    CONTROL_DATA_NET_LIST: 192.168.1.0/24
+    VROUTER_GATEWAY: 192.168.1.1
+  contrail_env_vrouter_kernel:
+    AGENT_MODE: nic
+```
+
+Here are helm install commands to deploy Contrail helm chart after setting configuration parameters in "values.yaml" files.
+
+```bash
+  (k8s-master)> helm install --name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty \
+  --namespace=contrail
+
+  (k8s-master)> helm install --name contrail-controller ${CHD_PATH}/contrail-controller \
+  --namespace=contrail
+
+  (k8s-master)> helm install --name contrail-analytics ${CHD_PATH}/contrail-analytics \
+  --namespace=contrail
+
+  # Edit contrail-vrouter/values.yaml and make sure that images.tags.vrouter_kernel_init is right. Image tag name will be different depending upon your linux. Also set the conf.host_os to ubuntu or centos depending on your system
+
+  (k8s-master)> helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
+  --namespace=contrail
+```
+
+4. Once Contrail PODs are up and running deploy OpenStack Heat chart using following command.
+
+```bash
+(k8s-master)> ./tools/deployment/multinode/151-heat-opencontrail.sh
+```
+
+5. Run compute kit test using following command at the end.
 
   ```bash
-  helm install --name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty \
-  --namespace=openstack
-
-  helm install --name contrail-controller ${CHD_PATH}/contrail-controller \
-  --namespace=openstack \
-  --set manifests.each_container_is_pod=true
-
-  helm install --name contrail-analytics ${CHD_PATH}/contrail-analytics \
-  --namespace=openstack  \
-  --set manifests.each_container_is_pod=true
-
-  helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
-  --namespace=openstack  \
-  --set manifests.each_container_is_pod=true
+(k8s-master)> ./tools/deployment/multinode/143-compute-kit-opencontrail-test.sh
   ```
 
-12. Installing neutron
+### OSH Contrail Helm Clsuter basic testing
 
-  ```bash
-  cd ${OSH_PATH}
-  #CAVEAT: Give only one IP of config node as of now
-  export CONFIG_NODE=10.84.29.32
-  helm install ${OSH_PATH}/neutron --namespace=openstack \
-  --name=neutron --values=${OSH_PATH}/tools/overrides/mvp/neutron-opencontrail.yaml \
-  --set conf.plugins.opencontrail.APISERVER.api_server_ip=${CONFIG_NODE} \
-  --set conf.plugins.opencontrail.COLLECTOR.analytics_api_ip=${ANALYTICS_NODES:-${CONFIG_NODE}}
-  ```
-13. Deploying Nova
+1. Basic Virtual Network and VMs testing
 
-  ```bash
-  helm install ${OSH_PATH}/nova \
-      --namespace=openstack \
-      --values=${OSH_PATH}/tools/overrides/mvp/nova-opencontrail.yaml \
-      --name=nova
-  ```
+ ```bash
+(k8s-master)> export OS_CLOUD=openstack_helm
+
+(k8s-master)> openstack network create MGMT-VN
+(k8s-master)> openstack subnet create --subnet-range 172.16.1.0/24 --network MGMT-VN MGMT-VN-subnet
+
+(k8s-master)> openstack server create --flavor m1.tiny --image 'Cirros 0.3.5 64-bit' \
+--nic net-id=MGMT-VN \
+Test-01
+
+(k8s-master)> openstack server create --flavor m1.tiny --image 'Cirros 0.3.5 64-bit' \
+--nic net-id=MGMT-VN \
+Test-02
+ ```
+
+### Reference
+
+* <https://github.com/Juniper/openstack-helm/blob/master/doc/source/install/multinode.rst>
 
 ### [FAQ's](faq.md)
