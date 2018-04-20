@@ -48,7 +48,7 @@ Install below packages on your setup
 
 2. Installing necessary packages and deploying kubernetes
 
-  Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to install a different version of kubernetes, cni, calico. This overrides the default values given in `${OSH_INFRA_PATH}/tools/gate/playbooks/vars.yaml`
+Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to install a different version of kubernetes, cni, calico. This overrides the default values given in `${OSH_INFRA_PATH}/tools/vars.yaml`
 
   ```bash
   cd ${OSH_PATH}
