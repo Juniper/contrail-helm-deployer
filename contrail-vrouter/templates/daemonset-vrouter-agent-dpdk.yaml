@@ -126,6 +126,8 @@ spec:
             name: host-bin
           - mountPath: /dev/log
             name: host-dev-log
+          - mountPath: /etc/contrail/ssl
+            name: ssl-dir
 {{- if eq $host_os "centos"}}
           - mountPath: /etc/sysconfig/network-scripts
             name: network-scripts
@@ -150,6 +152,8 @@ spec:
             name: contrail-log
           - mountPath: /var/crashes
             name: var-crashes-vrouter
+          - mountPath: /etc/contrail/ssl
+            name: ssl-dir
       volumes:
 {{- if eq $host_os "centos"}}
       - name: network-scripts
@@ -199,4 +203,7 @@ spec:
       - name: host-dev-log
         hostPath:
           path: /dev/log
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
 {{- end }}

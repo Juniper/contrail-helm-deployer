@@ -65,6 +65,8 @@ spec:
           name: contrail-log
         - mountPath: /var/crashes
           name: var-crashes-webui
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
       - name: contrail-webui
         image: {{ .Values.global.images.tags.webui | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
@@ -78,6 +80,8 @@ spec:
           name: contrail-log
         - mountPath: /var/crashes
           name: var-crashes-webui
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
       volumes:
       - name: contrail-log
         hostPath:
@@ -88,4 +92,7 @@ spec:
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
 {{- end }}

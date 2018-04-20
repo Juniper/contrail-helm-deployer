@@ -57,8 +57,13 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/cassandra
           name: configdb-data
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
       volumes:
       - name: configdb-data
         hostPath:
           path: /var/lib/configdb
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
 {{- end }}

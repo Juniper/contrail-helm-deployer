@@ -57,8 +57,13 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/cassandra
           name: analyticsdb-data
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
       volumes:
       - name: analyticsdb-data
         hostPath:
           path: /var/lib/analyticsdb
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
 {{- end }}

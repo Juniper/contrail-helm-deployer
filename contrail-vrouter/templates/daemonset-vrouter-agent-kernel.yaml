@@ -118,6 +118,8 @@ spec:
           name: host-dev-log
         - mountPath: /var/run/libvirt
           name: var-run-libvirt
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
       - name: contrail-vrouter-nodemgr
         image: {{ .Values.global.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
@@ -138,6 +140,8 @@ spec:
           name: contrail-log
         - mountPath: /var/crashes
           name: var-crashes-vrouter
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
       volumes:
 {{- if eq $host_os "ubuntu"}}
       - name: usr-src
@@ -179,4 +183,8 @@ spec:
       - name: host-dev-log
         hostPath:
           path: /dev/log
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
+
 {{- end }}

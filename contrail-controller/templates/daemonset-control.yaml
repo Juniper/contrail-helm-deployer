@@ -63,6 +63,8 @@ spec:
           name: contrail-log
         - mountPath: /var/crashes
           name: var-crashes-control
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
       - name: contrail-dns
         image: {{ .Values.global.images.tags.control_dns | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
@@ -119,6 +121,8 @@ spec:
           name: contrail-log
         - mountPath: /var/crashes
           name: var-crashes-control
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
       volumes:
       - name: docker-unix-socket
         hostPath:
@@ -135,4 +139,7 @@ spec:
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
 {{- end }}
