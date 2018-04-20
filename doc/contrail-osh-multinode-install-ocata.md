@@ -12,6 +12,8 @@ This installation procedure will use Juniper OpenStack Helm infra and OpenStack 
 5. kubernetes: v1.9.3
 6. openstack: Ocata
 
+### Multinode Topology Diagram
+![Web Console](images/OSH-Contrail-MN-Topology.png)
 ### Pre-requisites
 
 1. Generate SSH key on master node and copy to all nodes, in below example three nodes with IP addresses 10.13.82.43, 10.13.82.44 & 10.13.82.45 is used.
@@ -24,7 +26,16 @@ This installation procedure will use Juniper OpenStack Helm infra and OpenStack 
 (k8s-master)> ssh-copy-id -i ~/.ssh/id_rsa.pub 10.13.82.45
  ```
 
-2. Git clone the necessary repo's using below command on **all Nodes**
+2. Please make sure in all nodes NTP is configured and each node is sync to time-server as per your environment. In below example NTP server IP is "10.84.5.100".
+
+```bash
+ (k8s-all-nodes)> ntpq -p
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+*10.84.5.100     66.129.255.62    2 u   15   64  377   72.421  -22.686   2.628
+```
+
+3. Git clone the necessary repo's using below command on **all Nodes**
 
   ```bash
   # Download openstack-helm code
@@ -35,7 +46,7 @@ This installation procedure will use Juniper OpenStack Helm infra and OpenStack 
   (k8s-all-nodes)> git clone https://github.com/Juniper/contrail-helm-deployer.git /opt/contrail-helm-deployer
   ```
 
-3. Export variables needed by below procedure
+4. Export variables needed by below procedure
 
   ```bash
   (k8s-master)> cd /opt
@@ -45,9 +56,9 @@ This installation procedure will use Juniper OpenStack Helm infra and OpenStack 
   (k8s-master)> export CHD_PATH=${BASE_DIR}/contrail-helm-deployer
   ```
 
-4. Installing necessary packages and deploying kubernetes
+5. Installing necessary packages and deploying kubernetes
 
-Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to install a different version of kubernetes, cni, calico. This overrides the default values given in `${OSH_INFRA_PATH}/tools/gate/playbooks/vars.yaml`
+Edit `${OSH_INFRA_PATH}/tools/gate/devel/multinode-vars.yaml` if you would want to install a different version of kubernetes, cni or calico then overrides the default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`
 
   ```bash
   (k8s-master)> cd ${OSH_PATH}
@@ -100,7 +111,26 @@ kubernetes:
 EOF
  ```
 
-Note: In above example all interfaces configrued with defualt route will be used for k8s cluster creation.
+**Note-1**: In above example all interfaces configrued with defualt route will be used for k8s cluster creation.
+
+**Note-2**: If you would like to use another interface "enp0s8" for k8s clsuter and internal insecure Docker registry please add following to "multinode-vars.yaml" file
+
+```bash
+(k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
+version:
+ kubernetes: v1.9.3
+ helm: v2.7.2
+ cni: v0.6.0
+   network:
+     default_device: enp0s8
+   cluster:
+     cni: calico
+     pod_subnet: 192.168.0.0/16
+     domain: cluster.local
+ docker:
+  insecure_registries:
+    - 10.84.5.81:5000
+EOF
 
 8. Run the playbooks on master node
 
@@ -212,7 +242,7 @@ Here are each chart **"contrail_env"** reference values.yaml file (**FYI**)
 ```Text
 global:
   contrail_env:
-    CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
@@ -223,8 +253,8 @@ global:
 ```Text
 global:
   contrail_env:
-    CONTROL_NODES: 192.168.1.237,192.168.1.238,192.168.1.239
-    CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+    CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
+    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
@@ -236,7 +266,7 @@ global:
 ```Text
 global:
   contrail_env:
-    CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
+    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
@@ -247,8 +277,8 @@ global:
 ```Text
 global:
   contrail_env:
-    CONTROLLER_NODES: 10.13.82.237,10.13.82.238,10.13.82.239
-    CONTROL_NODES: 192.168.1.237,192.168.1.238,192.168.1.239
+    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
+    CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
@@ -281,6 +311,12 @@ Here are helm install commands to deploy Contrail helm chart after setting confi
 ```bash
 (k8s-master)> ./tools/deployment/multinode/151-heat-opencontrail.sh
 ```
+
+5. Run compute kit test using following command at the end.
+
+  ```bash
+(k8s-master)> ./tools/deployment/multinode/143-compute-kit-opencontrail-test.sh
+  ```
 
 ### OSH Contrail Helm Clsuter basic testing
 
