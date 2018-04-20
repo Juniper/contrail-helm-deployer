@@ -57,6 +57,8 @@ spec:
           name: analytics-zookeeper-data
         - mountPath: /datalog
           name: analytics-zookeeper-datalog
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
       volumes:
       - name: analytics-zookeeper-data
         hostPath:
@@ -64,4 +66,7 @@ spec:
       - name: analytics-zookeeper-datalog
         hostPath:
           path: /var/lib/analytics_zookeeper_datalog
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
 {{- end }}

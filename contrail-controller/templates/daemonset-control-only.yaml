@@ -46,6 +46,8 @@ spec:
           volumeMounts:
           - mountPath: /host/usr/bin
             name: host-usr-bin
+          - mountPath: /etc/contrail/ssl
+            name: ssl-dir
       containers:
       - name: contrail-control
         image: {{ .Values.global.images.tags.contrail_control | quote }}
@@ -72,4 +74,7 @@ spec:
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
 {{- end }}
