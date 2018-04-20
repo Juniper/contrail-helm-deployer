@@ -108,36 +108,6 @@ spec:
           name: contrail-log
         - mountPath: /var/crashes
           name: var-crashes-analytics
-      - name: contrail-snmp-collector
-        image: {{ .Values.global.images.tags.analytics_snmp_collector | quote }}
-        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
-        envFrom:
-        - configMapRef:
-            name: contrail-analytics-env
-        - configMapRef:
-            name: contrail-analytics-keystone
-        - configMapRef:
-            name: contrail-analytics-rabbitmq
-        volumeMounts:
-        - mountPath: /var/log/contrail/
-          name: contrail-log
-        - mountPath: /var/crashes
-          name: var-crashes-analytics
-      - name: contrail-topology
-        image: {{ .Values.global.images.tags.contrail_topology | quote }}
-        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
-        envFrom:
-        - configMapRef:
-            name: contrail-analytics-env
-        - configMapRef:
-            name: contrail-analytics-keystone
-        - configMapRef:
-            name: contrail-analytics-rabbitmq
-        volumeMounts:
-        - mountPath: /var/log/contrail/
-          name: contrail-log
-        - mountPath: /var/crashes
-          name: var-crashes-analytics
       - name: contrail-analytics-nodemgr
         image: {{ .Values.global.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
