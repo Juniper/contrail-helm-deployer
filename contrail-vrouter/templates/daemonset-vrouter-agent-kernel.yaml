@@ -99,6 +99,10 @@ spec:
             name: contrail-vrouter-kernel
         - configMapRef:
             name: contrail-vrouter-keystone
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/clean-up.sh"]
         volumeMounts:
 {{- if eq $host_os "centos"}}
         - mountPath: /etc/sysconfig/network-scripts

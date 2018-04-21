@@ -97,8 +97,8 @@ spec:
             name: os-release
           - mountPath: /etc/lsb-release
             name: lsb-release
-          - mountPath: /dev/hugepages
-            name: hugepages
+          - mountPath: /dev
+            name: host-dev
           - mountPath: /var/crashes
             name: var-crashes-vrouter
         - name: contrail-vrouter-agent
@@ -118,14 +118,12 @@ spec:
             name: contrail-log
           - mountPath: /var/run/
             name: var-run
-          - mountPath: /dev/hugepages
-            name: hugepages
           - mountPath: /var/crashes
             name: var-crashes-vrouter
           - mountPath: /host/bin
             name: host-bin
-          - mountPath: /dev/log
-            name: host-dev-log
+          - mountPath: /dev
+            name: host-dev
           - mountPath: /etc/contrail/ssl
             name: ssl-dir
 {{- if eq $host_os "centos"}}
@@ -200,9 +198,9 @@ spec:
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
-      - name: host-dev-log
+      - name: host-dev
         hostPath:
-          path: /dev/log
+          path: /dev
       - name: ssl-dir
         hostPath:
           path: /etc/contrail/ssl
