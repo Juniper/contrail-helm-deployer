@@ -128,6 +128,11 @@ version:
  docker:
   insecure_registries:
     - 10.84.5.81:5000
+  # Adding login information to private secure registry
+  # secure_registries:
+  #  - name: <docker-registry-name>
+  #    username: username@abc.xyz
+  #    password: password
 EOF
  ```
 
