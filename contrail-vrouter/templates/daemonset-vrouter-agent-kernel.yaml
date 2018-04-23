@@ -35,6 +35,8 @@ spec:
         effect: NoSchedule
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      imagePullSecrets:
+        - name: contrail-vrouter-docker-secret
       initContainers:
 {{ tuple $context .Values.dependencies.vrouter_agent_kernel nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: contrail-node-init
