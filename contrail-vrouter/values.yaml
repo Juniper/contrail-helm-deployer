@@ -11,6 +11,11 @@ global:
       vrouter_init_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init-dpdk:ocata-master-46"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"
+    # Specify imageCredentials
+    imageCredentials:
+      # registry: quay.io
+      # username: username
+      # password: password
 
   # common section for all vrouter variants
   # this section is commonized with other Contrails' services

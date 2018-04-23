@@ -30,6 +30,8 @@ spec:
         effect: NoSchedule
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      imagePullSecrets:
+        - name: contrail-controller-docker-secret
       initContainers:
 {{ tuple $context .Values.dependencies.config nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: contrail-node-init
