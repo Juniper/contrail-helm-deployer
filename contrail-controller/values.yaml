@@ -15,6 +15,11 @@ global:
       webui: "docker.io/opencontrailnightly/contrail-controller-webui-web:ocata-master-46"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"
+    # Specify imageCredentials
+    imageCredentials:
+      # registry: quay.io
+      # username: username
+      # password: password
 
   contrail_env:
     CONTROLLER_NODES: 10.87.65.248
