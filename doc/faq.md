@@ -2,28 +2,7 @@
 
 ### Config
 
-1. Use `manifests.each_container_is_pod` variable to make each contrail service run as a single pod. Otherwise services under control, config, webui, analytics and vrouter components are grouped into a pod
-
-2. How to setup vhost0 interface for vrouter on non-mgmt interface of your compute node?
-  [to-do have to fix below caveat]
-  Caveats: It assumes that non-mgmt interface name of all nodes in your cluster has same name
-
-  If your non-mgmt interface is eth1, then you need to set
-  `contrail_env.PHYSICAL_INTERFACE` to `eth1` and set `contrail_env.VROUTER_GATEWAY`
-  to non-mgmt gateway IP in [contrail-vrouter/values.yaml](../contrail-vrouter/values.yaml)
-
-  ```bash
-  # Sample config
-  contrail_env:
-    CONTROLLER_NODES: 1.1.1.10
-    LOG_LEVEL: SYS_NOTICE
-    CLOUD_ORCHESTRATOR: openstack
-    AAA_MODE: cloud-admin
-    PHYSICAL_INTERFACE: eth1
-    VROUTER_GATEWAY: 1.1.1.1
-  ```
-
-3. How to configure contrail control BGP server to listen on a different port?
+1. How to configure contrail control BGP server to listen on a different port?
 
   If you would like to configure a non default BGP port then set `contrail_env.BGP`
   in [contrail-controller/values.yaml](../contrail-controller/values.yaml)
@@ -38,15 +17,14 @@
     BGP_PORT: 1179
   ```
 
-4. How to pass additional parameters to Contrails' services with configuration file in INI format?
+2. How to pass additional parameters to Contrails' services with configuration file in INI format?
 
-  Please note that this is not related to WebUI service cause it has configuration file in JS format.
   To pass variable 'some_key' to set in section 'SOME_SECTION' of Contrail's service 'SOME_SERVICE' you need to add it in next way to environment:
 
   ```bash
   # Sample config
   contrail_env:
-    SOME_SERVICE__SOME_SECTION__some_key: "value"
+    CONTRAIL_SERVICE__CONTRAIL_SECTION__CONTRAIL_VARIABLE: "value"
   ```
 
   Service's name, section's name and key's name are divided by two underscore symbols.
@@ -77,9 +55,9 @@
   List of database services for now is: DATABASE_NODEMGR
   List of vrouter services for now is: VROUTER_AGENT, VROUTER_AGENT_NODEMGR
 
-5. How to pass additional parameters to WebUI services with configuration file in JS format?
+  **Note:** This does not hold true for Webui service
 
-  Right now there is one one to do it - define exact variable in invironment like this:
+3. How to pass additional parameters to WebUI services with configuration file in JS format?
 
   ```bash
   # Sample config
@@ -102,7 +80,7 @@
 2. How to see logs of each of the container?
 
   Contrail logs are mounted under /var/log/contrail/ on each node and
-  to check for stdout log for each container use `kubectl logs -f <contrail-pod-name> -n openstack`
+  to check for stdout log for each container use `kubectl logs -f <contrail-pod-name> -n openstack -c <container-name>`
 
 3. How to enter into pod?
 
