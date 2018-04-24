@@ -50,6 +50,34 @@ Install below packages on your setup
 
 Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to install a different version of kubernetes, cni, calico. This overrides the default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`
 
+  Sample `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` file
+  ```yaml
+  version:
+    kubernetes: v1.8.3
+    helm: v2.7.2
+    cni: v0.6.0
+
+  docker:
+    # list of insecure_registries, from where you will be pulling container images
+    insecure_registries:
+      - "10.87.65.243:5000"
+    # list of private secure docker registry auth info, from where you will be pulling container images
+    #private_registries:
+    #  - name: <docker-registry-name>
+    #    username: username@abc.xyz
+    #    email: username@abc.xyz
+    #    password: password
+    #    secret_name: contrail-image-secret
+    #    namespace: openstack
+  kubernetes:
+    network:
+      default_device: docker0
+    cluster:
+      cni: calico
+      pod_subnet: 192.168.0.0/16
+      domain: cluster.local
+  ```
+
   ```bash
   cd ${OSH_PATH}
   ./tools/deployment/developer/common/001-install-packages-opencontrail.sh
@@ -74,6 +102,9 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
   ./tools/deployment/developer/nfs/100-horizon.sh
   ./tools/deployment/developer/nfs/120-glance.sh
   ./tools/deployment/developer/nfs/151-libvirt-opencontrail.sh
+  # Edit ${OSH_PATH}/tools/overrides/backends/opencontrail/nova.yaml and
+  # ${OSH_PATH}/tools/overrides/backends/opencontrail/neutron.yaml
+  # to make sure that you are pulling the right opencontrail init container image
   ./tools/deployment/developer/nfs/161-compute-kit-opencontrail.sh
   ```
 
@@ -90,6 +121,15 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
   export CONTROL_DATA_NET_LIST=10.87.65.128/25
   export VROUTER_GATEWAY=10.87.65.129
 
+  # [Optional] By default, it will pull latest image from opencontrailnightly
+
+  export CONTRAIL_REGISTRY="opencontrailnightly"
+  export CONTRAIL_TAG="latest"
+
+  # [Optional] only if you are pulling images from a private docker registry
+  export CONTRAIL_REG_USERNAME="abc@abc.com"
+  export CONTRAIL_REG_PASSWORD="password"
+
   kubectl label node opencontrail.org/controller=enabled --all
   kubectl label node opencontrail.org/vrouter-kernel=enabled --all
 
@@ -105,10 +145,56 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
       AAA_MODE: cloud-admin
       CONTROL_DATA_NET_LIST: ${CONTROL_DATA_NET_LIST}
       VROUTER_GATEWAY: ${VROUTER_GATEWAY}
+    images:
+      tags:
+        kafka: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-external-kafka:${CONTRAIL_TAG:-latest}"
+        cassandra: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-external-cassandra:${CONTRAIL_TAG:-latest}"
+        redis: "redis:4.0.2"
+        zookeeper: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-external-zookeeper:${CONTRAIL_TAG:-latest}"
+        contrail_control: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-control-control:${CONTRAIL_TAG:-latest}"
+        control_dns: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-control-dns:${CONTRAIL_TAG:-latest}"
+        control_named: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-control-named:${CONTRAIL_TAG:-latest}"
+        config_api: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-config-api:${CONTRAIL_TAG:-latest}"
+        config_devicemgr: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-config-devicemgr:${CONTRAIL_TAG:-latest}"
+        config_schema_transformer: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-config-schema:${CONTRAIL_TAG:-latest}"
+        config_svcmonitor: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-config-svcmonitor:${CONTRAIL_TAG:-latest}"
+        webui_middleware: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-webui-job:${CONTRAIL_TAG:-latest}"
+        webui: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-webui-web:${CONTRAIL_TAG:-latest}"
+        analytics_api: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-api:${CONTRAIL_TAG:-latest}"
+        contrail_collector: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-collector:${CONTRAIL_TAG:-latest}"
+        analytics_alarm_gen: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-alarm-gen:${CONTRAIL_TAG:-latest}"
+        analytics_query_engine: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-query-engine:${CONTRAIL_TAG:-latest}"
+        analytics_snmp_collector: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-snmp-collector:${CONTRAIL_TAG:-latest}"
+        contrail_topology: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-topology:${CONTRAIL_TAG:-latest}"
+        build_driver_init: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-kernel-build-init:${CONTRAIL_TAG:-latest}"
+        vrouter_agent: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-agent:${CONTRAIL_TAG:-latest}"
+        vrouter_init_kernel: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-kernel-init:${CONTRAIL_TAG:-latest}"
+        vrouter_dpdk: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-agent-dpdk:${CONTRAIL_TAG:-latest}"
+        vrouter_init_dpdk: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-kernel-init-dpdk:${CONTRAIL_TAG:-latest}"
+        nodemgr: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-nodemgr:${CONTRAIL_TAG:-latest}"
+        contrail_status: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-status:${CONTRAIL_TAG:-latest}"
+        node_init: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-node-init:${CONTRAIL_TAG:-latest}"
+        dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
 EOF
 
+```bash
+# [Optional] only if you are pulling contrail images from a private registry
+tee /tmp/contrail-registry-auth.yaml << EOF
+global:
+  images:
+    imageCredentials:
+      registry: ${CONTRAIL_REGISTRY:-opencontrailnightly}
+      username: ${CONTRAIL_REG_USERNAME}
+      password: ${CONTRAIL_REG_PASSWORD}
+EOF
+
+# [Optional] only if you are pulling images from a private registry
+export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
+```
+
   helm install --name contrail ${CHD_PATH}/contrail \
-  --namespace=contrail --values=/tmp/contrail.yaml
+  --namespace=contrail --values=/tmp/contrail.yaml \
+  ${CONTRAIL_REGISTRY_ARG}
   ```
 
 6. Deploy heat charts

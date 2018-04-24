@@ -29,20 +29,20 @@ This installation procedure will use Juniper OpenStack Helm infra and OpenStack 
 2. Please make sure in all nodes NTP is configured and each node is sync to time-server as per your environment. In below example NTP server IP is "10.84.5.100".
 
 ```bash
- (k8s-all-nodes)> ntpq -p
+ (k8s-all-nodes)> ntpq -pn
      remote           refid      st t when poll reach   delay   offset  jitter
 ==============================================================================
 *10.84.5.100     66.129.255.62    2 u   15   64  377   72.421  -22.686   2.628
 ```
 
-3. Git clone the necessary repo's using below command on **all Nodes**
+3. Git clone the necessary repo's using below command
 
   ```bash
-  # Download openstack-helm code
+  # Download openstack-helm code on **all Nodes**
   (k8s-all-nodes)> git clone https://github.com/Juniper/openstack-helm.git /opt/openstack-helm
-  # Download openstack-helm-infra code
+  # Download openstack-helm-infra code on **all Nodes**
   (k8s-all-nodes)> git clone https://github.com/Juniper/openstack-helm-infra.git /opt/openstack-helm-infra
-  # Download contrail-helm-deployer code
+  # Download contrail-helm-deployer code on **Master node only**
   (k8s-all-nodes)> git clone https://github.com/Juniper/contrail-helm-deployer.git /opt/contrail-helm-deployer
   ```
 
@@ -96,45 +96,40 @@ all:
 EOF
  ```
 
-7. Create an environment file on the master node for the cluster. Edit `${OSH_INFRA_PATH}/tools/gate/devel/multinode-vars.yaml` if you would want to install a different version of kubernetes, cni or calico then overrides the default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`
+7. By default k8s v1.9.3, helm v2.7.2 and cni (v0.6.0) are installed. If you would want to install a different version then edit `${OSH_INFRA_PATH}/tools/gate/devel/multinode-vars.yaml` file to override default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`
+
+Sample `multinode-vars.yaml`
 
  ```bash
 (k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
+# version fields
+version:
+  kubernetes: v1.9.3
+  helm: v2.7.2
+  cni: v0.6.0
+
 kubernetes:
   network:
+    # enp0s8 is your control/data interface, to which kubernetes will bind to
+    default_device: enp0s8
   cluster:
     cni: calico
     pod_subnet: 192.168.0.0/16
     domain: cluster.local
-EOF
- ```
-
-**Note-1**: In above example all interfaces configrued with defualt route will be used for k8s cluster creation.
-
-**Note-2**: If you would like to use another interface "enp0s8" for k8s clsuter and internal insecure Docker registry please add following to "multinode-vars.yaml" file
-
- ```bash
-(k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
-version:
- kubernetes: v1.9.3
- helm: v2.7.2
- cni: v0.6.0
-   network:
-     default_device: enp0s8
-   cluster:
-     cni: calico
-     pod_subnet: 192.168.0.0/16
-     domain: cluster.local
- docker:
+docker:
+  # list of insecure_registries, from where you will be pulling container images
   insecure_registries:
-    - 10.84.5.81:5000
-  # Adding login information to private secure registry
-  # secure_registries:
+    - "10.87.65.243:5000"
+  # list of private secure docker registry auth info, from where you will be pulling container images
+  #private_registries:
   #  - name: <docker-registry-name>
   #    username: username@abc.xyz
+  #    email: username@abc.xyz
   #    password: password
+  #    secret_name: contrail-image-secret
+  #    namespace: openstack
 EOF
- ```
+```
 
 8. Run the playbooks on master node
 
@@ -162,14 +157,14 @@ Use `nslookup` to verify that you are able to resolve k8s cluster specific names
 
 ### Installation of OpenStack Helm Charts
 
-All nodes by default labeled with "openstack-control-plane" and "openstack-compute-node" labels, you can use following commands to check opesnatck labels. With this default config OSH pods will be created on all the nodes.
+All nodes by default labeled with "openstack-control-plane" and "openstack-compute-node" labels, you can use following commands to check openstack labels. With this default config OSH pods will be created on all the nodes.
 
 ```bash
 (k8s-master)>  kubectl get nodes -o wide -l openstack-control-plane=enabled
 (k8s-master)> kubectl get nodes -o wide -l openstack-compute-node=enabled
 ```
 
-* **Note**: If requried please disable openstack labels using following commands to restrict OSH pods creation on specific nodes. In following example "openstack-compute-node" lable is disabled on "ubuntu-contrail-9" node.
+**Note**: If requried please disable openstack labels using following commands to restrict OSH pods creation on specific nodes. In following example "openstack-compute-node" lable is disabled on "ubuntu-contrail-9" node.
 
 ```bash
 (k8s-master)> kubectl label node ubuntu-contrail-9 --overwrite openstack-compute-node=disabled
@@ -193,26 +188,27 @@ All nodes by default labeled with "openstack-control-plane" and "openstack-compu
   (k8s-master)> ./tools/deployment/multinode/100-glance.sh
   (k8s-master)> ./tools/deployment/multinode/110-cinder.sh
   (k8s-master)> ./tools/deployment/multinode/131-libvirt-opencontrail.sh
-  (k8s-master)>./tools/deployment/multinode/141-compute-kit-opencontrail.sh
-
-Note: Optional Horizon
-(k8s-master)> ./tools/deployment/developer/ceph/100-horizon.sh
+  # Edit ${OSH_PATH}/tools/overrides/backends/opencontrail/nova.yaml and
+  # ${OSH_PATH}/tools/overrides/backends/opencontrail/neutron.yaml
+  # to make sure that you are pulling init container image from correct registry and tag
+  (k8s-master)> ./tools/deployment/multinode/141-compute-kit-opencontrail.sh
+  (k8s-master)> ./tools/deployment/developer/ceph/100-horizon.sh
 ```
 
 #### Installation of Contrail Helm charts
 
-1. All contrail pods will be deployed in Namespace "contrail". Lable Contrail Nodes using below command and following labels are used by Contrail
+1. All contrail pods will be deployed in Namespace "contrail". Label Contrail Nodes using below command and following labels are used by Contrail
 
 * Control Nodes: opencontrail.org/controller
 * vRouter Kernel: opencontrail.org/vrouter-kernel
 * vRouter DPDK: opencontrail.org/vrouter-dpdk
 
-In following example "ubuntu-contrail-11" is DPDK and "ubuntu-contrail-10" is kernel vrouter.
+In following example "ubuntu-contrail-11" and "ubuntu-contrail-10" are dpdk vrouter and kernel vrouter compute node respectively. Whereas, ubuntu-contrail-7 ubuntu-contrail-8 ubuntu-contrail-9 are contrail controller nodes
 
  ```bash
 (k8s-master)> kubectl label node  ubuntu-contrail-11 opencontrail.org/vrouter-dpdk=enabled
 (k8s-master)> kubectl label node ubuntu-contrail-10 opencontrail.org/vrouter-kernel=enabled
-(k8s-master)> kubectl label nodes ubuntu-contrail-9 ubuntu-contrail-10 ubuntu-contrail-11 opencontrail.org/controller=enabled
+(k8s-master)> kubectl label nodes ubuntu-contrail-7 ubuntu-contrail-8 ubuntu-contrail-9 opencontrail.org/controller=enabled
  ```
 
 2. K8s clusterrolebinding for contrail
@@ -228,91 +224,119 @@ In following example "ubuntu-contrail-11" is DPDK and "ubuntu-contrail-10" is ke
  (k8s-master)> cd $CHD_PATH
  (k8s-master)> make
 
-  # Set the IP of your CONTROLLER_NODES in each chart values.yaml and BGP port for multi-node setup (specify your control data ip, if you have one). Please note in below example 10.13.82.0/24 is MGMT & K8S clsuter host network and 192.168.1.0/24 is Contrail "Control-Data" network.
-  CONTROLLER_NODES=10.13.82.43,10.13.82.44,10.13.82.45
-  CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
-  BGP_PORT=1179
+ # Please note in below example, 192.168.1.0/24 is "Control/Data" network
+ # Export variables
+ (k8s-master)> export CONTROLLER_NODES="192.168.1.43,192.168.1.44,192.168.1.45"
+ (k8s-master)> export VROUTER_GATEWAY="192.168.10.1"
+ (k8s-master)> export CONTROL_DATA_NET_LIST="192.168.10.0/24"
+ (k8s-master)> export BGP_PORT="1179"
 
-  # set the control data network cidr list separated by comma and set the respective gateway
-  CONTROL_DATA_NET_LIST=192.168.1.0/24
-  VROUTER_GATEWAY=192.168.1.1
-  AGENT_MODE: nic
-```
+ # [Optional] By default, it will pull latest image from opencontrailnightly
 
-Here are each chart **"contrail_env"** reference values.yaml file (**FYI**)
+ (k8s-master)> export CONTRAIL_REGISTRY="opencontrailnightly"
+ (k8s-master)> export CONTRAIL_TAG="latest"
 
-* **contrail-thirdparty/values.yaml**
+ # [Optional] only if you are pulling images from a private docker registry
+ export CONTRAIL_REG_USERNAME="abc@abc.com"
+ export CONTRAIL_REG_PASSWORD="password"
 
-```Text
+ tee /tmp/contrail-env-images.yaml << EOF
+ global:
+   contrail_env:
+     CONTROLLER_NODES: ${CONTROLLER_NODES}
+     CONTROL_NODES: ${CONTROL_NODES:-CONTROLLER_NODES}
+     LOG_LEVEL: SYS_NOTICE
+     CLOUD_ORCHESTRATOR: openstack
+     AAA_MODE: cloud-admin
+     VROUTER_GATEWAY: ${VROUTER_GATEWAY}
+     BGP_PORT: ${BGP_PORT}
+   contrail_env_vrouter_kernel:
+     CONTROL_DATA_NET_LIST: ${CONTROL_DATA_NET_LIST}
+     AGENT_MODE: nic
+   contrail_env_vrouter_dpdk:
+     AGENT_MODE: dpdk
+   images:
+     tags:
+       kafka: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-external-kafka:${CONTRAIL_TAG:-latest}"
+       cassandra: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-external-cassandra:${CONTRAIL_TAG:-latest}"
+       redis: "redis:4.0.2"
+       zookeeper: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-external-zookeeper:${CONTRAIL_TAG:-latest}"
+       contrail_control: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-control-control:${CONTRAIL_TAG:-latest}"
+       control_dns: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-control-dns:${CONTRAIL_TAG:-latest}"
+       control_named: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-control-named:${CONTRAIL_TAG:-latest}"
+       config_api: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-config-api:${CONTRAIL_TAG:-latest}"
+       config_devicemgr: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-config-devicemgr:${CONTRAIL_TAG:-latest}"
+       config_schema_transformer: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-config-schema:${CONTRAIL_TAG:-latest}"
+       config_svcmonitor: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-config-svcmonitor:${CONTRAIL_TAG:-latest}"
+       webui_middleware: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-webui-job:${CONTRAIL_TAG:-latest}"
+       webui: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-controller-webui-web:${CONTRAIL_TAG:-latest}"
+       analytics_api: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-api:${CONTRAIL_TAG:-latest}"
+       contrail_collector: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-collector:${CONTRAIL_TAG:-latest}"
+       analytics_alarm_gen: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-alarm-gen:${CONTRAIL_TAG:-latest}"
+       analytics_query_engine: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-query-engine:${CONTRAIL_TAG:-latest}"
+       analytics_snmp_collector: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-snmp-collector:${CONTRAIL_TAG:-latest}"
+       contrail_topology: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-analytics-topology:${CONTRAIL_TAG:-latest}"
+       build_driver_init: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-kernel-build-init:${CONTRAIL_TAG:-latest}"
+       vrouter_agent: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-agent:${CONTRAIL_TAG:-latest}"
+       vrouter_init_kernel: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-kernel-init:${CONTRAIL_TAG:-latest}"
+       vrouter_dpdk: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-agent-dpdk:${CONTRAIL_TAG:-latest}"
+       vrouter_init_dpdk: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-vrouter-kernel-init-dpdk:${CONTRAIL_TAG:-latest}"
+       nodemgr: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-nodemgr:${CONTRAIL_TAG:-latest}"
+       contrail_status: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-status:${CONTRAIL_TAG:-latest}"
+       node_init: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-node-init:${CONTRAIL_TAG:-latest}"
+       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+EOF
+ ```
+
+**Note:** If any other environment variables needs to be added, then you can add it in `values.yaml` file of respective charts
+
+```bash
+# [Optional] only if you are pulling contrail images from a private registry
+tee /tmp/contrail-registry-auth.yaml << EOF
 global:
-  contrail_env:
-    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
-    LOG_LEVEL: SYS_NOTICE
-    CLOUD_ORCHESTRATOR: openstack
-    AAA_MODE: cloud-admin
+  images:
+    imageCredentials:
+      registry: ${CONTRAIL_REGISTRY:-opencontrailnightly}
+      username: ${CONTRAIL_REG_USERNAME}
+      password: ${CONTRAIL_REG_PASSWORD}
+EOF
+
+# [Optional] only if you are pulling images from a private registry
+export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
 ```
 
-* **contrail-controller/values.yaml**
-
-```Text
-global:
-  contrail_env:
-    CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
-    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
-    LOG_LEVEL: SYS_NOTICE
-    CLOUD_ORCHESTRATOR: openstack
-    AAA_MODE: cloud-admin
-    BGP_PORT: 1179
-```
-
-* **contrail-analytics/values.yaml**
-
-```Text
-global:
-  contrail_env:
-    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
-    LOG_LEVEL: SYS_NOTICE
-    CLOUD_ORCHESTRATOR: openstack
-    AAA_MODE: cloud-admin
-```
-
-* **contrail-vrouter/values.yaml**
-
-```Text
-global:
-  contrail_env:
-    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
-    CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
-    LOG_LEVEL: SYS_NOTICE
-    CLOUD_ORCHESTRATOR: openstack
-    AAA_MODE: cloud-admin
-    CONTROL_DATA_NET_LIST: 192.168.1.0/24
-    VROUTER_GATEWAY: 192.168.1.1
-  contrail_env_vrouter_kernel:
-    AGENT_MODE: nic
-```
-
-Here are helm install commands to deploy Contrail helm chart after setting configuration parameters in "values.yaml" files.
+##### Commands to install contrail charts
 
 ```bash
   (k8s-master)> helm install --name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty \
-  --namespace=contrail
+  --namespace=contrail \
+  --values=/tmp/contrail-env-images.yaml \
+  ${CONTRAIL_REGISTRY_ARG}
 
   (k8s-master)> helm install --name contrail-controller ${CHD_PATH}/contrail-controller \
-  --namespace=contrail
+  --namespace=contrail \
+  --values=/tmp/contrail-env-images.yaml \
+  ${CONTRAIL_REGISTRY_ARG}
 
   (k8s-master)> helm install --name contrail-analytics ${CHD_PATH}/contrail-analytics \
-  --namespace=contrail
+  --namespace=contrail \
+  --values=/tmp/contrail-env-images.yaml \
+  ${CONTRAIL_REGISTRY_ARG}
 
-  # Edit contrail-vrouter/values.yaml and make sure that images.tags.vrouter_kernel_init is right. Image tag name will be different depending upon your linux. Also set the conf.host_os to ubuntu or centos depending on your system
+  # Edit contrail-vrouter/values.yaml and make sure that global.images.tags.vrouter_init_kernel is right. Image tag name will be different depending upon your linux. Also set the global.node.host_os to ubuntu or centos depending on your system
 
   (k8s-master)> helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
-  --namespace=contrail
+  --namespace=contrail \
+  --values=/tmp/contrail-env-images.yaml \
+  ${CONTRAIL_REGISTRY_ARG}
 ```
 
 4. Once Contrail PODs are up and running deploy OpenStack Heat chart using following command.
 
 ```bash
+# Edit ${OSH_PATH}/tools/overrides/backends/opencontrail/nova.yaml and
+# ${OSH_PATH}/tools/overrides/backends/opencontrail/heat.yaml  
+# to make sure that you are pulling the right opencontrail init container image
 (k8s-master)> ./tools/deployment/multinode/151-heat-opencontrail.sh
 ```
 
