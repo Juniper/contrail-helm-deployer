@@ -8,8 +8,6 @@ global:
       contrail_collector: "docker.io/opencontrailnightly/contrail-analytics-collector:ocata-master-46"
       analytics_alarm_gen: "docker.io/opencontrailnightly/contrail-analytics-alarm-gen:ocata-master-46"
       analytics_query_engine: "docker.io/opencontrailnightly/contrail-analytics-query-engine:ocata-master-46"
-      analytics_snmp_collector: "docker.io/opencontrailnightly/contrail-analytics-snmp-collector:ocata-master-46"
-      contrail_topology: "docker.io/opencontrailnightly/contrail-analytics-topology:ocata-master-46"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"
     # Specify imageCredentials
