@@ -96,45 +96,37 @@ all:
 EOF
  ```
 
-7. Create an environment file on the master node for the cluster. Edit `${OSH_INFRA_PATH}/tools/gate/devel/multinode-vars.yaml` if you would want to install a different version of kubernetes, cni or calico then overrides the default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`
+7. By default k8s v1.9.3, helm v2.7.2 and cni (v0.6.0) are installed. If you would want to install a different version then edit `${OSH_INFRA_PATH}/tools/gate/devel/multinode-vars.yaml` file to override default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`
+
+Sample `multinode-vars.yaml`
 
  ```bash
 (k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
+# version fields
+version:
+  kubernetes: v1.9.3
+  helm: v2.7.2
+  cni: v0.6.0
+
 kubernetes:
   network:
+    # enp0s8 is your control/data interface, to which kubernetes will bind to
+    default_device: enp0s8
   cluster:
     cni: calico
     pod_subnet: 192.168.0.0/16
     domain: cluster.local
-EOF
- ```
-
-**Note-1**: In above example all interfaces configrued with defualt route will be used for k8s cluster creation.
-
-**Note-2**: If you would like to use another interface "enp0s8" for k8s clsuter and internal insecure Docker registry please add following to "multinode-vars.yaml" file
-
- ```bash
-(k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
-version:
- kubernetes: v1.9.3
- helm: v2.7.2
- cni: v0.6.0
-   network:
-     default_device: enp0s8
-   cluster:
-     cni: calico
-     pod_subnet: 192.168.0.0/16
-     domain: cluster.local
- docker:
+docker:
+  # List of insecure_registries (local)
   insecure_registries:
     - 10.84.5.81:5000
   # Adding login information to private secure registry
-  # secure_registries:
-  #  - name: <docker-registry-name>
-  #    username: username@abc.xyz
-  #    password: password
+  #  secure_registries:
+  #    - name: <docker-registry-name>
+  #      username: username@abc.xyz
+  #      password: password
 EOF
- ```
+```
 
 8. Run the playbooks on master node
 
@@ -162,14 +154,14 @@ Use `nslookup` to verify that you are able to resolve k8s cluster specific names
 
 ### Installation of OpenStack Helm Charts
 
-All nodes by default labeled with "openstack-control-plane" and "openstack-compute-node" labels, you can use following commands to check opesnatck labels. With this default config OSH pods will be created on all the nodes.
+All nodes by default labeled with "openstack-control-plane" and "openstack-compute-node" labels, you can use following commands to check openstack labels. With this default config OSH pods will be created on all the nodes.
 
 ```bash
 (k8s-master)>  kubectl get nodes -o wide -l openstack-control-plane=enabled
 (k8s-master)> kubectl get nodes -o wide -l openstack-compute-node=enabled
 ```
 
-* **Note**: If requried please disable openstack labels using following commands to restrict OSH pods creation on specific nodes. In following example "openstack-compute-node" lable is disabled on "ubuntu-contrail-9" node.
+**Note**: If requried please disable openstack labels using following commands to restrict OSH pods creation on specific nodes. In following example "openstack-compute-node" lable is disabled on "ubuntu-contrail-9" node.
 
 ```bash
 (k8s-master)> kubectl label node ubuntu-contrail-9 --overwrite openstack-compute-node=disabled
@@ -194,25 +186,23 @@ All nodes by default labeled with "openstack-control-plane" and "openstack-compu
   (k8s-master)> ./tools/deployment/multinode/110-cinder.sh
   (k8s-master)> ./tools/deployment/multinode/131-libvirt-opencontrail.sh
   (k8s-master)>./tools/deployment/multinode/141-compute-kit-opencontrail.sh
-
-Note: Optional Horizon
-(k8s-master)> ./tools/deployment/developer/ceph/100-horizon.sh
+  (k8s-master)> ./tools/deployment/developer/ceph/100-horizon.sh
 ```
 
 #### Installation of Contrail Helm charts
 
-1. All contrail pods will be deployed in Namespace "contrail". Lable Contrail Nodes using below command and following labels are used by Contrail
+1. All contrail pods will be deployed in Namespace "contrail". Label Contrail Nodes using below command and following labels are used by Contrail
 
 * Control Nodes: opencontrail.org/controller
 * vRouter Kernel: opencontrail.org/vrouter-kernel
 * vRouter DPDK: opencontrail.org/vrouter-dpdk
 
-In following example "ubuntu-contrail-11" is DPDK and "ubuntu-contrail-10" is kernel vrouter.
+In following example "ubuntu-contrail-11" and "ubuntu-contrail-10" are dpdk vrouter and kernel vrouter compute node respectively. Whereas, ubuntu-contrail-7 ubuntu-contrail-8 ubuntu-contrail-9 are contrail controller nodes
 
  ```bash
 (k8s-master)> kubectl label node  ubuntu-contrail-11 opencontrail.org/vrouter-dpdk=enabled
 (k8s-master)> kubectl label node ubuntu-contrail-10 opencontrail.org/vrouter-kernel=enabled
-(k8s-master)> kubectl label nodes ubuntu-contrail-9 ubuntu-contrail-10 ubuntu-contrail-11 opencontrail.org/controller=enabled
+(k8s-master)> kubectl label nodes ubuntu-contrail-7 ubuntu-contrail-8 ubuntu-contrail-9 opencontrail.org/controller=enabled
  ```
 
 2. K8s clusterrolebinding for contrail
@@ -228,9 +218,8 @@ In following example "ubuntu-contrail-11" is DPDK and "ubuntu-contrail-10" is ke
  (k8s-master)> cd $CHD_PATH
  (k8s-master)> make
 
-  # Set the IP of your CONTROLLER_NODES in each chart values.yaml and BGP port for multi-node setup (specify your control data ip, if you have one). Please note in below example 10.13.82.0/24 is MGMT & K8S clsuter host network and 192.168.1.0/24 is Contrail "Control-Data" network.
-  CONTROLLER_NODES=10.13.82.43,10.13.82.44,10.13.82.45
-  CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
+  # Set the IP of your CONTROLLER_NODES in each chart values.yaml and BGP port for multi-node setup (specify your control data ip, if you have one). Please note in below example, 192.168.1.0/24 is "Control/Data" network.
+  CONTROLLER_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
   BGP_PORT=1179
 
   # set the control data network cidr list separated by comma and set the respective gateway
@@ -239,14 +228,14 @@ In following example "ubuntu-contrail-11" is DPDK and "ubuntu-contrail-10" is ke
   AGENT_MODE: nic
 ```
 
-Here are each chart **"contrail_env"** reference values.yaml file (**FYI**)
+Here are each chart **contrail_env** reference values.yaml file (**FYI**)
 
 * **contrail-thirdparty/values.yaml**
 
-```Text
+```yaml
 global:
   contrail_env:
-    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
+    CONTROLLER_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
@@ -254,11 +243,10 @@ global:
 
 * **contrail-controller/values.yaml**
 
-```Text
+```yaml
 global:
   contrail_env:
-    CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
-    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
+    CONTROLLER_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
@@ -267,10 +255,10 @@ global:
 
 * **contrail-analytics/values.yaml**
 
-```Text
+```yaml
 global:
   contrail_env:
-    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
+    CONTROLLER_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
@@ -278,11 +266,10 @@ global:
 
 * **contrail-vrouter/values.yaml**
 
-```Text
+```yaml
 global:
   contrail_env:
-    CONTROLLER_NODES: 10.13.82.43,10.13.82.44,10.13.82.45
-    CONTROL_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
+    CONTROLLER_NODES: 192.168.1.43,192.168.1.44,192.168.1.45
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
@@ -304,7 +291,7 @@ Here are helm install commands to deploy Contrail helm chart after setting confi
   (k8s-master)> helm install --name contrail-analytics ${CHD_PATH}/contrail-analytics \
   --namespace=contrail
 
-  # Edit contrail-vrouter/values.yaml and make sure that images.tags.vrouter_kernel_init is right. Image tag name will be different depending upon your linux. Also set the conf.host_os to ubuntu or centos depending on your system
+  # Edit contrail-vrouter/values.yaml and make sure that global.images.tags.vrouter_init_kernel is right. Image tag name will be different depending upon your linux. Also set the global.node.host_os to ubuntu or centos depending on your system
 
   (k8s-master)> helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter \
   --namespace=contrail
