@@ -81,8 +81,6 @@ global:
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
     PHYSICAL_INTERFACE: $physical_intf
-    VROUTER_GATEWAY:
-    CONTROL_DATA_NET_LIST:
 EOF
 
 # Pull images before you install contrail charts
