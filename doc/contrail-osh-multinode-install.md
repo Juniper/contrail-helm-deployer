@@ -228,7 +228,6 @@ In following example "ubuntu-contrail-11" and "ubuntu-contrail-10" are dpdk vrou
  # Export variables
  (k8s-master)> export CONTROLLER_NODES="192.168.1.43,192.168.1.44,192.168.1.45"
  (k8s-master)> export VROUTER_GATEWAY="192.168.1.1"
- (k8s-master)> export CONTROL_DATA_NET_LIST="192.168.1.0/24"
  (k8s-master)> export BGP_PORT="1179"
 
  # [Optional] By default, it will pull latest image from opencontrailnightly
@@ -245,16 +244,8 @@ In following example "ubuntu-contrail-11" and "ubuntu-contrail-10" are dpdk vrou
    contrail_env:
      CONTROLLER_NODES: ${CONTROLLER_NODES}
      CONTROL_NODES: ${CONTROL_NODES:-CONTROLLER_NODES}
-     LOG_LEVEL: SYS_NOTICE
-     CLOUD_ORCHESTRATOR: openstack
-     AAA_MODE: cloud-admin
      VROUTER_GATEWAY: ${VROUTER_GATEWAY}
      BGP_PORT: ${BGP_PORT}
-   contrail_env_vrouter_kernel:
-     CONTROL_DATA_NET_LIST: ${CONTROL_DATA_NET_LIST}
-     AGENT_MODE: nic
-   contrail_env_vrouter_dpdk:
-     AGENT_MODE: dpdk
    images:
      tags:
        kafka: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-external-kafka:${CONTRAIL_TAG:-latest}"
