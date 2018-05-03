@@ -117,8 +117,6 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
 
   # Set the IP of your CONTROL_NODES (specify your control data ip, if you have one)
   export CONTROL_NODES=10.87.65.245
-  # set the control data network cidr list separated by comma and set the respective gateway
-  export CONTROL_DATA_NET_LIST=10.87.65.128/25
   export VROUTER_GATEWAY=10.87.65.129
 
   # [Optional] By default, it will pull latest image from opencontrailnightly
@@ -140,10 +138,6 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
     contrail_env:
       CONTROLLER_NODES: 172.17.0.1
       CONTROL_NODES: ${CONTROL_NODES}
-      LOG_LEVEL: SYS_NOTICE
-      CLOUD_ORCHESTRATOR: openstack
-      AAA_MODE: cloud-admin
-      CONTROL_DATA_NET_LIST: ${CONTROL_DATA_NET_LIST}
       VROUTER_GATEWAY: ${VROUTER_GATEWAY}
     images:
       tags:
