@@ -69,6 +69,11 @@ spec:
           name: var-crashes-webui
         - mountPath: /etc/contrail/ssl
           name: ssl-dir
+        {{- if and (.Values.global.contrail_env.WEBUI_SSL_CERT_FILE) (.Values.global.contrail_env.WEBUI_SSL_KEY_FILE) }}
+        - mountPath: {{ .Values.global.contrail_env.WEBUI_SSL_CERT_DIR | quote }}
+          name: webui-certificate
+          readOnly: true
+        {{- end }}
       - name: contrail-webui
         image: {{ .Values.global.images.tags.webui | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
@@ -84,6 +89,11 @@ spec:
           name: var-crashes-webui
         - mountPath: /etc/contrail/ssl
           name: ssl-dir
+        {{- if and (.Values.global.contrail_env.WEBUI_SSL_CERT_FILE) (.Values.global.contrail_env.WEBUI_SSL_KEY_FILE) }}
+        - mountPath: {{ .Values.global.contrail_env.WEBUI_SSL_CERT_DIR | quote }}
+          name: webui-certificate
+          readOnly: true
+        {{- end }}
       volumes:
       - name: contrail-log
         hostPath:
@@ -97,4 +107,9 @@ spec:
       - name: ssl-dir
         hostPath:
           path: /etc/contrail/ssl
+      {{- if and (.Values.global.contrail_env.WEBUI_SSL_CERT_FILE) (.Values.global.contrail_env.WEBUI_SSL_KEY_FILE) }}
+      - name: webui-certificate
+        hostPath:
+          path: {{ .Values.global.contrail_env.WEBUI_SSL_CERT_DIR | quote }}
+      {{- end }}
 {{- end }}
