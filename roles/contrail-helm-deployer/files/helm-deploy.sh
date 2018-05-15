@@ -108,6 +108,10 @@ helm install --name contrail ${CHD_PATH}/contrail \
 # Wait for contrail pods to come up
 ${OSH_PATH}/tools/deployment/common/wait-for-pods.sh contrail 1200 || true
 
+helm status contrail
+
+
+
 # Deploying heat charts after contrail charts are deployed as they have dependency on contrail charts
 cd ${OSH_PATH}
 export OSH_EXTRA_HELM_ARGS_HEAT="--set images.tags.opencontrail_heat_init=${CONTRAIL_REGISTRY}/contrail-openstack-heat-init:${CONTAINER_TAG}"
