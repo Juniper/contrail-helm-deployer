@@ -108,6 +108,10 @@ helm install --name contrail ${CHD_PATH}/contrail \
 # Wait for contrail pods to come up
 ${OSH_PATH}/tools/deployment/common/wait-for-pods.sh contrail 1200 || true
 
+helm status contrail
+
+
+
 # Deploying heat charts after contrail charts are deployed as they have dependency on contrail charts
 cd ${OSH_PATH}
 export OSH_EXTRA_HELM_ARGS_HEAT="--set images.tags.opencontrail_heat_init=${CONTRAIL_REGISTRY}/contrail-openstack-heat-init:${CONTAINER_TAG}"
@@ -115,7 +119,14 @@ export OSH_EXTRA_HELM_ARGS_HEAT="--set images.tags.opencontrail_heat_init=${CONT
 ./tools/deployment/developer/nfs/091-heat-opencontrail.sh
 
 sleep 60
-sudo contrail-status
+
+if [ -f /usr/bin/contrail-status ]; then
+    echo "Path is: $PATH"
+    sudo contrail-status
+else
+    echo "INFO: contrail-status file not found"
+    exit 1
+fi
 
 # Verify creation of VM
 ./tools/deployment/developer/nfs/901-use-it-opencontrail.sh

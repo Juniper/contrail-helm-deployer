@@ -3,10 +3,22 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: nginx-cluster
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/rewrite-target: /
+    # tls will be terminated at the pod
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    # session affinity related annotations
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-name: route
   name: contrail-webui
 spec:
+  tls:
+  - hosts:
+    - contrail-webui.contrail.svc.cluster.local
+    - contrail-webui.contrail
+    - contrail-webui
   rules:
   - host: contrail-webui
     http:
