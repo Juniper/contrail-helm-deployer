@@ -170,6 +170,7 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
         node_init: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-node-init:${CONTRAIL_TAG:-latest}"
         dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
 EOF
+```
 
 ```bash
 # [Optional] only if you are pulling contrail images from a private registry
@@ -186,6 +187,7 @@ EOF
 export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
 ```
 
+```bash
   helm install --name contrail ${CHD_PATH}/contrail \
   --namespace=contrail --values=/tmp/contrail.yaml \
   ${CONTRAIL_REGISTRY_ARG}
