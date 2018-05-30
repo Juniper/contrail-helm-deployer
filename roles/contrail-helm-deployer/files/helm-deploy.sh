@@ -85,6 +85,8 @@ global:
     PHYSICAL_INTERFACE: $physical_intf
     VROUTER_GATEWAY:
     CONTROL_DATA_NET_LIST:
+  contrail_env_vrouter_kernel:
+    AGENT_MODE: kernel
 EOF
 
 # Pull images before you install contrail charts
