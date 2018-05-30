@@ -46,7 +46,7 @@ Install below packages on your setup
   export CHD_PATH=${BASE_DIR}/contrail-helm-deployer
   ```
 
-2. Installing necessary packages and deploying kubernetes
+3. Installing necessary packages and deploying kubernetes
 
 Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to install a different version of kubernetes, cni, calico. This overrides the default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`
 
@@ -84,13 +84,13 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
   ./tools/deployment/developer/common/010-deploy-k8s.sh
   ```
 
-3. Install openstack and heat client
+4. Install openstack and heat client
 
   ```bash
   ./tools/deployment/developer/common/020-setup-client.sh
   ```
 
-4. Deploy openstack-helm related charts
+5. Deploy openstack-helm related charts
 
   ```bash
   ./tools/deployment/developer/nfs/031-ingress-opencontrail.sh
@@ -108,7 +108,7 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
   ./tools/deployment/developer/nfs/161-compute-kit-opencontrail.sh
   ```
 
-5. Now deploy opencontrail charts
+6. Now deploy opencontrail charts
 
   ```bash
   cd $CHD_PATH
@@ -170,6 +170,7 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
         node_init: "${CONTRAIL_REGISTRY:-opencontrailnightly}/contrail-node-init:${CONTRAIL_TAG:-latest}"
         dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
 EOF
+```
 
 ```bash
 # [Optional] only if you are pulling contrail images from a private registry
@@ -186,12 +187,13 @@ EOF
 export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
 ```
 
+```bash
   helm install --name contrail ${CHD_PATH}/contrail \
   --namespace=contrail --values=/tmp/contrail.yaml \
   ${CONTRAIL_REGISTRY_ARG}
   ```
 
-6. Deploy heat charts
+7. Deploy heat charts
 
   ```bash
   cd ${OSH_PATH}
