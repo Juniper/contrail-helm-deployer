@@ -13,6 +13,7 @@ physical_intf="$(sudo ip -4 route list 0/0 | awk '{ print $5; exit }')"
 intf_ip_address="$(ip addr show dev $physical_intf | grep "inet .*/.* brd " | awk '{print $2}' | cut -d '/' -f 1)"
 
 ./tools/deployment/developer/common/001-install-packages-opencontrail.sh
+
 ./tools/deployment/developer/common/010-deploy-k8s.sh
 
 #Install openstack and heat client
@@ -81,6 +82,7 @@ global:
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
     PHYSICAL_INTERFACE: $physical_intf
+    AGENT_MODE: kernel
     VROUTER_GATEWAY:
     CONTROL_DATA_NET_LIST:
 EOF

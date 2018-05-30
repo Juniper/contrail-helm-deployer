@@ -22,7 +22,7 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "^{{ ansible_default_ipv4.address }}"
-    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ ansible_domain }} {{ inventory_hostname }}"
+    line: "{{ ansible_default_ipv4.address }} {% if ansible_domain %}{{ inventory_hostname }}.{{ ansible_domain }}{% endif %} {{ inventory_hostname }}"
   when: ansible_hostname != inventory_hostname
   become: True
   become_user: root
