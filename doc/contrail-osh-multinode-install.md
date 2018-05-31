@@ -61,6 +61,9 @@ This installation procedure will use Juniper OpenStack Helm infra and OpenStack 
   ```bash
   (k8s-master)> cd ${OSH_PATH}
   (k8s-master)> ./tools/deployment/developer/common/001-install-packages-opencontrail.sh
+
+  (k8s-slave)> sudo apt-get update -y
+  (k8s-slave)> sudo apt-get install --no-install-recommends -y git
   ```
 
 6. Create an inventory file on the master node for ansible base provisoning, please note in below output 10.13.82.43/.44/.45 are nodes IP addresses and will use SSK-key generated in step 1
