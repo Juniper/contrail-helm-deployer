@@ -48,7 +48,7 @@ global:
 
   # section of vrouter template for kernel mode
   contrail_env_vrouter_kernel:
-    AGENT_MODE: nic
+    AGENT_MODE: kernel
 
   # section of vrouter template for dpdk mode
   contrail_env_vrouter_dpdk:
