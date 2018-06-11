@@ -1,7 +1,6 @@
 global:
   images:
     tags:
-      kafka: "docker.io/opencontrailnightly/contrail-external-kafka:latest"
       cassandra: "docker.io/opencontrailnightly/contrail-external-cassandra:latest"
       redis: "redis:4.0.2"
       zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:latest"
@@ -38,21 +37,14 @@ labels:
   redis:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
-  kafka:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
   analyticsdb_nodemgr:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
 
 dependencies:
-  kafka:
-    daemonset:
-    - contrail-analytics-zookeeper
   analyticsdb:
     daemonset:
     - contrail-analytics-zookeeper
-    - contrail-kafka
   configdb:
     daemonset:
     - contrail-config-zookeeper
@@ -109,10 +101,6 @@ pod:
           enabled: true
           min_ready_seconds: 0
           max_unavailable: 1
-        kafka:
-          enabled: true
-          min_ready_seconds: 0
-          max_unavailable: 1
         analyticsdb_nodemgr:
           enabled: true
           min_ready_seconds: 0
@@ -130,5 +118,4 @@ manifests:
   daemonset_redis: true
   daemonset_analytics_zookeeper: true
   daemonset_config_zookeeper: true
-  daemonset_kafka: true
   daemonset_analyticsdb_nodemgr: true

@@ -6,7 +6,6 @@ global:
       node_init: "docker.io/opencontrailnightly/contrail-node-init:latest"
       analytics_api: "docker.io/opencontrailnightly/contrail-analytics-api:latest"
       contrail_collector: "docker.io/opencontrailnightly/contrail-analytics-collector:latest"
-      analytics_alarm_gen: "docker.io/opencontrailnightly/contrail-analytics-alarm-gen:latest"
       analytics_query_engine: "docker.io/opencontrailnightly/contrail-analytics-query-engine:latest"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"

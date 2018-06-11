@@ -4,7 +4,6 @@ global:
   # section to configure images for all containers
   images:
     tags:
-      kafka: "docker.io/opencontrailnightly/contrail-external-kafka:latest"
       cassandra: "docker.io/opencontrailnightly/contrail-external-cassandra:latest"
       redis: "redis:4.0.2"
       zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:latest"
@@ -19,7 +18,6 @@ global:
       webui: "docker.io/opencontrailnightly/contrail-controller-webui-web:latest"
       analytics_api: "docker.io/opencontrailnightly/contrail-analytics-api:latest"
       contrail_collector: "docker.io/opencontrailnightly/contrail-analytics-collector:latest"
-      analytics_alarm_gen: "docker.io/opencontrailnightly/contrail-analytics-alarm-gen:latest"
       analytics_query_engine: "docker.io/opencontrailnightly/contrail-analytics-query-engine:latest"
       build_driver_init: "docker.io/opencontrailnightly/contrail-vrouter-kernel-build-init:latest"
       vrouter_agent: "docker.io/opencontrailnightly/contrail-vrouter-agent:latest"
