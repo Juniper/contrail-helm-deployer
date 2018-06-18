@@ -66,10 +66,11 @@ This installation procedure will use Juniper OpenStack Helm infra and OpenStack 
   (k8s-slave)> sudo apt-get install --no-install-recommends -y git
   ```
 
-6. Create an inventory file on the master node for ansible base provisoning, please note in below output 10.13.82.43/.44/.45 are nodes IP addresses and will use SSK-key generated in step 1
+6. Create an inventory file on the master node for ansible base provisoning, please note in below output 10.13.82.43/.44/.45 are nodes IP addresses and will use SSH-key generated in step 1. Refer to `${OSH_INFRA_PATH}/tools/gate/devel/sample-contrail-multinode-inventory.yaml` for much more options
 
- ```bash
- #!/bin/bash
+Sample `multinode-inventory.yaml`
+
+```bash
 (k8s-master)> set -xe
 (k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-inventory.yaml <<EOF
 all:
@@ -83,25 +84,29 @@ all:
           ansible_ssh_private_key_file: /root/.ssh/id_rsa
           ansible_ssh_extra_args: -o StrictHostKeyChecking=no
     nodes:
-      hosts:
-        node_two:
-          ansible_port: 22
-          ansible_host: 10.13.82.44
-          ansible_user: root
-          ansible_ssh_private_key_file: /root/.ssh/id_rsa
-          ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        node_three:
-          ansible_port: 22
-          ansible_host: 10.13.82.45
-          ansible_user: root
-          ansible_ssh_private_key_file: /root/.ssh/id_rsa
-          ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+      children:
+        openstack-compute:
+          children:
+            contrial-vrouter-kernel:
+              hosts:
+                node_two:
+                  ansible_port: 22
+                  ansible_host: 10.13.82.44
+                  ansible_user: root
+                  ansible_ssh_private_key_file: /root/.ssh/id_rsa
+                  ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+                node_three:
+                  ansible_port: 22
+                  ansible_host: 10.13.82.45
+                  ansible_user: root
+                  ansible_ssh_private_key_file: /root/.ssh/id_rsa
+                  ansible_ssh_extra_args: -o StrictHostKeyChecking=no
 EOF
- ```
+```
 
-7. By default k8s v1.9.3, helm v2.7.2 and cni (v0.6.0) are installed. If you would want to install a different version then edit `${OSH_INFRA_PATH}/tools/gate/devel/multinode-vars.yaml` file to override default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`
+7. By default k8s v1.9.3, helm v2.7.2 and cni (v0.6.0) are installed. If you would want to install a different version then edit `${OSH_INFRA_PATH}/tools/gate/devel/multinode-vars.yaml` file to override default values given in `${OSH_INFRA_PATH}/playbooks/vars.yaml`. Refer to `${OSH_INFRA_PATH}/tools/gate/devel/sample-contrail-multinode-vars.yaml` for much more options
 
-Sample `multinode-vars.yaml`
+Sample `multinode-vars.yaml`, in this example primary node is also contrail-controller node, hence opencontrail.org/controller label is specified under primary nodes
 
  ```bash
 (k8s-master)> cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
@@ -131,6 +136,34 @@ docker:
   #    password: password
   #    secret_name: contrail-image-secret
   #    namespace: openstack
+nodes:
+  labels:
+    primary:
+    - name: openstack-helm-node-class
+      value: primary
+    - name: openstack-control-plane
+      value: enabled
+    - name: ceph-mon
+      value: enabled
+    - name: ceph-osd
+      value: enabled
+    - name: ceph-mds
+      value: enabled
+    - name: ceph-rgw
+      value: enabled
+    - name: ceph-mgr
+      value: enabled
+    - name: opencontrail.org/controller
+      value: enabled
+    all:
+    - name: openstack-helm-node-class
+      value: general
+    openstack-compute:
+    - name: openstack-compute-node
+      value: enabled
+    contrial-vrouter-kernel:
+    - name: opencontrail.org/vrouter-kernel
+      value: enabled
 EOF
 ```
 
@@ -160,17 +193,13 @@ Use `nslookup` to verify that you are able to resolve k8s cluster specific names
 
 ### Installation of OpenStack Helm Charts
 
-All nodes by default labeled with "openstack-control-plane" and "openstack-compute-node" labels, you can use following commands to check openstack labels. With this default config OSH pods will be created on all the nodes.
+Use below commands to verify labelling of nodes
 
 ```bash
-(k8s-master)>  kubectl get nodes -o wide -l openstack-control-plane=enabled
-(k8s-master)> kubectl get nodes -o wide -l openstack-compute-node=enabled
-```
-
-**Note**: If requried please disable openstack labels using following commands to restrict OSH pods creation on specific nodes. In following example "openstack-compute-node" lable is disabled on "ubuntu-contrail-9" node.
-
-```bash
-(k8s-master)> kubectl label node ubuntu-contrail-9 --overwrite openstack-compute-node=disabled
+(k8s-master)> kubectl get nodes -l openstack-compute-node=enabled
+(k8s-master)> kubectl get nodes -l openstack-control-plane=enabled
+(k8s-master)> kubectl get nodes -l opencontrail.org/controller=enabled
+(k8s-master)> kubectl get nodes -l opencontrail.org/vrouter-kernel=enabled
 ```
 
 1. Deploy OpenStack Helm charts using following commands.
@@ -200,28 +229,14 @@ All nodes by default labeled with "openstack-control-plane" and "openstack-compu
 
 #### Installation of Contrail Helm charts
 
-1. All contrail pods will be deployed in Namespace "contrail". Label Contrail Nodes using below command and following labels are used by Contrail
-
-* Control Nodes: opencontrail.org/controller
-* vRouter Kernel: opencontrail.org/vrouter-kernel
-* vRouter DPDK: opencontrail.org/vrouter-dpdk
-
-In following example "ubuntu-contrail-11" and "ubuntu-contrail-10" are dpdk vrouter and kernel vrouter compute node respectively. Whereas, ubuntu-contrail-7 ubuntu-contrail-8 ubuntu-contrail-9 are contrail controller nodes
-
- ```bash
-(k8s-master)> kubectl label node  ubuntu-contrail-11 opencontrail.org/vrouter-dpdk=enabled
-(k8s-master)> kubectl label node ubuntu-contrail-10 opencontrail.org/vrouter-kernel=enabled
-(k8s-master)> kubectl label nodes ubuntu-contrail-7 ubuntu-contrail-8 ubuntu-contrail-9 opencontrail.org/controller=enabled
- ```
-
-2. K8s clusterrolebinding for contrail
+1. K8s clusterrolebinding for contrail
 
  ```bash
 (k8s-master)> cd $CHD_PATH
 (k8s-master)> kubectl replace -f ${CHD_PATH}/rbac/cluster-admin.yaml
   ```
 
-3. Now deploy opencontrail charts
+2. Now deploy opencontrail charts
 
 ```bash
  (k8s-master)> cd $CHD_PATH
@@ -325,7 +340,7 @@ export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
   ${CONTRAIL_REGISTRY_ARG}
 ```
 
-4. Once Contrail PODs are up and running deploy OpenStack Heat chart using following command.
+3. Once Contrail PODs are up and running deploy OpenStack Heat chart using following command.
 
 ```bash
 # Edit ${OSH_PATH}/tools/overrides/backends/opencontrail/nova.yaml and
@@ -334,7 +349,7 @@ export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
 (k8s-master)> ./tools/deployment/multinode/151-heat-opencontrail.sh
 ```
 
-5. Run compute kit test using following command at the end.
+4. Run compute kit test using following command at the end.
 
   ```bash
 (k8s-master)> ./tools/deployment/multinode/143-compute-kit-opencontrail-test.sh
