@@ -8,7 +8,7 @@ Using below step you can bring an all-in-one cluster with openstack and contrail
 2. Kernel: 4.4.0-87-generic
 3. docker: 1.13.1
 4. helm: v2.7.2
-5. kubernetes: v1.8.3
+5. kubernetes: v1.9.3
 6. openstack: ocata
 
 ### Resource spec (used for internal validation)
@@ -53,7 +53,7 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
   Sample `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` file
   ```yaml
   version:
-    kubernetes: v1.8.3
+    kubernetes: v1.9.3
     helm: v2.7.2
     cni: v0.6.0
 
@@ -76,6 +76,29 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
       cni: calico
       pod_subnet: 192.168.0.0/16
       domain: cluster.local
+  nodes:
+    labels:
+      all:
+      - name: openstack-control-plane
+        value: enabled
+      - name: openstack-compute-node
+        value: enabled
+      - name: linuxbridge
+        value: enabled
+      - name: ceph-mon
+        value: enabled
+      - name: ceph-osd
+        value: enabled
+      - name: ceph-mds
+        value: enabled
+      - name: ceph-rgw
+        value: enabled
+      - name: ceph-mgr
+        value: enabled
+      - name: opencontrail.org/controller
+        value: enabled
+      - name: opencontrail.org/vrouter-kernel
+        value: enabled
   ```
 
   ```bash
@@ -127,9 +150,6 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
   # [Optional] only if you are pulling images from a private docker registry
   export CONTRAIL_REG_USERNAME="abc@abc.com"
   export CONTRAIL_REG_PASSWORD="password"
-
-  kubectl label node opencontrail.org/controller=enabled --all
-  kubectl label node opencontrail.org/vrouter-kernel=enabled --all
 
   kubectl replace -f ${CHD_PATH}/rbac/cluster-admin.yaml
 
@@ -186,10 +206,12 @@ EOF
 export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
 ```
 
-  helm install --name contrail ${CHD_PATH}/contrail \
-  --namespace=contrail --values=/tmp/contrail.yaml \
-  ${CONTRAIL_REGISTRY_ARG}
-  ```
+Deploying contrail charts
+```bash
+helm install --name contrail ${CHD_PATH}/contrail \
+--namespace=contrail --values=/tmp/contrail.yaml \
+${CONTRAIL_REGISTRY_ARG}
+```
 
 6. Deploy heat charts
 

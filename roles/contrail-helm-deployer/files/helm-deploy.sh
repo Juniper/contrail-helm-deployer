@@ -40,10 +40,6 @@ export OSH_EXTRA_HELM_ARGS_NEUTRON="--set images.tags.opencontrail_neutron_init=
 cd $CHD_PATH
 make
 
-#Label nodes with contrail specific labels
-kubectl label node opencontrail.org/controller=enabled --all
-kubectl label node opencontrail.org/vrouter-kernel=enabled --all
-
 #Give cluster-admin permission for the user to create contrail pods
 kubectl replace -f rbac/cluster-admin.yaml
 
