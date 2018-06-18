@@ -37,6 +37,15 @@ global:
   contrail_env_vrouter_dpdk:
     AGENT_MODE: dpdk
 
+  contrail_env_vrouter_sriov:
+    AGENT_MODE: sriov
+    SRIOV: true
+    #per_compute_info:
+    #  - node_name: k8snode1
+    #    SRIOV_VF:  10
+    #    SRIOV_PHYSICAL_INTERFACE: enp129s0f1
+    #    SRIOV_PHYS_NET:  physnet1
+
   node:
     host_os: ubuntu
 
@@ -47,6 +56,9 @@ labels:
   vrouter_agent_dpdk:
     node_selector_key: "opencontrail.org/vrouter-dpdk"
     node_selector_value: "enabled"
+  vrouter_agent_sriov:
+    node_selector_key: "opencontrail.org/vrouter-sriov"
+    node_selector_value: "enabled"
 
 dependencies:
   vrouter_agent_kernel:
@@ -54,6 +66,10 @@ dependencies:
     - contrail-config
     - contrail-control
   vrouter_agent_dpdk:
+    daemonset:
+    - contrail-config
+    - contrail-control
+  vrouter_agent_sriov:
     daemonset:
     - contrail-config
     - contrail-control
@@ -99,10 +115,16 @@ pod:
           enabled: true
           min_ready_seconds: 0
           max_unavailable: 1
+        vrouter_agent_sriov:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
 
 manifests:
   configmap_vrouter_kernel: true
   configmap_vrouter_keystone: true
   configmap_vrouter_dpdk: false
+  configmap_vrouter_sriov: false
   daemonset_kernel: true
   daemonset_dpdk: false
+  daemonset_vrouter_sriov: false

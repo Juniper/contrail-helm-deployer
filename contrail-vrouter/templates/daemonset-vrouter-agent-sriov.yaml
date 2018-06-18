@@ -1,0 +1,169 @@
+{{- define "nova.compute.daemonset" }}
+{{- $daemonset_name := index . 0 }}
+{{- $config_map_name := index . 1 }}
+{{- $compute_name := index . 2 }}
+{{- $context := index . 3 }}
+
+{{- $_ := set $context.Values "images" $context.Values.global.images }}
+# host_os is a mandatory field
+{{- $_ := required ".Values.global.node.host_os must be specified, valid values are ubuntu, centos" $context.Values.global.node.host_os }}
+{{- $host_os := $context.Values.global.node.host_os }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: {{ $daemonset_name }}
+spec:
+{{ tuple $context "vrouter_agent_sriov" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-vrouter-agent-sriov" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+      annotations:
+        configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
+    spec:
+      #Disable affinity for single node setup
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ $context.Values.labels.vrouter_agent_sriov.node_selector_key }}
+                operator: In
+                values:
+                  - {{ $context.Values.labels.vrouter_agent_sriov.node_selector_value }}
+              - key: "kubernetes.io/hostname"
+                operator: In
+                values:
+                  - {{ $compute_name }}
+      #Enable tolerations for single node setup
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      imagePullSecrets:
+        - name: contrail-vrouter-docker-secret
+      initContainers:
+{{ tuple $context $context.Values.dependencies.vrouter_agent_sriov nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+        - name: contrail-node-init
+          image: {{ $context.Values.global.images.tags.node_init | quote }}
+          imagePullPolicy: {{ default "" $context.Values.global.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          env:
+          - name: CONTRAIL_STATUS_IMAGE
+            value: {{ $context.Values.global.images.tags.contrail_status | quote }}
+          envFrom:
+          - configMapRef:
+              name: {{ $config_map_name }}
+          volumeMounts:
+          - mountPath: /host/usr/bin
+            name: host-usr-bin
+      containers:
+      - name: contrail-vrouter-agent
+        image: {{ $context.Values.global.images.tags.vrouter_agent | quote }}
+        imagePullPolicy: {{ default "" $context.Values.global.images.imagePullPolicy | quote }}
+        securityContext:
+          privileged: true
+        envFrom:
+        - configMapRef:
+            name: {{ $config_map_name }}
+        - configMapRef:
+            name: contrail-vrouter-keystone
+        volumeMounts:
+{{- if eq $host_os "centos"}}
+        - mountPath: /etc/sysconfig/network-scripts
+          name: network-scripts
+{{- end }}
+        - mountPath: /lib/modules
+          name: lib-modules
+        - mountPath: /var/lib/contrail/
+          name: var-lib-contrail
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /var/crashes
+          name: var-crashes-vrouter
+        - mountPath: /host/bin
+          name: host-bin
+        - mountPath: /dev/log
+          name: host-dev-log
+        - mountPath: /var/run/libvirt
+          name: var-run-libvirt
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
+      - name: contrail-vrouter-nodemgr
+        image: {{ $context.Values.global.images.tags.nodemgr | quote }}
+        imagePullPolicy: {{ default "" $context.Values.global.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: {{ $config_map_name }}
+        - configMapRef:
+            name: contrail-vrouter-keystone
+        env:
+        - name: NODE_TYPE
+          value: vrouter
+        - name: DOCKER_HOST
+          value: "unix://mnt/docker.sock"
+        volumeMounts:
+        - mountPath: /mnt/docker.sock
+          name: docker-unix-socket
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /var/crashes
+          name: var-crashes-vrouter
+        - mountPath: /etc/contrail/ssl
+          name: ssl-dir
+      volumes:
+{{- if eq $host_os "centos" }}
+      - name: network-scripts
+        hostPath:
+          path: /etc/sysconfig/network-scripts
+{{- end }}
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
+      - name: var-run
+        hostPath:
+          path: /var/run/
+      - name: var-lib-contrail
+        hostPath:
+          path: /var/lib/contrail/
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail
+      - name: var-crashes-vrouter
+        hostPath:
+          path: /var/crashes
+      - name: host-bin
+        hostPath:
+          path: /bin
+      - name: var-run-libvirt
+        hostPath:
+          path: /var/run/libvirt
+      - name: host-usr-bin
+        hostPath:
+          path: /usr/bin
+      - name: host-dev-log
+        hostPath:
+          path: /dev/log
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
+{{- end }}
+
+{{- if .Values.manifests.daemonset_vrouter_sriov }}
+{{- $_ := required ".Values.global.contrail_env_vrouter_sriov.per_compute_info must be specified" .Values.global.contrail_env_vrouter_sriov.per_compute_info }}
+{{- $context := . }}
+{{- range $_, $compute_vars := .Values.global.contrail_env_vrouter_sriov.per_compute_info }}
+{{- $compute_name := index $compute_vars "node_name" }}
+{{- $daemonset_name := printf "contrail-vrouter-agent-sriov-%s" $compute_name }}
+{{- $config_map_name := printf "contrail-vrouter-sriov-%s" $compute_name }}
+{{- list $daemonset_name $config_map_name $compute_name $context | include "nova.compute.daemonset" }}
+{{- end }}
+{{- end }}
