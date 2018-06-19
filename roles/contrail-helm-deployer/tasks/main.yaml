@@ -49,5 +49,5 @@
     OSH_PATH: "{{ repos_dir }}/openstack-helm"
     OSH_INFRA_PATH: "{{ repos_dir }}/openstack-helm-infra"
     CHD_PATH: "{{ repos_dir }}/contrail-helm-deployer"
-    CONTRAIL_REGISTRY: "{{ contrail_docker_registry }}"
-    CONTAINER_TAG: "{{ container_tag }}"
+    CONTRAIL_REGISTRY: "opencontrailnightly"
+    CONTAINER_TAG: "ocata-master-157"

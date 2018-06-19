@@ -3,3 +3,7 @@
     check:
       jobs:
         - zuul-jobs-linters
+    experimental:
+      jobs:
+        - contrail-sanity-ubuntu1604-helm-ocata
+          voting: false
