@@ -1,0 +1,12 @@
+---
+- name: copy template for testrunner
+  template:
+    src: 'instances.yaml.j2'
+    dest: '{{ ansible_env.HOME }}/contrail_test_input.yaml'
+
+- name: fetch copy_test_input.yaml to executor
+  synchronize:
+    src: '{{ ansible_env.HOME }}/contrail_test_input.yaml'
+    dest: '{{ zuul.executor.log_root }}/'
+    mode: pull
+

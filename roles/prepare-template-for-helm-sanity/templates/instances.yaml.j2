@@ -1,0 +1,51 @@
+#jinja2: trim_blocks:False
+provider_config:
+  bms:
+    ntpserver: 10.84.5.100
+    ssh_user: root
+    ssh_private_key: /root/.ssh/id_rsa
+    domainsuffix: novalocal
+
+instances:
+  bms1:
+    provider: bms
+    ip: '{{ ansible_default_ipv4.address }}'
+    roles:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+      vrouter:
+      openstack:
+
+contrail_configuration:
+  AUTH_MODE: keystone
+  AAA_MODE: rbac
+  AGENT_MODE: kernel
+  BGP_PORT: 1179
+  CONTROLLER_NODES: '{{ ansible_ens4_ipv4.address }}'
+  CONTROL_NODES: '{{ ansible_ens4_ipv4.address }}'
+  PHYSICAL_INTERFACE: ens4
+  VROUTER_GATEWAY: '{{ ansible_default_ipv4.gateway }}'
+  CONFIG_API_VIP: '{{ ansible_ens4_ipv4.address }}'
+  KEYSTONE_AUTH_ADMIN_PASSWORD: c0ntrail123
+  KEYSTONE_AUTH_HOST: "{{ control_ip }}"
+  KEYSTONE_AUTH_URL_VERSION: "/v3"
+  RABBITMQ_NODE_PORT: 5673
+
+deployment:
+    orchestrator: '{{ cloud_orchestrator }}'
+    deployer: '{{ contrail_deployer }}'
+
+orchestrator_configuration:
+    keystone:
+        version: v3
+        password: c0ntrail123
+
+test_configuration:
+    image_web_server: 10.84.5.120
+    use_project_scoped_token: True
+    auth_port: 80
+    auth_url: http://keystone.openstack.svc.cluster.local:80/v3

@@ -1,0 +1,8 @@
+---
+contrail_version: >-
+  {%- if zuul.change is defined -%}
+    {{ openstack_version }}-{{ zuul.change }}-{{ zuul.patchset }}
+  {%- else -%}
+    {{ contrail_container_tag }}
+  {%- endif -%}
+openstack_version: 'ocata'
