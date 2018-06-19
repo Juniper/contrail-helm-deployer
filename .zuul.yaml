@@ -3,3 +3,15 @@
     check:
       jobs:
         - zuul-jobs-linters
+        - contrail-vnc-build-package-centos74
+        - contrail-vnc-build-containers-centos7-ocata:
+            dependencies:
+              - contrail-vnc-build-package-centos74
+        - contrail-vnc-build-test-containers:
+            dependencies:
+              - contrail-vnc-build-package-centos74
+        - contrail-sanity-ubuntu1604-helm-ocata:
+            dependencies:
+              - contrail-vnc-build-containers-centos74
+              - contrail-vnc-build-test-container
+            voting: false
