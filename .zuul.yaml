@@ -3,3 +3,16 @@
     check:
       jobs:
         - zuul-jobs-linters
+        - contrail-sanity-ubuntu1604-helm-ocata:
+            dependencies:
+              - contrail-vnc-build-containers-centos7-ocata
+              - contrail-vnc-build-test-containers
+            voting: false
+    experimental:
+      jobs:
+        - contrail-sanity-ubuntu1604-helm-ocata:
+            voting: false
+            vars:
+              contrail_docker_registry: opencontrailnightly
+              contrail_version: ocata-master-157
+              container_tag: ocata-master-157
