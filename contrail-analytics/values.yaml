@@ -90,6 +90,10 @@ pod:
 service:
   analytics_api_public_port: ""
 
+# Service related inputs are defined here
+ingress:
+  analytics_api_host: "contrail-analytics-api"
+
 manifests:
   configmap_analytics_env: true
   configmap_analytics_keystone: true

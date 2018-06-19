@@ -203,6 +203,11 @@ pod:
 service:
   config_api_public_port: ""
 
+# Service related inputs are defined here
+ingress:
+  config_api_host: "contrail-config-api"
+  webui_host: "contrail-webui"
+
 manifests:
   configmap_controller_env: true
   configmap_controller_keystone: true
