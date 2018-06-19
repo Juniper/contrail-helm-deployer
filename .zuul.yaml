@@ -2,4 +2,9 @@
     name: Juniper/contrail-helm-deployer
     check:
       jobs:
+        - contrail-sanity-ubuntu1604-helm-ocata:
+            dependencies:
+              - contrail-vnc-build-containers-centos74
+              - contrail-vnc-build-test-container
+            voting: false
         - zuul-jobs-linters
