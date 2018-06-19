@@ -3,3 +3,11 @@
     check:
       jobs:
         - zuul-jobs-linters
+    experimental:
+      jobs:
+        - contrail-sanity-ubuntu1604-helm-ocata:
+            voting: false
+            vars:
+              contrail_docker_registry: opencontrailnightly
+              contrail_version: ocata-master-200
+              container_tag: ocata-master-200
