@@ -84,6 +84,21 @@ spec:
           name: contrail-log
         - mountPath: /var/crashes
           name: var-crashes-analytics
+      - name: contrail-alarm-gen
+        image: {{ .Values.global.images.tags.analytics_alarm_gen | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: contrail-analytics-env
+        - configMapRef:
+            name: contrail-analytics-keystone
+        - configMapRef:
+            name: contrail-analytics-rabbitmq
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /var/crashes
+          name: var-crashes-analytics
       - name: contrail-query-engine
         image: {{ .Values.global.images.tags.analytics_query_engine | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
