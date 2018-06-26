@@ -71,7 +71,7 @@ spec:
             name: lib-modules
           - mountPath: /host/bin
             name: host-bin
-{{- else if $host_os "centos" }}
+{{- else if eq $host_os "centos" }}
         - name: contrail-vrouter-init-kernel
           image: {{ .Values.global.images.tags.vrouter_init_kernel | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
