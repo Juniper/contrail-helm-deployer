@@ -44,6 +44,9 @@ labels:
   analyticsdb_nodemgr:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
+  configdb_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
 
 dependencies:
   kafka:
@@ -59,6 +62,9 @@ dependencies:
   analyticsdb_nodemgr:
     daemonset:
     - contrail-analyticsdb
+  configdb_nodemgr:
+    daemonset:
+    - contrail-configdb
 
 endpoints:
   cluster_domain_suffix: cluster.local
@@ -117,6 +123,10 @@ pod:
           enabled: true
           min_ready_seconds: 0
           max_unavailable: 1
+        configdb_nodemgr:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
 
 manifests:
   configmap_analytics_zookeeper: true
@@ -132,3 +142,4 @@ manifests:
   daemonset_config_zookeeper: true
   daemonset_kafka: true
   daemonset_analyticsdb_nodemgr: true
+  daemonset_configdb_nodemgr: true
