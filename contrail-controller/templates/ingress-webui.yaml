@@ -16,25 +16,25 @@ metadata:
 spec:
   tls:
   - hosts:
-    - contrail-webui.contrail.svc.cluster.local
-    - contrail-webui.contrail
-    - contrail-webui
+    - {{ .Values.ingress.webui_host }}.contrail.svc.cluster.local
+    - {{ .Values.ingress.webui_host }}.contrail
+    - {{ .Values.ingress.webui_host }}
   rules:
-  - host: contrail-webui
+  - host: {{ .Values.ingress.webui_host }}
     http:
       paths:
       - backend:
           serviceName: contrail-web-controller
           servicePort: https
         path: /
-  - host: contrail-webui.{{ .Release.Namespace }}
+  - host: {{ .Values.ingress.webui_host }}.{{ .Release.Namespace }}
     http:
       paths:
       - backend:
           serviceName: contrail-web-controller
           servicePort: https
         path: /
-  - host: contrail-webui.{{ .Release.Namespace }}.svc.cluster.local
+  - host: {{ .Values.ingress.webui_host }}.{{ .Release.Namespace }}.svc.cluster.local
     http:
       paths:
       - backend:
