@@ -21,6 +21,8 @@ global:
       contrail_collector: "docker.io/opencontrailnightly/contrail-analytics-collector:latest"
       analytics_alarm_gen: "docker.io/opencontrailnightly/contrail-analytics-alarm-gen:latest"
       analytics_query_engine: "docker.io/opencontrailnightly/contrail-analytics-query-engine:latest"
+      analytics_snmp_collector: "docker.io/opencontrailnightly/contrail-analytics-snmp-collector:latest"
+      contrail_topology: "docker.io/opencontrailnightly/contrail-analytics-topology:latest"
       build_driver_init: "docker.io/opencontrailnightly/contrail-vrouter-kernel-build-init:latest"
       vrouter_agent: "docker.io/opencontrailnightly/contrail-vrouter-agent:latest"
       vrouter_init_kernel: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init:latest"
