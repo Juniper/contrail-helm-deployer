@@ -64,7 +64,6 @@ metadata:
 data:
   KEYSTONE_AUTH_ADMIN_USER: {{ .Values.endpoints.keystone.auth.username }}
   KEYSTONE_AUTH_ADMIN_TENANT: {{ .Values.endpoints.keystone.auth.project_name }}
-  KEYSTONE_AUTH_ADMIN_PASSWORD: {{ .Values.endpoints.keystone.auth.password }}
   KEYSTONE_AUTH_USER_DOMAIN_NAME: {{ .Values.endpoints.keystone.auth.user_domain_name }}
   KEYSTONE_AUTH_PROJECT_DOMAIN_NAME: {{ .Values.endpoints.keystone.auth.project_domain_name }}
   KEYSTONE_AUTH_URL_VERSION: {{ .Values.endpoints.keystone.path.default }}
