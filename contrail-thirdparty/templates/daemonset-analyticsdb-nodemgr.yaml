@@ -66,6 +66,11 @@ spec:
           value: {{ .Values.global.contrail_env.ANALYTICSDB_CQL_PORT | default 9042 | quote }}
         - name: CASSANDRA_JMX_LOCAL_PORT
           value: {{ .Values.global.contrail_env.ANALYTICSDB_JMX_LOCAL_PORT | default 7100 | quote }}
+        - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.keystone.admin }}
+              key: KEYSTONE_AUTH_ADMIN_PASSWORD
         volumeMounts:
         - mountPath: /mnt/docker.sock
           name: docker-unix-socket

@@ -60,6 +60,12 @@ spec:
             name: contrail-controller-keystone
         - configMapRef:
             name: contrail-controller-rabbitmq
+        env:
+        - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.keystone.admin }}
+              key: KEYSTONE_AUTH_ADMIN_PASSWORD
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -77,6 +83,12 @@ spec:
             name: contrail-controller-keystone
         - configMapRef:
             name: contrail-controller-rabbitmq
+        env:
+        - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.keystone.admin }}
+              key: KEYSTONE_AUTH_ADMIN_PASSWORD
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -96,6 +108,12 @@ spec:
             name: contrail-controller-keystone
         - configMapRef:
             name: contrail-controller-rabbitmq
+        env:
+        - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.keystone.admin }}
+              key: KEYSTONE_AUTH_ADMIN_PASSWORD
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -116,6 +134,11 @@ spec:
           value: control
         - name: DOCKER_HOST
           value: "unix://mnt/docker.sock"
+        - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.keystone.admin }}
+              key: KEYSTONE_AUTH_ADMIN_PASSWORD
         volumeMounts:
         - mountPath: /mnt/docker.sock
           name: docker-unix-socket

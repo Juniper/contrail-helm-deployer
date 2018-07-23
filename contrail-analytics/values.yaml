@@ -36,6 +36,11 @@ dependencies:
     - contrail-analyticsdb
     - contrail-config
 
+# Names of secrets used by bootstrap and environmental checks
+secrets:
+  keystone:
+    admin: contrail-analytics-keystone-admin
+
 # typically overriden by environmental
 # values, but should include all endpoints
 # required by this chart
@@ -105,3 +110,4 @@ manifests:
   service_analytics_api_server: true
   service_analytics_api_ingress: true
   ingress_analytics_api: true
+  secret_analytics_keystone_admin: true
