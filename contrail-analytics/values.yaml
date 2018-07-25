@@ -97,6 +97,11 @@ service:
 ingress:
   analytics_api_host: "contrail-analytics-api"
 
+# VolumeMounts related inputs are defined here
+volumeMounts:
+  host_usr_bin:
+    hostPath: '/usr/bin'
+
 manifests:
   configmap_analytics_env: true
   configmap_analytics_keystone: true
