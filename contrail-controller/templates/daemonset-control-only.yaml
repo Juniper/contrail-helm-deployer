@@ -75,7 +75,7 @@ spec:
           path: /var/crashes
       - name: host-usr-bin
         hostPath:
-          path: /usr/bin
+          path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}
       - name: ssl-dir
         hostPath:
           path: /etc/contrail/ssl

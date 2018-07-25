@@ -199,7 +199,7 @@ spec:
           path: /bin
       - name: host-usr-bin
         hostPath:
-          path: /usr/bin
+          path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}
       - name: host-dev
         hostPath:
           path: /dev

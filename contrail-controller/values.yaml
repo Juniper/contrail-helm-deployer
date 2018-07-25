@@ -208,6 +208,11 @@ ingress:
   config_api_host: "contrail-config-api"
   webui_host: "contrail-webui"
 
+# VolumeMounts related inputs are defined here
+volumeMounts:
+  host_usr_bin:
+    hostPath: '/usr/bin'
+
 manifests:
   configmap_controller_env: true
   configmap_controller_keystone: true

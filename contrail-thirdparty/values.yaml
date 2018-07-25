@@ -128,6 +128,11 @@ pod:
           min_ready_seconds: 0
           max_unavailable: 1
 
+# VolumeMounts related inputs are defined here
+volumeMounts:
+  host_usr_bin:
+    hostPath: '/usr/bin'
+
 manifests:
   configmap_analytics_zookeeper: true
   configmap_config_zookeeper: true

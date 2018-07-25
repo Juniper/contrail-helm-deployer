@@ -119,6 +119,11 @@ pod:
           min_ready_seconds: 0
           max_unavailable: 1
 
+# VolumeMounts related inputs are defined here
+volumeMounts:
+  host_usr_bin:
+    hostPath: '/usr/bin'
+
 manifests:
   configmap_vrouter_kernel: true
   configmap_vrouter_keystone: true
