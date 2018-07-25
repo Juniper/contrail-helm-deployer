@@ -103,7 +103,7 @@ spec:
           path: /var/crashes/contrail/webui
       - name: host-usr-bin
         hostPath:
-          path: /usr/bin
+          path: /usr/local/bin
       - name: ssl-dir
         hostPath:
           path: /etc/contrail/ssl

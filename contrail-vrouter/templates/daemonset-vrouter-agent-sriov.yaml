@@ -255,7 +255,7 @@ spec:
           path: /var/run/libvirt
       - name: host-usr-bin
         hostPath:
-          path: /usr/bin
+          path: /usr/local/bin
       - name: host-dev-log
         hostPath:
           path: /dev/log
