@@ -82,6 +82,8 @@ global:
     PHYSICAL_INTERFACE: $physical_intf
     VROUTER_GATEWAY:
     CONTROL_DATA_NET_LIST:
+    CONFIG_NODEMGR__DEFAULTS__minimum_diskGB: "5"
+    DATABASE_NODEMGR__DEFAULTS__minimum_diskGB: "5"
   contrail_env_vrouter_kernel:
     AGENT_MODE: kernel
 EOF
