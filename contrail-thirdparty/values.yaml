@@ -6,6 +6,7 @@ global:
       redis: "redis:4.0.2"
       zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:latest"
       nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:latest"
+      rabbitmq: "docker.io/opencontrailnightly/contrail-external-rabbitmq:latest"
       contrail_status: "docker.io/opencontrailnightly/contrail-status:latest"
       node_init: "docker.io/opencontrailnightly/contrail-node-init:latest"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
@@ -21,6 +22,11 @@ global:
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
+
+  # Sample RABBITMQ Config
+  # RABBITMQ_VHOST: "/"
+  # RABBITMQ_USER: "guest"
+  # RABBITMQ_PASSWORD: "guest"
 
 labels:
   configdb:
@@ -47,6 +53,9 @@ labels:
   configdb_nodemgr:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
+  rabbitmq:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
 
 dependencies:
   kafka:
@@ -64,6 +73,10 @@ dependencies:
     - contrail-analyticsdb
   configdb_nodemgr:
     daemonset:
+    - contrail-configdb
+  rabbitmq:
+    daemonset:
+    - contrail-config-zookeeper
     - contrail-configdb
 
 endpoints:
@@ -119,6 +132,10 @@ pod:
           enabled: true
           min_ready_seconds: 0
           max_unavailable: 1
+        rabbitmq:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
         analyticsdb_nodemgr:
           enabled: true
           min_ready_seconds: 0
@@ -143,3 +160,4 @@ manifests:
   daemonset_kafka: true
   daemonset_analyticsdb_nodemgr: true
   daemonset_configdb_nodemgr: true
+  daemonset_rabbitmq: true
