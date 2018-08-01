@@ -5,6 +5,7 @@ global:
       cassandra: "docker.io/opencontrailnightly/contrail-external-cassandra:latest"
       redis: "redis:4.0.2"
       zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:latest"
+      rabbitmq: "docker.io/opencontrailnightly/contrail-external-rabbitmq:latest"
       nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:latest"
       contrail_status: "docker.io/opencontrailnightly/contrail-status:latest"
       node_init: "docker.io/opencontrailnightly/contrail-node-init:latest"
@@ -21,6 +22,9 @@ global:
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
+    RABBITMQ_VHOST: "/"
+    RABBITMQ_USER: "guest"
+    RABBITMQ_PASSWORD: "guest"
 
 labels:
   configdb:
@@ -47,6 +51,9 @@ labels:
   configdb_nodemgr:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
+  rabbitmq:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
 
 dependencies:
   kafka:
@@ -64,6 +71,10 @@ dependencies:
     - contrail-analyticsdb
   configdb_nodemgr:
     daemonset:
+    - contrail-configdb
+  rabbitmq:
+    daemonset:
+    - contrail-config-zookeeper
     - contrail-configdb
 
 # Names of secrets used by bootstrap and environmental checks
@@ -124,6 +135,10 @@ pod:
           enabled: true
           min_ready_seconds: 0
           max_unavailable: 1
+        rabbitmq:
+          enabled: true
+          min_ready_seconds: 0
+          max_unavailable: 1
         analyticsdb_nodemgr:
           enabled: true
           min_ready_seconds: 0
@@ -137,6 +152,9 @@ pod:
 volumeMounts:
   host_usr_bin:
     hostPath: '/usr/bin'
+
+service:
+  config_api_public_port: ""
 
 manifests:
   configmap_analytics_zookeeper: true
@@ -154,3 +172,5 @@ manifests:
   daemonset_analyticsdb_nodemgr: true
   daemonset_configdb_nodemgr: true
   secret_thirdparty_keystone_admin: true
+  daemonset_rabbitmq: true
+  service_rabbitmq: true
