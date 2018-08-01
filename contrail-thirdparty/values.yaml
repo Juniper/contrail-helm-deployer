@@ -21,6 +21,9 @@ global:
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
+    RABBITMQ_VHOST: "/"
+    RABBITMQ_USER: "guest"
+    RABBITMQ_PASSWORD: "guest"
 
 labels:
   configdb:
@@ -133,6 +136,9 @@ volumeMounts:
   host_usr_bin:
     hostPath: '/usr/bin'
 
+service:
+  config_api_public_port: ""
+
 manifests:
   configmap_analytics_zookeeper: true
   configmap_config_zookeeper: true
@@ -148,3 +154,4 @@ manifests:
   daemonset_kafka: true
   daemonset_analyticsdb_nodemgr: true
   daemonset_configdb_nodemgr: true
+  service_rabbitmq: true

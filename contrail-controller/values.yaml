@@ -61,8 +61,8 @@ endpoints:
   cluster_domain_suffix: cluster.local
   rabbitmq:
     auth:
-      username: rabbitmq
-      password: password
+      username: guest
+      password: guest
     path: /
     scheme: rabbit
     port:
