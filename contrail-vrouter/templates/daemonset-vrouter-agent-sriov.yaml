@@ -5,6 +5,7 @@
 {{- $sriov_env := index . 3 }}
 {{- $context := index . 4 }}
 {{- $agent_mode := $sriov_env.AGENT_MODE | default "kernel" }}
+{{- $uio_driver := $sriov_env.DPDK_UIO_DRIVER | default "kernel" }}
 
 {{- $_ := set $context.Values "images" $context.Values.global.images }}
 # host_os is a mandatory field
@@ -113,7 +114,22 @@ spec:
           - mountPath: /host/bin
             name: host-bin
 {{- end }}
-{{- else if and $agent_mode ( eq $agent_mode "dpdk" ) }}
+{{- else if and $agent_mode ( eq $agent_mode "dpdk" ) }} 
+{{- if and (eq $host_os "ubuntu") (eq $uio_driver "mlnx") }}
+        - name: contrail-vrouter-plugin-mellanox-init
+          image: {{ $context.Values.global.images.tags.vrouter_plugin_mellanox_init | quote }}
+          imagePullPolicy: {{ default "" $context.Values.global.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          envFrom:
+          - configMapRef:
+              name: contrail-vrouter-dpdk
+          volumeMounts:
+          - mountPath: /lib/modules
+            name: lib-modules
+          - mountPath: /usr/src
+            name: usr-src
+{{- end }}
         - name: contrail-vrouter-init-dpdk
           image: {{ $context.Values.global.images.tags.vrouter_init_dpdk | quote }}
           imagePullPolicy: {{ default "" $context.Values.global.images.imagePullPolicy | quote }}
