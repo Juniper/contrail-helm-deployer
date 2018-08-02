@@ -53,6 +53,10 @@ dependencies:
     - contrail-config
     - contrail-redis
 
+# Names of secrets used by bootstrap and environmental checks
+secrets:
+  keystone:
+    admin: contrail-controller-keystone-admin
 
 # typically overriden by environmental
 # values, but should include all endpoints
@@ -227,3 +231,4 @@ manifests:
   service_webui_ingress: true
   ingress_webui: true
   ingress_config_api: true
+  secret_controller_keystone_admin: true

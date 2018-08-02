@@ -75,6 +75,12 @@ spec:
               name: contrail-vrouter-kernel
           - configMapRef:
               name: contrail-vrouter-keystone
+          env:
+          - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secrets.keystone.admin }}
+                key: KEYSTONE_AUTH_ADMIN_PASSWORD
           volumeMounts:
           - mountPath: /usr/src
             name: usr-src
@@ -93,6 +99,12 @@ spec:
               name: configmap-vrouter
           - configMapRef:
               name: contrail-vrouter-keystone
+          env:
+          - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secrets.keystone.admin }}
+                key: KEYSTONE_AUTH_ADMIN_PASSWORD
           volumeMounts:
           - mountPath: /lib/modules
             name: lib-modules
@@ -101,7 +113,7 @@ spec:
           - mountPath: /host/bin
             name: host-bin
 {{- end }}
-{{- else if and $agent_mode ( eq $agent_mode "dpdk" ) }} 
+{{- else if and $agent_mode ( eq $agent_mode "dpdk" ) }}
         - name: contrail-vrouter-init-dpdk
           image: {{ $context.Values.global.images.tags.vrouter_init_dpdk | quote }}
           imagePullPolicy: {{ default "" $context.Values.global.images.imagePullPolicy | quote }}
@@ -112,6 +124,12 @@ spec:
               name: contrail-vrouter-dpdk
           - configMapRef:
               name: contrail-vrouter-keystone
+          env:
+          - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secrets.keystone.admin }}
+                key: KEYSTONE_AUTH_ADMIN_PASSWORD
           volumeMounts:
           - mountPath: /lib/modules
             name: lib-modules
@@ -125,7 +143,7 @@ spec:
             name: hugepages
 {{- end }}
       containers:
-{{- if and $agent_mode ( eq $agent_mode "dpdk" ) }} 
+{{- if and $agent_mode ( eq $agent_mode "dpdk" ) }}
         - name: contrail-vrouter-dpdk
           image: {{ $context.Values.global.images.tags.vrouter_dpdk | quote }}
           imagePullPolicy: {{ default "" $context.Values.global.images.imagePullPolicy | quote }}
@@ -136,6 +154,12 @@ spec:
               name: contrail-vrouter-dpdk
           - configMapRef:
               name: contrail-vrouter-keystone
+          env:
+          - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secrets.keystone.admin }}
+                key: KEYSTONE_AUTH_ADMIN_PASSWORD
           volumeMounts:
           - mountPath: /etc/
             name: mount-etc
@@ -166,6 +190,12 @@ spec:
             name: {{ $config_map_name }}
         - configMapRef:
             name: contrail-vrouter-keystone
+        env:
+        - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.keystone.admin }}
+              key: KEYSTONE_AUTH_ADMIN_PASSWORD
         volumeMounts:
 {{- if eq $host_os "centos"}}
         - mountPath: /etc/sysconfig/network-scripts
@@ -200,6 +230,11 @@ spec:
           value: vrouter
         - name: DOCKER_HOST
           value: "unix://mnt/docker.sock"
+        - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.keystone.admin }}
+              key: KEYSTONE_AUTH_ADMIN_PASSWORD
         volumeMounts:
         - mountPath: /mnt/docker.sock
           name: docker-unix-socket
