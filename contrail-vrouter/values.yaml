@@ -7,6 +7,7 @@ global:
       build_driver_init: "docker.io/opencontrailnightly/contrail-vrouter-kernel-build-init:latest"
       vrouter_agent: "docker.io/opencontrailnightly/contrail-vrouter-agent:latest"
       vrouter_init_kernel: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init:latest"
+      vrouter_plugin_init: "docker.io/opencontrailnightly/contrail-vrouter-plugin-mellanox-init-ubuntu:latest"
       vrouter_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-agent-dpdk:latest"
       vrouter_init_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init-dpdk:latest"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
