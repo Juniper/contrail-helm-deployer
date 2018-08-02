@@ -1,3 +1,4 @@
+---
 - name: Set variables
   set_fact:
     repos_dir: "{{ ansible_env.HOME }}/src/{{ zuul.project.canonical_hostname }}/Juniper"
