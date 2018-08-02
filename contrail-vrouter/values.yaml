@@ -73,6 +73,11 @@ dependencies:
     - contrail-config
     - contrail-control
 
+# Names of secrets used by bootstrap and environmental checks
+secrets:
+  keystone:
+    admin: contrail-vrouter-keystone-admin
+
 # typically overriden by environmental
 # values, but should include all endpoints
 # required by this chart
@@ -132,3 +137,4 @@ manifests:
   daemonset_kernel: true
   daemonset_dpdk: false
   daemonset_vrouter_sriov: false
+  secret_vrouter_keystone_admin: true

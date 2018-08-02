@@ -66,6 +66,11 @@ dependencies:
     daemonset:
     - contrail-configdb
 
+# Names of secrets used by bootstrap and environmental checks
+secrets:
+  keystone:
+    admin: contrail-thirdparty-keystone-admin
+
 endpoints:
   cluster_domain_suffix: cluster.local
   keystone:
@@ -148,3 +153,4 @@ manifests:
   daemonset_kafka: true
   daemonset_analyticsdb_nodemgr: true
   daemonset_configdb_nodemgr: true
+  secret_thirdparty_keystone_admin: true
