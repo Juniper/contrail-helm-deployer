@@ -3,7 +3,7 @@ global:
     tags:
       kafka: "docker.io/opencontrailnightly/contrail-external-kafka:latest"
       cassandra: "docker.io/opencontrailnightly/contrail-external-cassandra:latest"
-      redis: "redis:4.0.2"
+      redis: "docker.io/opencontrailnightly/contrail-external-redis:latest"
       zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:latest"
       rabbitmq: "docker.io/opencontrailnightly/contrail-external-rabbitmq:latest"
       nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:latest"
