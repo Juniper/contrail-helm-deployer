@@ -36,6 +36,9 @@ spec:
       - name: redis
         image: {{ .Values.global.images.tags.redis | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: contrail-thirdparty-env
         readinessProbe:
           tcpSocket:
             port: 6379
