@@ -115,7 +115,7 @@ spec:
           - mountPath: /host/bin
             name: host-bin
 {{- end }}
-{{- else if and $agent_mode ( eq $agent_mode "dpdk" ) }} 
+{{- else if and $agent_mode ( eq $agent_mode "dpdk" ) }}
 {{- if and (eq $host_os "ubuntu") (eq $uio_driver "mlnx") }}
         - name: contrail-vrouter-plugin-mellanox-init
           image: {{ $context.Values.global.images.tags.vrouter_plugin_mellanox_init | quote }}
@@ -230,8 +230,8 @@ spec:
           name: host-bin
         - mountPath: /dev/log
           name: host-dev-log
-        - mountPath: /var/run/libvirt
-          name: var-run-libvirt
+        - mountPath: /var/run
+          name: var-run
         - mountPath: /etc/contrail/ssl
           name: ssl-dir
       - name: contrail-vrouter-nodemgr
@@ -302,9 +302,6 @@ spec:
       - name: host-bin
         hostPath:
           path: /bin
-      - name: var-run-libvirt
-        hostPath:
-          path: /var/run/libvirt
       - name: host-usr-bin
         hostPath:
           path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}

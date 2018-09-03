@@ -141,8 +141,8 @@ spec:
           name: host-bin
         - mountPath: /dev/log
           name: host-dev-log
-        - mountPath: /var/run/libvirt
-          name: var-run-libvirt
+        - mountPath: /var/run
+          name: var-run
         - mountPath: /etc/contrail/ssl
           name: ssl-dir
       - name: contrail-vrouter-nodemgr
@@ -191,7 +191,7 @@ spec:
           type: Socket
       - name: var-run
         hostPath:
-          path: /var/run/
+          path: /var/run
       - name: var-lib-contrail
         hostPath:
           path: /var/lib/contrail/
@@ -204,9 +204,6 @@ spec:
       - name: host-bin
         hostPath:
           path: /bin
-      - name: var-run-libvirt
-        hostPath:
-          path: /var/run/libvirt
       - name: host-usr-bin
         hostPath:
           path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}

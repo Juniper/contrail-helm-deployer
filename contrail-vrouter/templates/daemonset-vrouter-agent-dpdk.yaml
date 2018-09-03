@@ -152,7 +152,7 @@ spec:
             name: var-lib-contrail
           - mountPath: /var/log/contrail/
             name: contrail-log
-          - mountPath: /var/run/
+          - mountPath: /var/run
             name: var-run
           - mountPath: /var/crashes
             name: var-crashes-vrouter
