@@ -95,6 +95,8 @@ spec:
             name: lsb-release
           - mountPath: /dev/hugepages
             name: hugepages
+          - mountPath: /host/bin
+            name: host-bin
       containers:
         - name: contrail-vrouter-dpdk
           image: {{ .Values.global.images.tags.vrouter_dpdk | quote }}
