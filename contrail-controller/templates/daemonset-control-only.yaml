@@ -50,6 +50,8 @@ spec:
             name: host-usr-bin
           - mountPath: /etc/contrail/ssl
             name: ssl-dir
+          - mountPath: /etc/sysctl.conf
+            name: host-sysctl-conf
       containers:
       - name: contrail-control
         image: {{ .Values.global.images.tags.contrail_control | quote }}
@@ -85,4 +87,7 @@ spec:
       - name: ssl-dir
         hostPath:
           path: /etc/contrail/ssl
+      - name: host-sysctl-conf
+        hostPath:
+          path: /etc/sysctl.conf
 {{- end }}
