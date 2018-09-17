@@ -48,6 +48,10 @@ spec:
           volumeMounts:
           - mountPath: /host/usr/bin
             name: host-usr-bin
+          - mountPath: /etc/contrail/ssl
+            name: ssl-dir
+          - mountPath: /etc/sysctl.conf
+            name: host-sysctl-conf
       containers:
       - name: contrail-webui-middleware
         image: {{ .Values.global.images.tags.webui_middleware | quote }}
@@ -119,6 +123,9 @@ spec:
       - name: ssl-dir
         hostPath:
           path: /etc/contrail/ssl
+      - name: host-sysctl-conf
+        hostPath:
+          path: /etc/sysctl.conf
       {{- if and (.Values.global.contrail_env.WEBUI_SSL_CERT_FILE) (.Values.global.contrail_env.WEBUI_SSL_KEY_FILE) }}
       - name: webui-certificate
         hostPath:

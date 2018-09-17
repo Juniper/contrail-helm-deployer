@@ -48,6 +48,10 @@ spec:
           volumeMounts:
           - mountPath: /host/usr/bin
             name: host-usr-bin
+          - mountPath: /etc/contrail/ssl
+            name: ssl-dir
+          - mountPath: /etc/sysctl.conf
+            name: host-sysctl-conf
       containers:
       - name: contrail-config-api
         image: {{ .Values.global.images.tags.config_api | quote }}
@@ -188,4 +192,7 @@ spec:
       - name: ssl-dir
         hostPath:
           path: /etc/contrail/ssl
+      - name: host-sysctl-conf
+        hostPath:
+          path: /etc/sysctl.conf
 {{- end }}
