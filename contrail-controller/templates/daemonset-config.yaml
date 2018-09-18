@@ -1,9 +1,10 @@
 {{- if .Values.manifests.daemonset_config }}
 {{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
+{{- $dependencies := .Values.dependencies.config }}
 
-{{- $serviceAccountName := "config-api" }}
-{{ tuple $envAll $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
+{{- $serviceAccountName := "config" }}
+{{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -36,7 +37,7 @@ spec:
       imagePullSecrets:
         - name: contrail-controller-docker-secret
       initContainers:
-{{ tuple $context .Values.dependencies.config nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{ tuple $context $dependencies nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: contrail-node-init
           image: {{ .Values.global.images.tags.node_init | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}

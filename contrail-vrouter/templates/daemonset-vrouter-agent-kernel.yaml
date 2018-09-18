@@ -1,12 +1,13 @@
 {{- if .Values.manifests.daemonset_kernel }}
 {{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
+{{- $dependencies := .Values.dependencies.vrouter_agent_kernel }}
 # host_os is a mandatory field
 {{- $_ := required ".Values.global.node.host_os must be specified, valid values are ubuntu, centos" .Values.global.node.host_os }}
 {{- $host_os := .Values.global.node.host_os }}
 
 {{- $serviceAccountName := "vrouter-agent-kernel" }}
-{{ tuple $envAll $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
+{{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -42,7 +43,7 @@ spec:
       imagePullSecrets:
         - name: contrail-vrouter-docker-secret
       initContainers:
-{{ tuple $context .Values.dependencies.vrouter_agent_kernel nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{ tuple $context $dependencies nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: contrail-node-init
           image: {{ .Values.global.images.tags.node_init | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
