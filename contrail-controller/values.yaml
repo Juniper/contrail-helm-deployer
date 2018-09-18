@@ -226,9 +226,7 @@ manifests:
   daemonset_control_only: false
   daemonset_webui: true
   service_config_api_server: true
-  service_config_ingress: true
   service_web_controller: true
-  service_webui_ingress: true
   ingress_webui: true
   ingress_config_api: true
   secret_controller_keystone_admin: true

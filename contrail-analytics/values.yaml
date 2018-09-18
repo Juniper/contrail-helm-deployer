@@ -113,6 +113,5 @@ manifests:
   configmap_analytics_rabbitmq: true
   daemonset_analytics: true
   service_analytics_api_server: true
-  service_analytics_api_ingress: true
   ingress_analytics_api: true
   secret_analytics_keystone_admin: true
