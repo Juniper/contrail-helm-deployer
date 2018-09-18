@@ -1,6 +1,9 @@
 {{- if .Values.manifests.daemonset_webui }}
 {{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
+
+{{- $serviceAccountName := "webui" }}
+{{ tuple $envAll $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
