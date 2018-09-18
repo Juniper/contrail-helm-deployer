@@ -23,6 +23,7 @@ spec:
       annotations:
         configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
     spec:
+      serviceAccountName: {{ $serviceAccountName }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

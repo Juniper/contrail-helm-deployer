@@ -22,6 +22,7 @@ spec:
       annotations:
         configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
     spec:
+      serviceAccountName: {{ $serviceAccountName }}
       #Disable affinity for single node setup
       affinity:
         nodeAffinity:
