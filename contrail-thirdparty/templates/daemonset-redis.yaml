@@ -1,6 +1,10 @@
 {{- if .Values.manifests.daemonset_redis }}
 {{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
+{{- $dependencies := .Values.dependencies.redis }}
+
+{{- $serviceAccountName := "redis" }}
+{{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -15,6 +19,7 @@ spec:
       annotations:
         configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
     spec:
+      serviceAccountName: {{ $serviceAccountName }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -31,7 +36,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
-{{ tuple $context .Values.dependencies.redis nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{ tuple $context $dependencies nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
       - name: redis
         image: {{ .Values.global.images.tags.redis | quote }}

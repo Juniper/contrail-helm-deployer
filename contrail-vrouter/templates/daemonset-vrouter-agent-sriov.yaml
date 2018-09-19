@@ -4,6 +4,7 @@
 {{- $compute_name := index . 2 }}
 {{- $sriov_env := index . 3 }}
 {{- $context := index . 4 }}
+{{- $dependencies := $context.Values.dependencies.vrouter_agent_sriov }}
 {{- $agent_mode := $sriov_env.AGENT_MODE | default "kernel" }}
 {{- $uio_driver := $sriov_env.DPDK_UIO_DRIVER | default "kernel" }}
 
@@ -11,6 +12,9 @@
 # host_os is a mandatory field
 {{- $_ := required ".Values.global.node.host_os must be specified, valid values are ubuntu, centos" $context.Values.global.node.host_os }}
 {{- $host_os := $context.Values.global.node.host_os }}
+
+{{- $serviceAccountName := "vrouter-agent-sriov" }}
+{{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -25,6 +29,7 @@ spec:
       annotations:
         configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
     spec:
+      serviceAccountName: {{ $serviceAccountName }}
       #Disable affinity for single node setup
       affinity:
         nodeAffinity:
@@ -50,7 +55,7 @@ spec:
       imagePullSecrets:
         - name: contrail-vrouter-docker-secret
       initContainers:
-{{ tuple $context $context.Values.dependencies.vrouter_agent_sriov nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{ tuple $context $dependencies nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: contrail-node-init
           image: {{ $context.Values.global.images.tags.node_init | quote }}
           imagePullPolicy: {{ default "" $context.Values.global.images.imagePullPolicy | quote }}

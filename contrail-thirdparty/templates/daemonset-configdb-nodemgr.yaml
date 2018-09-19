@@ -1,6 +1,10 @@
 {{- if .Values.manifests.daemonset_configdb_nodemgr }}
 {{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
+{{- $dependencies := .Values.dependencies.configdb_nodemgr }}
+
+{{- $serviceAccountName := "configdb-nodemgr" }}
+{{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -15,6 +19,7 @@ spec:
       annotations:
         configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
     spec:
+      serviceAccountName: {{ $serviceAccountName }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -33,7 +38,7 @@ spec:
       imagePullSecrets:
         - name: contrail-thirdparty-docker-secret
       initContainers:
-{{ tuple $context .Values.dependencies.configdb_nodemgr nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{ tuple $context $dependencies nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: contrail-node-init
           image: {{ .Values.global.images.tags.node_init | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
