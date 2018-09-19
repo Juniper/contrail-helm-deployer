@@ -61,6 +61,8 @@ spec:
             name: host-usr-bin
           - mountPath: /etc/contrail/ssl
             name: ssl-dir
+          - mountPath: /etc/sysctl.conf
+            name: host-sysctl-conf
 {{- if eq $host_os "ubuntu"}}
         - name: contrail-vrouter-init-kernel
           image: {{ .Values.global.images.tags.build_driver_init | quote }}

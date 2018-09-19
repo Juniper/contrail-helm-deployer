@@ -55,6 +55,8 @@ spec:
             name: host-usr-bin
           - mountPath: /etc/contrail/ssl
             name: ssl-dir
+          - mountPath: /etc/sysctl.conf
+            name: host-sysctl-conf
       containers:
       - name: contrail-configdb-nodemgr
         image: {{ .Values.global.images.tags.nodemgr | quote }}
