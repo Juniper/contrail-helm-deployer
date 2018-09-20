@@ -94,7 +94,8 @@ endpoints:
       project_domain_name: default
       region_name: RegionOne
     hosts:
-      default: keystone-api
+      default: keystone
+      internal: keystone-api
     path:
       default: /v3
     port:
@@ -102,6 +103,7 @@ endpoints:
         default: 35357
       api:
         default: 80
+        internal: 5000
     scheme:
       default: http
     host_fqdn_override:
