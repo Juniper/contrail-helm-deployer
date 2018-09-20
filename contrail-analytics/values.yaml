@@ -60,7 +60,6 @@ endpoints:
     host_fqdn_override:
        default: null
     domain_override: null
-    namespace: null
   keystone:
     auth:
       username: admin
