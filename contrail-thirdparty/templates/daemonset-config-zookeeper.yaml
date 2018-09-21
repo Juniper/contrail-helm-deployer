@@ -40,7 +40,7 @@ spec:
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         env:
         - name: NODE_TYPE
-          value: config
+          value: config-database
         envFrom:
         - configMapRef:
             name: contrail-config-zookeeper
