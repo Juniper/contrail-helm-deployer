@@ -1,5 +1,5 @@
 {{- $context := . }}
-{{- $keystone_auth_host := tuple "keystone" "internal" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
+{{- $keystone_auth_host := tuple "keystone" "default" $context | include "helm-toolkit.endpoints.hostname_namespaced_endpoint_lookup" }}
 
 {{- if not .Values.global.contrail_env_vrouter_kernel -}}
 {{- $_ := set .Values.global "contrail_env_vrouter_kernel" dict -}}
@@ -75,7 +75,7 @@ data:
   KEYSTONE_AUTH_URL_VERSION: {{ .Values.endpoints.keystone.path.default }}
   KEYSTONE_AUTH_HOST: {{ $keystone_auth_host }}
   KEYSTONE_AUTH_PROTO: {{ .Values.endpoints.keystone.scheme.default }}
-  KEYSTONE_AUTH_ADMIN_PORT: {{ .Values.endpoints.keystone.port.api.internal | quote }}
+  KEYSTONE_AUTH_ADMIN_PORT: {{ .Values.endpoints.keystone.port.api.default | quote }}
   KEYSTONE_AUTH_PUBLIC_PORT: {{ .Values.endpoints.keystone.port.api.default | quote }}
   KEYSTONE_AUTH_REGION_NAME: {{ .Values.endpoints.keystone.auth.region_name | quote }}
 {{- end }}

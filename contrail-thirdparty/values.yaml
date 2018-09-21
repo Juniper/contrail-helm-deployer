@@ -95,13 +95,11 @@ endpoints:
       region_name: RegionOne
     hosts:
       default: keystone
-      internal: keystone-api
     path:
       default: /v3
     port:
       api:
         default: 80
-        internal: 5000
     scheme:
       default: http
     host_fqdn_override:
