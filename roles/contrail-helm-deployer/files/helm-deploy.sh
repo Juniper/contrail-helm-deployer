@@ -43,9 +43,6 @@ make
 kubectl label node opencontrail.org/controller=enabled --all --overwrite=true
 kubectl label node opencontrail.org/vrouter-kernel=enabled --all --overwrite=true
 
-#Give cluster-admin permission for the user to create contrail pods
-kubectl replace -f rbac/cluster-admin.yaml
-
 #Populate the contrail-override-values.yaml file
 tee /tmp/contrail.yaml << EOF
 global:
