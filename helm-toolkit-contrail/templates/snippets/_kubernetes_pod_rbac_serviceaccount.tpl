@@ -48,7 +48,6 @@ metadata:
 {{- $resourceList := (splitList "," (trimSuffix "," $vv)) }}
 {{- tuple $envAll $resourceList $saName $ns | include "helm-toolkit.snippets.kubernetes_pod_rbac_roles" }}
 {{- end -}}
-{{- end -}}
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -73,3 +72,4 @@ subjects:
   - kind: ServiceAccount
     name: {{ $saName }}
     namespace: {{ $saNamespace }}
+{{- end -}}
