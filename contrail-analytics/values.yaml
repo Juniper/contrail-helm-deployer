@@ -60,7 +60,6 @@ endpoints:
     host_fqdn_override:
        default: null
     domain_override: null
-    namespace: contrail
   keystone:
     auth:
       username: admin
