@@ -48,3 +48,28 @@ metadata:
 {{- tuple $envAll $resourceList $saName $ns | include "helm-toolkit.snippets.kubernetes_pod_rbac_roles" }}
 {{- end -}}
 {{- end -}}
+
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ $releaseName }}-{{ $saNamespace }}-{{ $saName }}-certs
+  namespace: {{ $saNamespace }}
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: {{ $releaseName }}-{{ $saName }}-certs
+  namespace: {{ $saNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $releaseName }}-{{ $saNamespace }}-{{ $saName }}-certs
+subjects:
+  - kind: ServiceAccount
+    name: {{ $saName }}
+    namespace: {{ $saNamespace }}
