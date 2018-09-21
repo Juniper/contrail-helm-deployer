@@ -99,8 +99,6 @@ endpoints:
     path:
       default: /v3
     port:
-      admin:
-        default: 35357
       api:
         default: 80
         internal: 5000
