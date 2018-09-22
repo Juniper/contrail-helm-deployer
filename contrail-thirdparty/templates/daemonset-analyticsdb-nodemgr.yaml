@@ -5,6 +5,7 @@
 
 {{- $serviceAccountName := "analyticsdb-nodemgr" }}
 {{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
+{{ tuple $context $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_csr_role" }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
