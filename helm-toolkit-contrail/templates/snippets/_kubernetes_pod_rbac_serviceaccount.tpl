@@ -21,6 +21,7 @@ limitations under the License.
 {{- $saNamespace := $envAll.Release.Namespace }}
 {{- $randomKey := randAlphaNum 32 }}
 {{- $allNamespace := dict $randomKey "" }}
+{{- $releaseName := $envAll.Release.Name }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -47,4 +48,28 @@ metadata:
 {{- $resourceList := (splitList "," (trimSuffix "," $vv)) }}
 {{- tuple $envAll $resourceList $saName $ns | include "helm-toolkit.snippets.kubernetes_pod_rbac_roles" }}
 {{- end -}}
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ $releaseName }}-{{ $saNamespace }}-{{ $saName }}-certs
+  namespace: {{ $saNamespace }}
+rules:
+  - apiGroups: ["*"]
+    resources: ["certificatesigningrequests", "certificatesigningrequests/approval"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ $releaseName }}-{{ $saName }}-certs
+  namespace: {{ $saNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ $releaseName }}-{{ $saNamespace }}-{{ $saName }}-certs
+subjects:
+  - kind: ServiceAccount
+    name: {{ $saName }}
+    namespace: {{ $saNamespace }}
 {{- end -}}
