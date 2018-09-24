@@ -229,14 +229,7 @@ Use below commands to verify labelling of nodes
 
 #### Installation of Contrail Helm charts
 
-1. K8s clusterrolebinding for contrail
-
- ```bash
-(k8s-master)> cd $CHD_PATH
-(k8s-master)> kubectl replace -f ${CHD_PATH}/rbac/cluster-admin.yaml
-  ```
-
-2. Now deploy opencontrail charts
+1. Now deploy opencontrail charts
 
 ```bash
  (k8s-master)> cd $CHD_PATH
@@ -340,7 +333,7 @@ export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
   ${CONTRAIL_REGISTRY_ARG}
 ```
 
-3. Once Contrail PODs are up and running deploy OpenStack Heat chart using following command.
+2. Once Contrail PODs are up and running deploy OpenStack Heat chart using following command.
 
 ```bash
 # Edit ${OSH_PATH}/tools/overrides/backends/opencontrail/nova.yaml and
@@ -349,7 +342,7 @@ export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
 (k8s-master)> ./tools/deployment/multinode/151-heat-opencontrail.sh
 ```
 
-4. Run compute kit test using following command at the end.
+3. Run compute kit test using following command at the end.
 
   ```bash
 (k8s-master)> ./tools/deployment/multinode/143-compute-kit-opencontrail-test.sh
