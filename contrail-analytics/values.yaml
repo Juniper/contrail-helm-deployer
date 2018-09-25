@@ -69,12 +69,10 @@ endpoints:
       project_domain_name: default
       region_name: RegionOne
     hosts:
-      default: keystone-api
+      default: keystone
     path:
       default: /v3
     port:
-      admin:
-        default: 35357
       api:
         default: 80
     scheme:
