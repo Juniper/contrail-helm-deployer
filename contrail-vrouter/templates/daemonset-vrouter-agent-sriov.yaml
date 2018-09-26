@@ -73,8 +73,8 @@ spec:
             name: host-usr-bin
           - mountPath: /etc/contrail/ssl
             name: ssl-dir
-          - mountPath: /etc/sysctl.conf
-            name: host-sysctl-conf
+          - mountPath: /etc/sysctl.d
+            name: host-sysctld-dir
 {{- if and $agent_mode ( eq $agent_mode "kernel" ) }}
 {{- if eq $host_os "ubuntu"}}
         - name: contrail-vrouter-init-kernel
@@ -321,9 +321,9 @@ spec:
       - name: ssl-dir
         hostPath:
           path: /etc/contrail/ssl
-      - name: host-sysctl-conf
+      - name: host-sysctld-dir
         hostPath:
-          path: /etc/sysctl.conf
+          path: /etc/sysctl.d
 {{- end }}
 
 {{- if .Values.manifests.daemonset_vrouter_sriov }}
