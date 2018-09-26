@@ -290,6 +290,31 @@ Use below commands to verify labelling of nodes
 EOF
  ```
 
+# [Mandatory] : Need to update hosts:default field for rabbitmq
+Hosts config for the rabbitmq endpoint need to set to CONTROLLER Node IPs in 
+both contrail-controller/values.yaml & contrail-analytics/values.yaml file.
+
+```bash
+      endpoints:
+        cluster_domain_suffix: cluster.local
+        rabbitmq:
+          auth:
+            username: guest
+            password: guest
+          path: /
+          scheme: rabbit
+          port:
+            amqp:
+              default: 5673
+          hosts:
+            default: 10.10.0.4,10.10.0.5,10.10.0.6
+          host_fqdn_override:
+          default: null
+          domain_override: null
+          namespace: contrail
+ ```
+
+
 **Note:** If any other environment variables needs to be added, then you can add it in `values.yaml` file of respective charts
 
 ```bash
