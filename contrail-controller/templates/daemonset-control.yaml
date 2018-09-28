@@ -66,8 +66,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
         - configMapRef:
             name: contrail-controller-keystone
+{{- end }}
         - configMapRef:
             name: contrail-controller-rabbitmq
         env:
@@ -89,8 +91,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
         - configMapRef:
             name: contrail-controller-keystone
+{{- end }}
         - configMapRef:
             name: contrail-controller-rabbitmq
         env:
@@ -114,8 +118,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
         - configMapRef:
             name: contrail-controller-keystone
+{{- end }}
         - configMapRef:
             name: contrail-controller-rabbitmq
         env:
@@ -137,8 +143,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
         - configMapRef:
             name: contrail-controller-keystone
+{{- end }}
         env:
         - name: NODE_TYPE
           value: control

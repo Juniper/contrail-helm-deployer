@@ -73,8 +73,10 @@ spec:
           envFrom:
           - configMapRef:
               name: contrail-vrouter-kernel
+{{- if .Values.manifests.configmap_vrouter_keystone }}
           - configMapRef:
               name: contrail-vrouter-keystone
+{{- end }}
           env:
           - name: KEYSTONE_AUTH_ADMIN_PASSWORD
             valueFrom:
@@ -97,8 +99,10 @@ spec:
           envFrom:
           - configMapRef:
               name: configmap-vrouter
+{{- if .Values.manifests.configmap_vrouter_keystone }}
           - configMapRef:
               name: contrail-vrouter-keystone
+{{- end }}
           env:
           - name: KEYSTONE_AUTH_ADMIN_PASSWORD
             valueFrom:
@@ -122,8 +126,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-vrouter-kernel
+{{- if .Values.manifests.configmap_vrouter_keystone }}
         - configMapRef:
             name: contrail-vrouter-keystone
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -161,8 +167,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-vrouter-kernel
+{{- if .Values.manifests.configmap_vrouter_keystone }}
         - configMapRef:
             name: contrail-vrouter-keystone
+{{- end }}
         env:
         - name: NODE_TYPE
           value: vrouter

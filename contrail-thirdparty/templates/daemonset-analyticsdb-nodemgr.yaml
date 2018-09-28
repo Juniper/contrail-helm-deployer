@@ -65,8 +65,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-thirdparty-env
+{{- if .Values.manifests.configmap_thirdparty_keystone }}
         - configMapRef:
             name: contrail-thirdparty-keystone
+{{- end }}
         env:
         - name: NODE_TYPE
           value: database

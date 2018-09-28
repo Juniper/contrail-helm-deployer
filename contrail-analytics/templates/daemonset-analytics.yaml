@@ -70,8 +70,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -91,8 +93,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
         env:
@@ -112,8 +116,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
         env:
@@ -133,8 +139,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -152,8 +160,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
         volumeMounts:
@@ -167,8 +177,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
         volumeMounts:
@@ -182,8 +194,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         env:
         - name: NODE_TYPE
           value: analytics
