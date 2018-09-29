@@ -70,8 +70,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -91,10 +93,14 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_analytics_rabbitmq }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -112,10 +118,14 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_analytics_rabbitmq }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -133,8 +143,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -152,10 +164,14 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_analytics_rabbitmq }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
+{{- end }}
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -167,10 +183,14 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_analytics_rabbitmq }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
+{{- end }}
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -182,8 +202,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
         env:
         - name: NODE_TYPE
           value: analytics

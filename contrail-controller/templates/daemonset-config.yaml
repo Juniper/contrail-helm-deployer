@@ -70,10 +70,14 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
         - configMapRef:
             name: contrail-controller-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_controller_rabbitmq }}
         - configMapRef:
             name: contrail-controller-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -93,10 +97,14 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
         - configMapRef:
             name: contrail-controller-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_controller_rabbitmq }}
         - configMapRef:
             name: contrail-controller-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -114,10 +122,14 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
         - configMapRef:
             name: contrail-controller-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_controller_rabbitmq }}
         - configMapRef:
             name: contrail-controller-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -135,10 +147,14 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
         - configMapRef:
             name: contrail-controller-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_controller_rabbitmq }}
         - configMapRef:
             name: contrail-controller-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -156,8 +172,10 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
         - configMapRef:
             name: contrail-controller-keystone
+{{- end }}
         env:
         - name: NODE_TYPE
           value: config
