@@ -1,0 +1,128 @@
+{{- if .Values.manifests.daemonset_kubemanager }}
+{{- $_ := set .Values "images" .Values.global.images }}
+{{- $context := . }}
+{{- $dependencies := .Values.dependencies.kubemanager }}
+
+{{- $serviceAccountName := "kubemanager" }}
+{{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
+{{ tuple $context $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_csr_role" }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-kubemanager
+spec:
+{{ tuple $context "kubemanager" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-kubemanager" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+      annotations:
+        configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
+    spec:
+      serviceAccountName: {{ $serviceAccountName }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.kubemanager.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.kubemanager.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      automountServiceAccountToken: false
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      imagePullSecrets:
+        - name: contrail-controller-docker-secret
+      initContainers:
+{{ tuple $context $dependencies nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+        - name: contrail-node-init
+          image: {{ .Values.global.images.tags.node_init | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          env:
+          - name: CONTRAIL_STATUS_IMAGE
+            value: {{ .Values.global.images.tags.contrail_status | quote }}
+          envFrom:
+          - configMapRef:
+              name: contrail-controller-env
+          volumeMounts:
+          - mountPath: /host/usr/bin
+            name: host-usr-bin
+          - mountPath: /etc/contrail/ssl
+            name: ssl-dir
+          - mountPath: /etc/sysctl.conf
+            name: host-sysctl-conf
+      containers:
+      - name: contrail-kubemanager
+        image: {{ .Values.global.images.tags.kubemanager | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: contrail-controller-env
+        - configMapRef:
+            name: kubemanager-config
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /tmp/serviceaccount
+          name: pod-secret
+      volumes:
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail
+      - name: pod-secret
+        secret:
+          secretName: contrail-kubemanager-token
+      - name: host-usr-bin
+        hostPath:
+          path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
+      - name: host-sysctl-conf
+        hostPath:
+          path: /etc/sysctl.conf
+
+---     
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: contrail-kubemanager
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: contrail-kubemanager
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: contrail-kubemanager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: contrail-kubemanager
+subjects:
+- kind: ServiceAccount
+  name: contrail-kubemanager
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: contrail-kubemanager-token
+  annotations:
+    kubernetes.io/service-account.name: contrail-kubemanager
+type: kubernetes.io/service-account-token
+
+{{- end }}

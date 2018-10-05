@@ -88,3 +88,16 @@ data:
   RABBITMQ_USE_SSL: {{ .Values.global.contrail_env.RABBITMQ_USE_SSL | default "false" | quote }}
   RABBITMQ_VHOST: {{ .Values.endpoints.rabbitmq.path | default "/" | quote }}
 {{- end }}
+
+{{- if .Values.manifests.daemonset_kubemanager }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubemanager-config
+  namespace: kube-system
+data:
+  KUBERNETES_API_SERVER: {{ .Values.global.contrail_env.KUBERNETES_API_SERVER }}
+  KUBERNETES_API_SECURE_PORT: {{ .Values.global.contrail_env.KUBERNETES_API_SECURE_PORT | quote }}
+  K8S_TOKEN_FILE: "/tmp/serviceaccount/token"
+{{- end }}
