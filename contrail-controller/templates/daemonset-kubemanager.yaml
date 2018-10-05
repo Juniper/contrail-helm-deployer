@@ -95,6 +95,7 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: contrail-kubemanager
+  namespace: {{ .Release.Namespace }}
 rules:
   - apiGroups: ["*"]
     resources: ["*"]
@@ -109,13 +110,15 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: contrail-kubemanager
+  namespace: {{ .Release.Namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: contrail-kubemanager
 subjects:
-- kind: ServiceAccount
-  name: contrail-kubemanager
+  - kind: ServiceAccount
+    name: contrail-kubemanager
+    namespace: {{ .Release.Namespace }}
 ---
 apiVersion: v1
 kind: Secret
