@@ -34,7 +34,6 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      automountServiceAccountToken: false
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       imagePullSecrets:
@@ -90,7 +89,7 @@ spec:
         hostPath:
           path: /etc/sysctl.conf
 
----     
+---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
@@ -126,6 +125,6 @@ metadata:
   name: contrail-kubemanager-token
   annotations:
     kubernetes.io/service-account.name: contrail-kubemanager
-type: kubernetes.io/service-account-token
+type: Opaque
 
 {{- end }}
