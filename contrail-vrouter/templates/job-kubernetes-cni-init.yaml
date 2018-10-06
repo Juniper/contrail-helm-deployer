@@ -1,0 +1,69 @@
+{{- if .Values.manifests.job_kubernetes_cni_init }}
+{{- $_ := set .Values "images" .Values.global.images }}
+{{- $context := . }}
+{{- $dependencies := .Values.dependencies.kubernetes_cni_init }}
+
+{{- $serviceAccountName := "kubernetes-cni-init" }}
+{{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: contrail-kubernetes-cni-init
+spec:
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "kubernetes-cni-init" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+      annotations:
+        configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
+    spec:
+      serviceAccountName: {{ $serviceAccountName }}
+      restartPolicy: OnFailure
+      #Disable affinity for single node setup
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.vrouter_agent_kernel.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.vrouter_agent_kernel.node_selector_value }}
+      #Enable tolerations for single node setup
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      imagePullSecrets:
+        - name: contrail-vrouter-docker-secret
+      containers:
+      - name: contrail-kubernetes-cni-init
+        image: {{ .Values.global.images.tags.kubernetes_cni_init | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-vrouter
+        volumeMounts:
+        - mountPath: /var/lib/contrail
+          name: var-lib-contrail
+        - mountPath: /host/etc_cni
+          name: etc-cni
+        - mountPath: /host/opt_cni_bin
+          name: opt-cni-bin
+        - mountPath: /host/log_cni
+          name: var-log-contrail-cni
+      volumes:
+      - name: etc-cni
+        hostPath:
+          path: /etc/cni
+      - name: opt-cni-bin
+        hostPath:
+          path: /opt/cni/bin
+      - name: var-log-contrail-cni
+        hostPath:
+          path: /var/log/contrail/cni
+      - name: var-lib-contrail
+        hostPath:
+          path: /var/lib/contrail
+{{- end }}

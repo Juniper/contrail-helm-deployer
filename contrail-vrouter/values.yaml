@@ -10,7 +10,7 @@ global:
       vrouter_plugin_mellanox_init: "docker.io/opencontrailnightly/contrail-vrouter-plugin-mellanox-init-ubuntu:latest"
       vrouter_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-agent-dpdk:latest"
       vrouter_init_dpdk: "docker.io/opencontrailnightly/contrail-vrouter-kernel-init-dpdk:latest"
-      cni_init: "docker.io/opencontrailnightly/contrail-kubernetes-cni-init:latest"
+      kubernetes_cni_init: "docker.io/opencontrailnightly/contrail-kubernetes-cni-init:latest"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"
     # Specify imageCredentials
