@@ -62,11 +62,6 @@ spec:
       - name: contrail-kubemanager
         image: {{ .Values.global.images.tags.kubemanager | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
-        env:
-        - name: KUBERNETES_API_SERVER
-          value: __KUBERNETES_SERVICE_HOST__
-        - name: KUBERNETES_API_SECURE_PORT
-          value: __KUBERNETES_SERVICE_PORT_HTTPS__
         envFrom:
         - configMapRef:
             name: contrail-controller-env
