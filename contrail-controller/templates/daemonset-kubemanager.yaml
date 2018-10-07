@@ -70,8 +70,6 @@ spec:
         envFrom:
         - configMapRef:
             name: contrail-controller-env
-        - configMapRef:
-            name: kubemanager-config
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
