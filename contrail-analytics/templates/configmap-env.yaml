@@ -40,7 +40,6 @@ kind: ConfigMap
 metadata:
   name: contrail-analytics-rabbitmq
 data:
-  RABBITMQ_NODES: {{ $rabbitmq_host }}
   RABBITMQ_NODE_PORT: {{ .Values.endpoints.rabbitmq.port.amqp.default | quote }}
   RABBITMQ_USER: {{ .Values.endpoints.rabbitmq.auth.username | quote }}
   RABBITMQ_PASSWORD: {{ .Values.endpoints.rabbitmq.auth.password | quote }}
