@@ -35,6 +35,8 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       imagePullSecrets:
         - name: contrail-vrouter-docker-secret
       containers:
