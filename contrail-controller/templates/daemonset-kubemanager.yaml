@@ -62,6 +62,11 @@ spec:
       - name: contrail-kubemanager
         image: {{ .Values.global.images.tags.kubemanager | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+        env:
+        - name: KUBERNETES_API_SERVER
+          value: __KUBERNETES_SERVICE_HOST__
+        - name: KUBERNETES_API_SECURE_PORT
+          value: __KUBERNETES_SERVICE_PORT_HTTPS__
         envFrom:
         - configMapRef:
             name: contrail-controller-env
@@ -70,15 +75,10 @@ spec:
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
-        - mountPath: /tmp/serviceaccount
-          name: pod-secret
       volumes:
       - name: contrail-log
         hostPath:
           path: /var/log/contrail
-      - name: pod-secret
-        secret:
-          secretName: contrail-kubemanager-token
       - name: host-usr-bin
         hostPath:
           path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}
@@ -118,13 +118,5 @@ subjects:
   - kind: ServiceAccount
     name: contrail-kubemanager
     namespace: {{ .Release.Namespace }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: contrail-kubemanager-token
-  annotations:
-    kubernetes.io/service-account.name: contrail-kubemanager
-type: Opaque
 
 {{- end }}
