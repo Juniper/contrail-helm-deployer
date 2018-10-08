@@ -45,7 +45,7 @@ spec:
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
-            name: contrail-vrouter-kernel
+            name: contrail-vrouter
         volumeMounts:
         - mountPath: /var/lib/contrail
           name: var-lib-contrail

@@ -55,6 +55,8 @@ spec:
             value: {{ .Values.global.images.tags.contrail_status | quote }}
           envFrom:
           - configMapRef:
+              name: contrail-vrouter
+          - configMapRef:
               name: contrail-vrouter-dpdk
           volumeMounts:
           - mountPath: /host/usr/bin
@@ -71,6 +73,8 @@ spec:
             privileged: true
           envFrom:
           - configMapRef:
+              name: contrail-vrouter
+          - configMapRef:
               name: contrail-vrouter-dpdk
           volumeMounts:
           - mountPath: /lib/modules
@@ -84,6 +88,8 @@ spec:
           securityContext:
             privileged: true
           envFrom:
+          - configMapRef:
+              name: contrail-vrouter
           - configMapRef:
               name: contrail-vrouter-dpdk
 {{- if .Values.manifests.configmap_vrouter_keystone }}
@@ -116,6 +122,8 @@ spec:
           securityContext:
             privileged: true
           envFrom:
+          - configMapRef:
+              name: contrail-vrouter
           - configMapRef:
               name: contrail-vrouter-dpdk
 {{- if .Values.manifests.configmap_vrouter_keystone }}
@@ -154,6 +162,8 @@ spec:
             privileged: true
           envFrom:
           - configMapRef:
+              name: contrail-vrouter
+          - configMapRef:
               name: contrail-vrouter-dpdk
 {{- if .Values.manifests.configmap_vrouter_keystone }}
           - configMapRef:
@@ -188,6 +198,8 @@ spec:
           image: {{ .Values.global.images.tags.nodemgr | quote }}
           imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
           envFrom:
+          - configMapRef:
+              name: contrail-vrouter
           - configMapRef:
               name: contrail-vrouter-dpdk
 {{- if .Values.manifests.configmap_vrouter_keystone }}
