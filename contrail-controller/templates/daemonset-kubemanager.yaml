@@ -1,22 +1,47 @@
-{{- if .Values.manifests.daemonset_kubemanager }}
+{{- if .Values.manifests.daemonset_kube_manager }}
 {{- $_ := set .Values "images" .Values.global.images }}
 {{- $context := . }}
-{{- $dependencies := .Values.dependencies.kubemanager }}
+{{- $dependencies := .Values.dependencies.kube_manager }}
 
-{{- $serviceAccountName := "kubemanager" }}
+{{- $serviceAccountName := "kube-manager" }}
 {{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
 {{ tuple $context $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_csr_role" }}
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ .Release.Name }}-{{ .Release.Namespace }}-{{ $serviceAccountName }}
+  namespace: {{ .Release.Namespace }}
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Namespace }}-{{ $serviceAccountName }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Name }}-{{ .Release.Namespace }}-{{ $serviceAccountName }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ $serviceAccountName }}
+    namespace: {{ .Release.Namespace }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: contrail-kubemanager
+  name: contrail-kube-manager
 spec:
-{{ tuple $context "kubemanager" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
+{{ tuple $context "kube_manager" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-kubemanager" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-kube-manager" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
       annotations:
         configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
     spec:
@@ -26,10 +51,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.kubemanager.node_selector_key }}
+              - key: {{ .Values.labels.kube_manager.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.kubemanager.node_selector_value }}
+                - {{ .Values.labels.kube_manager.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
@@ -59,8 +84,8 @@ spec:
           - mountPath: /etc/sysctl.conf
             name: host-sysctl-conf
       containers:
-      - name: contrail-kubemanager
-        image: {{ .Values.global.images.tags.kubemanager | quote }}
+      - name: contrail-kube-manager
+        image: {{ .Values.global.images.tags.kube_manager | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -89,35 +114,4 @@ spec:
       - name: host-sysctl-conf
         hostPath:
           path: /etc/sysctl.conf
-
----
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: contrail-kubemanager
-  namespace: {{ .Release.Namespace }}
-rules:
-  - apiGroups: ["*"]
-    resources: ["*"]
-    verbs: ["*"]
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: contrail-kubemanager
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: contrail-kubemanager
-  namespace: {{ .Release.Namespace }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: contrail-kubemanager
-subjects:
-  - kind: ServiceAccount
-    name: contrail-kubemanager
-    namespace: {{ .Release.Namespace }}
-
 {{- end }}

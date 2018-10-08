@@ -13,7 +13,7 @@ global:
       config_svcmonitor: "docker.io/opencontrailnightly/contrail-controller-config-svcmonitor:latest"
       webui_middleware: "docker.io/opencontrailnightly/contrail-controller-webui-job:latest"
       webui: "docker.io/opencontrailnightly/contrail-controller-webui-web:latest"
-      kubemanager: "docker.io/opencontrailnightly/contrail-kubernetes-kube-manager:latest"
+      kube_manager: "docker.io/opencontrailnightly/contrail-kubernetes-kube-manager:latest"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"
     # Specify imageCredentials
@@ -41,7 +41,7 @@ labels:
   webui:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
-  kubemanager:
+  kube_manager:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
 
@@ -226,7 +226,7 @@ manifests:
   daemonset_control: true
   daemonset_control_only: false
   daemonset_webui: true
-  daemonset_kubemanager: false
+  daemonset_kube_manager: false
   service_config_api_server: true
   service_config_ingress: true
   service_web_controller: true
