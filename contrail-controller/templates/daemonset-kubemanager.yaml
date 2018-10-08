@@ -1,0 +1,117 @@
+{{- if .Values.manifests.daemonset_kube_manager }}
+{{- $_ := set .Values "images" .Values.global.images }}
+{{- $context := . }}
+{{- $dependencies := .Values.dependencies.kube_manager }}
+
+{{- $serviceAccountName := "kube-manager" }}
+{{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
+{{ tuple $context $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_csr_role" }}
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ .Release.Name }}-{{ .Release.Namespace }}-{{ $serviceAccountName }}
+  namespace: {{ .Release.Namespace }}
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Namespace }}-{{ $serviceAccountName }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Name }}-{{ .Release.Namespace }}-{{ $serviceAccountName }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ $serviceAccountName }}
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: contrail-kube-manager
+spec:
+{{ tuple $context "kube_manager" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
+  template:
+    metadata:
+      labels:
+{{ tuple $context "opencontrail" "contrail-kube-manager" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+      annotations:
+        configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
+    spec:
+      serviceAccountName: {{ $serviceAccountName }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.labels.kube_manager.node_selector_key }}
+                operator: In
+                values:
+                - {{ .Values.labels.kube_manager.node_selector_value }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      imagePullSecrets:
+        - name: contrail-controller-docker-secret
+      initContainers:
+{{ tuple $context $dependencies nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+        - name: contrail-node-init
+          image: {{ .Values.global.images.tags.node_init | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          env:
+          - name: CONTRAIL_STATUS_IMAGE
+            value: {{ .Values.global.images.tags.contrail_status | quote }}
+          envFrom:
+          - configMapRef:
+              name: contrail-controller-env
+          volumeMounts:
+          - mountPath: /host/usr/bin
+            name: host-usr-bin
+          - mountPath: /etc/contrail/ssl
+            name: ssl-dir
+          - mountPath: /etc/sysctl.d
+            name: host-sysctld-dir
+      containers:
+      - name: contrail-kube-manager
+        image: {{ .Values.global.images.tags.kube_manager | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: contrail-controller-env
+{{- if .Values.manifests.configmap_controller_keystone }}
+        - configMapRef:
+            name: contrail-controller-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_controller_rabbitmq }}
+        - configMapRef:
+            name: contrail-controller-rabbitmq
+{{- end }}
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+      volumes:
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail
+      - name: host-usr-bin
+        hostPath:
+          path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}
+      - name: ssl-dir
+        hostPath:
+          path: /etc/contrail/ssl
+      - name: host-sysctld-dir
+        hostPath:
+          path: /etc/sysctl.d
+{{- end }}
