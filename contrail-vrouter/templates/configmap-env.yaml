@@ -9,6 +9,18 @@
 {{- $_ := set .Values.global "contrail_env_vrouter_dpdk" dict -}}
 {{- end -}}
 
+{{- if or (.Values.manifests.configmap_vrouter_kernel) (.Values.manifests.configmap_vrouter_dpdk) }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-vrouter
+data:
+  {{- range $key, $value := .Values.global.contrail_env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
+
 {{- if .Values.manifests.configmap_vrouter_kernel }}
 ---
 apiVersion: v1
@@ -16,9 +28,6 @@ kind: ConfigMap
 metadata:
   name: contrail-vrouter-kernel
 data:
-  {{- range $key, $value := .Values.global.contrail_env }}
-  {{ $key }}: {{ $value | quote }}
-  {{- end }}
   {{- range $key, $value := .Values.global.contrail_env_vrouter_kernel }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
@@ -31,9 +40,6 @@ kind: ConfigMap
 metadata:
   name: contrail-vrouter-dpdk
 data:
-  {{- range $key, $value := .Values.global.contrail_env }}
-  {{ $key }}: {{ $value | quote }}
-  {{- end }}
   {{- range $key, $value := .Values.global.contrail_env_vrouter_dpdk }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}

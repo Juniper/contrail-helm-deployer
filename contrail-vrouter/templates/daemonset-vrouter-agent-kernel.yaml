@@ -56,6 +56,8 @@ spec:
             value: {{ .Values.global.images.tags.contrail_status | quote }}
           envFrom:
           - configMapRef:
+              name: contrail-vrouter
+          - configMapRef:
               name: contrail-vrouter-kernel
           volumeMounts:
           - mountPath: /host/usr/bin
@@ -71,6 +73,8 @@ spec:
           securityContext:
             privileged: true
           envFrom:
+          - configMapRef:
+              name: contrail-vrouter
           - configMapRef:
               name: contrail-vrouter-kernel
 {{- if .Values.manifests.configmap_vrouter_keystone }}
@@ -99,6 +103,8 @@ spec:
           envFrom:
           - configMapRef:
               name: configmap-vrouter
+          - configMapRef:
+              name: configmap-vrouter-kernel
 {{- if .Values.manifests.configmap_vrouter_keystone }}
           - configMapRef:
               name: contrail-vrouter-keystone
@@ -124,6 +130,8 @@ spec:
         securityContext:
           privileged: true
         envFrom:
+        - configMapRef:
+            name: contrail-vrouter
         - configMapRef:
             name: contrail-vrouter-kernel
 {{- if .Values.manifests.configmap_vrouter_keystone }}
@@ -165,6 +173,8 @@ spec:
         image: {{ .Values.global.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
+        - configMapRef:
+            name: contrail-vrouter
         - configMapRef:
             name: contrail-vrouter-kernel
 {{- if .Values.manifests.configmap_vrouter_keystone }}
