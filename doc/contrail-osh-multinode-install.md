@@ -229,14 +229,7 @@ Use below commands to verify labelling of nodes
 
 #### Installation of Contrail Helm charts
 
-1. K8s clusterrolebinding for contrail
-
- ```bash
-(k8s-master)> cd $CHD_PATH
-(k8s-master)> kubectl replace -f ${CHD_PATH}/rbac/cluster-admin.yaml
-  ```
-
-2. Now deploy opencontrail charts
+1. Now deploy opencontrail charts
 
 ```bash
  (k8s-master)> cd $CHD_PATH
@@ -297,6 +290,31 @@ Use below commands to verify labelling of nodes
 EOF
  ```
 
+# [Mandatory] : Need to update hosts:default field for rabbitmq
+Hosts config for the rabbitmq endpoint need to set to CONTROLLER Node IPs in
+both contrail-controller/values.yaml & contrail-analytics/values.yaml file.
+
+```bash
+      endpoints:
+        cluster_domain_suffix: cluster.local
+        rabbitmq:
+          auth:
+            username: guest
+            password: guest
+          path: /
+          scheme: rabbit
+          port:
+            amqp:
+              default: 5673
+          hosts:
+            default: 10.10.0.4,10.10.0.5,10.10.0.6
+          host_fqdn_override:
+          default: null
+          domain_override: null
+          namespace: contrail
+ ```
+
+
 **Note:** If any other environment variables needs to be added, then you can add it in `values.yaml` file of respective charts
 
 ```bash
@@ -340,7 +358,7 @@ export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
   ${CONTRAIL_REGISTRY_ARG}
 ```
 
-3. Once Contrail PODs are up and running deploy OpenStack Heat chart using following command.
+2. Once Contrail PODs are up and running deploy OpenStack Heat chart using following command.
 
 ```bash
 # Edit ${OSH_PATH}/tools/overrides/backends/opencontrail/nova.yaml and
@@ -349,7 +367,7 @@ export CONTRAIL_REGISTRY_ARG="--values=/tmp/contrail-registry-auth.yaml "
 (k8s-master)> ./tools/deployment/multinode/151-heat-opencontrail.sh
 ```
 
-4. Run compute kit test using following command at the end.
+3. Run compute kit test using following command at the end.
 
   ```bash
 (k8s-master)> ./tools/deployment/multinode/143-compute-kit-opencontrail-test.sh

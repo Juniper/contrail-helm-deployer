@@ -151,8 +151,6 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
   export CONTRAIL_REG_USERNAME="abc@abc.com"
   export CONTRAIL_REG_PASSWORD="password"
 
-  kubectl replace -f ${CHD_PATH}/rbac/cluster-admin.yaml
-
   tee /tmp/contrail.yaml << EOF
   global:
     contrail_env:

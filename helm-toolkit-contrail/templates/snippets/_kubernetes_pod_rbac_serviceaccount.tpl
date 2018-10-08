@@ -21,7 +21,6 @@ limitations under the License.
 {{- $saNamespace := $envAll.Release.Namespace }}
 {{- $randomKey := randAlphaNum 32 }}
 {{- $allNamespace := dict $randomKey "" }}
-{{- $releaseName := $envAll.Release.Name }}
 ---
 apiVersion: v1
 kind: ServiceAccount
