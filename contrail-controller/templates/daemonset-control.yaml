@@ -70,8 +70,10 @@ spec:
         - configMapRef:
             name: contrail-controller-keystone
 {{- end }}
+{{- if .Values.manifests.configmap_controller_rabbitmq }}
         - configMapRef:
             name: contrail-controller-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -95,8 +97,10 @@ spec:
         - configMapRef:
             name: contrail-controller-keystone
 {{- end }}
+{{- if .Values.manifests.configmap_controller_rabbitmq }}
         - configMapRef:
             name: contrail-controller-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -122,8 +126,10 @@ spec:
         - configMapRef:
             name: contrail-controller-keystone
 {{- end }}
+{{- if .Values.manifests.configmap_controller_rabbitmq }}
         - configMapRef:
             name: contrail-controller-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:

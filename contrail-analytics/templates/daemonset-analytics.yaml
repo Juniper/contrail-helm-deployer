@@ -97,8 +97,10 @@ spec:
         - configMapRef:
             name: contrail-analytics-keystone
 {{- end }}
+{{- if .Values.manifests.configmap_analytics_rabbitmq }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -120,8 +122,10 @@ spec:
         - configMapRef:
             name: contrail-analytics-keystone
 {{- end }}
+{{- if .Values.manifests.configmap_analytics_rabbitmq }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
+{{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
           valueFrom:
@@ -164,8 +168,10 @@ spec:
         - configMapRef:
             name: contrail-analytics-keystone
 {{- end }}
+{{- if .Values.manifests.configmap_analytics_rabbitmq }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
+{{- end }}
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
@@ -181,8 +187,10 @@ spec:
         - configMapRef:
             name: contrail-analytics-keystone
 {{- end }}
+{{- if .Values.manifests.configmap_analytics_rabbitmq }}
         - configMapRef:
             name: contrail-analytics-rabbitmq
+{{- end }}
         volumeMounts:
         - mountPath: /var/log/contrail/
           name: contrail-log
