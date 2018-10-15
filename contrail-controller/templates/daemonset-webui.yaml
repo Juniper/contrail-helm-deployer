@@ -126,7 +126,7 @@ spec:
           path: /var/log/contrail
       - name: var-crashes-webui
         hostPath:
-          path: /var/crashes/contrail/webui
+          path: /var/crashes
       - name: host-usr-bin
         hostPath:
           path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}
