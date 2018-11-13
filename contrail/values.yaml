@@ -60,6 +60,7 @@ global:
     #HUGE_PAGES: 32000
     #HUGE_PAGES_DIR: /dev/hugepages
     #DPDK_MEM_PER_SOCKET: 1024
+    #NIC_OFFLOAD_ENABLE: false
 
   node:
     host_os: ubuntu
