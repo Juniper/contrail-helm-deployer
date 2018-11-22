@@ -1,0 +1,4 @@
+---
+osh_clone_dir: "{{ playbook_dir }}/../../openstack-helm"
+osh_infra_clone_dir: "{{ playbook_dir }}/../../openstack-helm-infra"
+ansible_cfg_file: "{{ playbook_dir }}/../ansible.cfg"

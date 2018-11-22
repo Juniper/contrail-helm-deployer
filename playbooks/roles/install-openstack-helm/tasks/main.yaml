@@ -1,0 +1,20 @@
+---
+# TODO: get deployment type automatically using inventory
+- name: set deployment type
+  set_fact:
+    deploy_type: multi_node
+
+- name: set nova image tag
+  shell: "export OSH_EXTRA_HELM_ARGS_NOVA=\"--set images.tags.opencontrail_compute_init={{ CONTRAIL_REGISTRY }}/contrail-openstack-compute-init:{{ CONTAINER_TAG }}\""
+
+- name: set neutron image tag
+  shell: "export OSH_EXTRA_HELM_ARGS_NEUTRON=\"--set images.tags.opencontrail_neutron_init={{ CONTRAIL_REGISTRY }}/contrail-openstack-neutron-init:{{ CONTAINER_TAG }}\""
+
+- name: deploy openstack helm charts
+  include: "{{ deploy_type }}.yaml"
+  when: deploy_type == "multi_node" or deploy_type == "single_node"
+
+- name: wait for openstack pods to come up
+  shell: ./tools/deployment/common/wait-for-pods.sh openstack 1800
+  args:
+    chdir: "{{ osh_dir }}"

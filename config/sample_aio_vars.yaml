@@ -1,0 +1,44 @@
+version:
+  kubernetes: v1.9.3
+  helm: v2.7.2
+  cni: v0.6.0
+
+kubernetes:
+  network:
+    default_device: eth0
+  cluster:
+    cni: calico
+    pod_subnet: 192.168.0.0/16
+    domain: cluster.local
+
+docker:
+  insecure_registries:
+    - "10.84.5.81:5010"
+
+nodes:
+  labels:
+    primary:
+      - name: openstack-helm-node-class
+        value: primary
+    nodes:
+      - name: openstack-helm-node-class
+        value: general
+    all:
+      - name: openstack-control-plane
+        value: enabled
+      - name: openstack-compute-node
+        value: enabled
+      - name: ceph-mon
+        value: enabled
+      - name: ceph-osd
+        value: enabled
+      - name: ceph-mds
+        value: enabled
+      - name: ceph-rgw
+        value: enabled
+      - name: ceph-mgr
+        value: enabled
+      - name: opencontrail.org/controller
+        value: enabled
+      - name: opencontrail.org/vrouter-kernel
+        value: enabled

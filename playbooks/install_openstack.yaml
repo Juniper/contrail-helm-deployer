@@ -1,0 +1,7 @@
+---
+# Deploy openstack helm charts
+- name: install openstack helm charts
+  hosts: primary
+  gather_facts: no
+  roles:
+    - install-openstack-helm

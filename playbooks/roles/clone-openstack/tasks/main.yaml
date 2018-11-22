@@ -1,0 +1,36 @@
+---
+# install git
+- name: install git
+  apt:
+    name: git
+    state: present
+    install_recommends: no
+# clone openstack helm repos
+- name: clone openstack-helm repo
+  git:
+    repo: https://github.com/Juniper/openstack-helm.git
+    dest: "{{ osh_clone_dir }}"
+    version: "{{ openstack_branch }}"
+    force: "{{ force_clone }}"
+- name: clone openstack-helm-infra repo
+  git:
+    repo: https://github.com/Juniper/openstack-helm-infra.git
+    dest: "{{ osh_infra_clone_dir }}"
+    version: "{{ openstack_branch }}"
+    force: "{{ force_clone }}"
+# enable openstack helm logging
+- name: copy ansible.cfg file to openstack helm repos
+  copy:
+    src: "{{ ansible_cfg_file }}"
+    dest: "{{ item }}"
+  with_items:
+    - "{{ osh_clone_dir }}"
+    - "{{ osh_infra_clone_dir }}"
+# archive openstack helm repos
+- name: compress openstack helm repos
+  archive:
+    path: "{{ item }}"
+    dest: "{{ item }}.tgz"
+  with_items:
+    - "{{ osh_clone_dir }}"
+    - "{{ osh_infra_clone_dir }}"

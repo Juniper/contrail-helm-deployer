@@ -1,0 +1,4 @@
+---
+osh_dir: /opt/openstack-helm
+osh_infra_dir: /opt/openstack-helm-infra
+helm_vars_file: "{{ playbook_dir }}/../config/helm_vars.yaml"

@@ -1,0 +1,60 @@
+all:
+  children:
+    primary:
+      hosts:
+        node1:
+          ansible_port: 22
+          ansible_host: 10.10.10.13
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: /home/ubuntu/.ssh/insecure.pem
+          ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+    nodes:
+      children:
+        contrail-controller:
+          hosts:
+            node2:
+              ansible_port: 22
+              ansible_host: 10.10.10.14
+              ansible_user: ubuntu
+              ansible_ssh_private_key_file: /home/ubuntu/.ssh/insecure.pem
+              ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+            node3:
+              ansible_port: 22
+              ansible_host: 10.10.10.15
+              ansible_user: ubuntu
+              ansible_ssh_private_key_file: /home/ubuntu/.ssh/insecure.pem
+              ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+            node4:
+              ansible_port: 22
+              ansible_host: 10.10.10.16
+              ansible_user: ubuntu
+              ansible_ssh_private_key_file: /home/ubuntu/.ssh/insecure.pem
+              ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+        openstack-compute:
+           children:
+             contrial-vrouter-kernel:
+               hosts:
+                 node5:
+                   ansible_port: 22
+                   ansible_host: 10.10.10.17
+                   ansible_user: ubuntu
+                   ansible_ssh_private_key_file: /home/ubuntu/.ssh/insecure.pem
+                   ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+             contrail-vrouter-dpdk:
+               hosts:
+                 node6:
+                   ansible_port: 22
+                   ansible_host: 10.10.10.18
+                   ansible_user: ubuntu
+                   ansible_ssh_private_key_file: /home/ubuntu/.ssh/insecure.pem
+                   ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+               vars:
+                 DPDK_UIO_DRIVER: vfio-pci
+             contrail-vrouter-sriov:
+               hosts:
+                 node7:
+                   ansible_port: 22
+                   ansible_host: 10.10.10.19
+                   ansible_user: ubuntu
+                   ansible_ssh_private_key_file: /home/ubuntu/.ssh/insecure.pem
+                   ansible_ssh_extra_args: -o StrictHostKeyChecking=no

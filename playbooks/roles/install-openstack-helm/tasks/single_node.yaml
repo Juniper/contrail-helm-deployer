@@ -1,0 +1,55 @@
+---
+- name: install openstack and heat clients
+  shell: ./tools/deployment/developer/common/020-setup-client.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install ingress controller
+  shell: ./tools/deployment/developer/nfs/031-ingress-opencontrail.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install nfs provisioner
+  shell: ./tools/deployment/developer/nfs/040-nfs-provisioner.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install mariadb
+  shell: ./tools/deployment/developer/nfs/050-mariadb.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install rabbitmq
+  shell: ./tools/deployment/developer/nfs/060-rabbitmq.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install memcached
+  shell: ./tools/deployment/developer/nfs/070-memcached.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install keystone
+  shell: ./tools/deployment/developer/nfs/080-keystone.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install horizon
+  shell: ./tools/deployment/developer/nfs/100-horizon.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install glance
+  shell: ./tools/deployment/developer/nfs/120-glance.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install libvirt opencontrail
+  shell: ./tools/deployment/developer/nfs/151-libvirt-opencontrail.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install nova and neutron
+  shell: ./tools/deployment/developer/nfs/161-compute-kit-opencontrail.sh
+  args:
+    chdir: "{{ osh_dir }}"

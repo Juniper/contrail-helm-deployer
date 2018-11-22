@@ -1,0 +1,3 @@
+---
+osh_tar_file: "{{ playbook_dir }}/../../openstack-helm.tgz"
+osh_infra_tar_file: "{{ playbook_dir }}/../../openstack-helm-infra.tgz"

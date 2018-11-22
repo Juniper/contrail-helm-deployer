@@ -1,0 +1,15 @@
+---
+# install software packages
+- name: install necessary packages on master node
+  shell: ./tools/deployment/developer/common/001-install-packages-opencontrail.sh
+  args:
+    chdir: "{{ osh_dir }}"
+# setup host and install kubernetes
+- name: setup host for deployment
+  shell: make dev-deploy setup-host local {{ inventory_file }} {{ helm_vars_file }}
+  args:
+    chdir: "{{ osh_infra_dir }}"
+- name: install and setup kubernetes cluster
+  shell: make dev-deploy k8s local {{ inventory_file }} {{ helm_vars_file }}
+  args:
+    chdir: "{{ osh_infra_dir }}"

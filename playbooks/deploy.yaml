@@ -1,0 +1,22 @@
+---
+- name: clone openstack helm repos
+  hosts: primary
+  gather_facts: no
+  roles:
+    - { role: clone-openstack, when: clone_openstack | bool }
+  vars:
+    clone_openstack: yes
+
+- name: copy openstack helm repos to all nodes
+  hosts: all
+  gather_facts: no
+  roles:
+    - copy-openstack
+
+- name: setup k8s cluster, deploy openstack and contrail helm charts
+  hosts: primary
+  gather_facts: no
+  roles:
+    - setup-k8s
+    - install-openstack-helm
+    - install-contrail-helm
