@@ -1,0 +1,32 @@
+---
+# deploy contrail helm charts
+- name: copy contrail values file
+  template:
+    src: contrail_values.j2
+    dest: "{{ contrail_vars_file }}"
+
+- name: pack contrail helm charts
+  shell: make
+  args:
+    chdir: "{{ chd_dir }}"
+
+# TODO: update /etc/hosts file for rabbitmq to work
+- name: install contrail thirdparty
+  shell: helm install --name contrail-thirdparty {{ chd_dir }}/contrail-thirdparty \
+            --namespace=contrail \
+            --values={{ contrail_vars_file }}
+
+- name: install contrail controller
+  shell: helm install --name contrail-controller {{ chd_dir }}/contrail-controller \
+            --namespace=contrail \
+            --values={{ contrail_vars_file }}
+
+- name: install contrail analytics
+  shell: helm install --name contrail-analytics {{ chd_dir }}/contrail-analytics \
+            --namespace=contrail \
+            --values={{ contrail_vars_file }}
+
+- name: install contrail vrouter
+  shell: helm install --name contrail-vrouter {{ chd_dir }}/contrail-vrouter \
+            --namespace=contrail \
+            --values={{ contrail_vars_file }}

@@ -1,0 +1,7 @@
+---
+# Deploy Kubernetes cluster
+- name: install and setup k8s cluster
+  hosts: primary
+  gather_facts: no
+  roles:
+    - setup-k8s

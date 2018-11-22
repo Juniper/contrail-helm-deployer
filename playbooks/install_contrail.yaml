@@ -1,0 +1,7 @@
+---
+# Deploy contrail helm charts
+- name: install contrail helm charts
+  hosts: primary
+  gather_facts: no
+  roles:
+    - install-contrail-helm

@@ -1,0 +1,4 @@
+---
+CONTRAIL_REGISTRY: opencontrailnightly
+CONTAINER_TAG: ocata-master-latest
+CONTROLLER_NODES: "192.168.10.61"

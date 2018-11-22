@@ -1,0 +1,3 @@
+---
+CONTRAIL_REGISTRY: opencontrailnightly
+CONTAINER_TAG: ocata-master-latest

@@ -1,0 +1,22 @@
+---
+- name: create base directory if it doesn't exist
+  file:
+    path: "{{ base_dir }}"
+    state: directory
+    mode: 0744
+# extract openstack helm repos
+- name: copy and extract openstack helm repos
+  unarchive:
+    src: "{{ item }}"
+    dest: "{{ base_dir }}"
+  with_items:
+    - "{{ osh_tar_file }}"
+    - "{{ osh_infra_tar_file }}"
+# stop firewall and flush iptables
+- name: stop firewall service
+  service:
+    name: ufw
+    state: stopped
+    enabled: no
+- name: flush iptables
+  shell: iptables -F

@@ -1,0 +1,3 @@
+---
+chd_dir: "{{ playbook_dir }}/../"
+contrail_vars_file: /tmp/contrail-values.yaml

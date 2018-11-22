@@ -1,0 +1,78 @@
+---
+- name: install openstack and heat clients
+  shell: ./tools/deployment/multinode/010-setup-client.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install ingress controller
+  shell: ./tools/deployment/multinode/021-ingress-opencontrail.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+# Multi node Ceph is not working. Use Single node Ceph
+- name: install ceph
+  #shell: ./tools/deployment/multinode/030-ceph.sh
+  shell: ./tools/deployment/developer/ceph/040-ceph.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install ceph openstack namespace
+  #shell: ./tools/deployment/multinode/040-ceph-ns-activate.sh
+  shell: ./tools/deployment/developer/ceph/045-ceph-ns-activate.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install mariadb
+  shell: ./tools/deployment/multinode/050-mariadb.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install rabbitmq
+  shell: ./tools/deployment/multinode/060-rabbitmq.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install memcached
+  shell: ./tools/deployment/multinode/070-memcached.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install keystone
+  shell: ./tools/deployment/multinode/080-keystone.sh
+  args:
+    chdir: "{{ osh_dir }}"
+  ignore_errors: yes
+
+- name: install ceph rados gateway
+  #shell: ./tools/deployment/multinode/090-ceph-radosgateway.sh
+  shell: ./tools/deployment/developer/ceph/110-ceph-radosgateway.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install glance
+  shell: ./tools/deployment/multinode/100-glance.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install cinder
+  shell: ./tools/deployment/multinode/110-cinder.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install libvirt opencontrail
+  shell: ./tools/deployment/multinode/131-libvirt-opencontrail.sh
+  args:
+    chdir: "{{ osh_dir }}"
+
+- name: install nova and neutron
+  shell: ./tools/deployment/multinode/141-compute-kit-opencontrail.sh
+  args:
+    chdir: "{{ osh_dir }}"
+  environment:
+    OSH_EXTRA_HELM_ARGS_NOVA: "--set images.tags.opencontrail_compute_init={{ CONTRAIL_REGISTRY }}/contrail-openstack-compute-init:{{ CONTAINER_TAG }}"
+    OSH_EXTRA_HELM_ARGS_NEUTRON: "--set images.tags.opencontrail_neutron_init={{ CONTRAIL_REGISTRY }}/contrail-openstack-neutron-init:{{ CONTAINER_TAG }}"
+
+- name: install horizon
+  shell: ./tools/deployment/developer/ceph/100-horizon.sh
+  args:
+    chdir: "{{ osh_dir }}"
