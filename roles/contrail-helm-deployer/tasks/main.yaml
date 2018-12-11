@@ -52,3 +52,4 @@
     CHD_PATH: "{{ repos_dir }}/contrail-helm-deployer"
     CONTRAIL_REGISTRY: "{{ contrail_docker_registry }}"
     CONTAINER_TAG: "{{ container_tag }}"
+
