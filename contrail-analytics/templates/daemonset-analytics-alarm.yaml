@@ -1,21 +1,22 @@
-{{- if .Values.manifests.daemonset_analyticsdb }}
 {{- $_ := set .Values "images" .Values.global.images }}
+{{- if .Values.manifests.daemonset_analytics_alarm }}
 {{- $context := . }}
-{{- $dependencies := .Values.dependencies.analyticsdb }}
+{{- $dependencies := .Values.dependencies.analytics_alarm }}
 
-{{- $serviceAccountName := "analyticsdb" }}
+{{- $serviceAccountName := "analytics-alarm" }}
 {{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
+{{ tuple $context $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_csr_role" }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: contrail-analyticsdb
+  name: contrail-analytics-alarm
 spec:
-{{ tuple $context "analyticsdb" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
+{{ tuple $context "analytics-alarm" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-analyticsdb" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-analytics-alarm" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
       annotations:
         configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
     spec:
@@ -25,10 +26,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.analyticsdb.node_selector_key }}
+              - key: {{ .Values.labels.analytics.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.analyticsdb.node_selector_value }}
+                - {{ .Values.labels.analytics.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
@@ -36,38 +37,30 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       imagePullSecrets:
-        - name: contrail-thirdparty-docker-secret
+        - name: contrail-analytics-docker-secret
       initContainers:
 {{ tuple $context $dependencies nil | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+        - name: contrail-node-init
+          image: {{ .Values.global.images.tags.node_init | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+          securityContext:
+            privileged: true
+          env:
+          - name: CONTRAIL_STATUS_IMAGE
+            value: {{ .Values.global.images.tags.contrail_status | quote }}
+          envFrom:
+          - configMapRef:
+              name: contrail-analytics-env
+          volumeMounts:
+          - mountPath: /host/usr/bin
+            name: host-usr-bin
+          - mountPath: /etc/contrail/ssl
+            name: ssl-dir
+          - mountPath: /etc/sysctl.d
+            name: host-sysctld-dir
       containers:
-      - name: contrail-analyticsdb
-        image: {{ .Values.global.images.tags.cassandra | quote }}
-        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
-        env:
-        - name: NODE_TYPE
-          value: database
-        envFrom:
-        - configMapRef:
-            name: contrail-analyticsdb
-        - configMapRef:
-            name: contrail-thirdparty-env
-        readinessProbe:
-          exec:
-            command: ["/readiness.sh"]
-          initialDelaySeconds: 90
-          periodSeconds: 30
-        livenessProbe:
-          exec:
-            command: ["/liveness.sh"]
-          initialDelaySeconds: 90
-          periodSeconds: 30
-        volumeMounts:
-        - mountPath: /var/lib/cassandra
-          name: analyticsdb-data
-        - mountPath: /etc/contrail/ssl
-          name: ssl-dir
-      - name: contrail-query-engine
-        image: {{ .Values.global.images.tags.analytics_query_engine | quote }}
+      - name: contrail-alarm-gen
+        image: {{ .Values.global.images.tags.analytics_alarm_gen | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -75,6 +68,10 @@ spec:
 {{- if .Values.manifests.configmap_analytics_keystone }}
         - configMapRef:
             name: contrail-analytics-keystone
+{{- end }}
+{{- if .Values.manifests.configmap_analytics_rabbitmq }}
+        - configMapRef:
+            name: contrail-analytics-rabbitmq
 {{- end }}
         env:
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
@@ -88,16 +85,23 @@ spec:
         - mountPath: /var/crashes
           name: var-crashes-analytics
       volumes:
+      - name: docker-unix-socket
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
       - name: contrail-log
         hostPath:
           path: /var/log/contrail
       - name: var-crashes-analytics
         hostPath:
           path: /var/crashes
-      - name: analyticsdb-data
+      - name: host-usr-bin
         hostPath:
-          path: /var/lib/analyticsdb
+          path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}
       - name: ssl-dir
         hostPath:
           path: /etc/contrail/ssl
+      - name: host-sysctld-dir
+        hostPath:
+          path: /etc/sysctl.d
 {{- end }}

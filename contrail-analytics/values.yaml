@@ -33,7 +33,12 @@ labels:
 dependencies:
   analytics:
     daemonset:
-    - contrail-analyticsdb
+    - contrail-config
+  analytics_snmp:
+    daemonset:
+    - contrail-config
+  analytics_alarm:
+    daemonset:
     - contrail-config
 
 # Names of secrets used by bootstrap and environmental checks
@@ -109,6 +114,8 @@ manifests:
   configmap_analytics_keystone: true
   configmap_analytics_rabbitmq: true
   daemonset_analytics: true
+  daemonset_analytics_snmp: true
+  daemonset_analytics_alarm: true
   service_analytics_api_server: true
   service_analytics_api_ingress: true
   ingress_analytics_api: true
