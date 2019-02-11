@@ -221,6 +221,14 @@ volumeMounts:
   host_usr_bin:
     hostPath: '/usr/bin'
 
+conf:
+  policy:
+    "alias-ip-pool.*": "admin_contrail:CRUD,admin:CRUD,*:R"
+    "analytics-node.*": "admin_contrail:CRUD,admin:CRUD,*:R"
+    "api-access-list.*": "admin_contrail:CRUD,admin:CRUD,*:R"
+    "bgp-as-a-service.*": "admin_contrail:CRUD,admin:CRUD,*:R"
+
+
 manifests:
   configmap_controller_env: true
   configmap_controller_keystone: true
