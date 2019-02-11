@@ -1,0 +1,9 @@
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: contrail-config-etc
+type: Opaque
+data:
+  policy.json: {{ toJson .Values.conf.policy | b64enc }}

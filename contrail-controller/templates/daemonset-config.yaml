@@ -85,6 +85,10 @@ spec:
               name: {{ .Values.secrets.keystone.admin }}
               key: KEYSTONE_AUTH_ADMIN_PASSWORD
         volumeMounts:
+        - name: contrail-config-etc
+          mountPath: /etc/contrail/policy.json
+          subPath: policy.json
+          readOnly: true
         - mountPath: /var/log/contrail/
           name: contrail-log
         - mountPath: /var/crashes
@@ -191,6 +195,10 @@ spec:
               name: {{ .Values.secrets.keystone.admin }}
               key: KEYSTONE_AUTH_ADMIN_PASSWORD
         volumeMounts:
+        - name: contrail-config-etc
+          mountPath: /etc/contrail/policy.json
+          subPath: policy.json
+          readOnly: true
         - mountPath: /mnt/docker.sock
           name: docker-unix-socket
         - mountPath: /var/log/contrail/
@@ -200,6 +208,10 @@ spec:
         - mountPath: /etc/contrail/ssl
           name: ssl-dir
       volumes:
+      - name: contrail-config-etc
+        secret:
+          secretName: contrail-config-etc
+          defaultMode: 0444
       - name: docker-unix-socket
         hostPath:
           path: /var/run/docker.sock
