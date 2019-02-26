@@ -66,7 +66,34 @@ spec:
           name: analyticsdb-data
         - mountPath: /etc/contrail/ssl
           name: ssl-dir
+      - name: contrail-query-engine
+        image: {{ .Values.global.images.tags.analytics_query_engine | quote }}
+        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: contrail-analytics-env
+{{- if .Values.manifests.configmap_analytics_keystone }}
+        - configMapRef:
+            name: contrail-analytics-keystone
+{{- end }}
+        env:
+        - name: KEYSTONE_AUTH_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.keystone.admin }}
+              key: KEYSTONE_AUTH_ADMIN_PASSWORD
+        volumeMounts:
+        - mountPath: /var/log/contrail/
+          name: contrail-log
+        - mountPath: /var/crashes
+          name: var-crashes-analytics
       volumes:
+      - name: contrail-log
+        hostPath:
+          path: /var/log/contrail
+      - name: var-crashes-analyticsdb
+        hostPath:
+          path: /var/crashes
       - name: analyticsdb-data
         hostPath:
           path: /var/lib/analyticsdb
