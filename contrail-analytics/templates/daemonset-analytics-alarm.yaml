@@ -1,22 +1,22 @@
 {{- $_ := set .Values "images" .Values.global.images }}
-{{- if .Values.manifests.daemonset_analytics }}
+{{- if .Values.manifests.daemonset_analytics_alarm }}
 {{- $context := . }}
-{{- $dependencies := .Values.dependencies.analytics }}
+{{- $dependencies := .Values.dependencies.analytics_alarm }}
 
-{{- $serviceAccountName := "analytics" }}
+{{- $serviceAccountName := "analytics-alarm" }}
 {{ tuple $context $dependencies $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}
 {{ tuple $context $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_csr_role" }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: contrail-analytics
+  name: contrail-analytics-alarm
 spec:
-{{ tuple $context "analytics" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
+{{ tuple $context "analytics-alarm" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
   template:
     metadata:
       labels:
-{{ tuple $context "opencontrail" "contrail-analytics" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+{{ tuple $context "opencontrail" "contrail-analytics-alarm" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
       annotations:
         configmap-hash: {{ tuple "configmap-env.yaml" $context | include "helm-toolkit.utils.hash" }}
     spec:
@@ -26,10 +26,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: {{ .Values.labels.analytics.node_selector_key }}
+              - key: {{ .Values.labels.analytics_alarm.node_selector_key }}
                 operator: In
                 values:
-                - {{ .Values.labels.analytics.node_selector_value }}
+                - {{ .Values.labels.analytics_alarm.node_selector_value }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
@@ -59,36 +59,8 @@ spec:
           - mountPath: /etc/sysctl.d
             name: host-sysctld-dir
       containers:
-      - name: contrail-analytics-api
-        image: {{ .Values.global.images.tags.analytics_api | quote }}
-        imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
-        ports:
-        - name: api-port
-          containerPort: {{ .Values.global.contrail_env.ANALYTICS_API_PORT | default 8081 }}
-        - name: introspect-port
-          containerPort: {{ .Values.global.contrail_env.ANALYTICS_API_INTROSPECT_PORT | default 8090 }}
-        envFrom:
-        - configMapRef:
-            name: contrail-analytics-env
-{{- if .Values.manifests.configmap_analytics_keystone }}
-        - configMapRef:
-            name: contrail-analytics-keystone
-{{- end }}
-        env:
-        - name: KEYSTONE_AUTH_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.secrets.keystone.admin }}
-              key: KEYSTONE_AUTH_ADMIN_PASSWORD
-        volumeMounts:
-        - mountPath: /var/log/contrail/
-          name: contrail-log
-        - mountPath: /var/crashes
-          name: var-crashes-analytics
-        - mountPath: /etc/contrail/ssl
-          name: ssl-dir
-      - name: contrail-collector
-        image: {{ .Values.global.images.tags.contrail_collector | quote }}
+      - name: contrail-alarm-gen
+        image: {{ .Values.global.images.tags.analytics_alarm_gen | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
         - configMapRef:
@@ -112,7 +84,7 @@ spec:
           name: contrail-log
         - mountPath: /var/crashes
           name: var-crashes-analytics
-      - name: contrail-analytics-nodemgr
+      - name: contrail-analytics-alarm-nodemgr
         image: {{ .Values.global.images.tags.nodemgr | quote }}
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         envFrom:
@@ -124,7 +96,7 @@ spec:
 {{- end }}
         env:
         - name: NODE_TYPE
-          value: analytics
+          value: analytics-alarm
         - name: DOCKER_HOST
           value: "unix://mnt/docker.sock"
         - name: KEYSTONE_AUTH_ADMIN_PASSWORD
