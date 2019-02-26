@@ -7,9 +7,8 @@ global:
       analytics_api: "docker.io/opencontrailnightly/contrail-analytics-api:latest"
       contrail_collector: "docker.io/opencontrailnightly/contrail-analytics-collector:latest"
       analytics_alarm_gen: "docker.io/opencontrailnightly/contrail-analytics-alarm-gen:latest"
-      analytics_query_engine: "docker.io/opencontrailnightly/contrail-analytics-query-engine:latest"
       analytics_snmp_collector: "docker.io/opencontrailnightly/contrail-analytics-snmp-collector:latest"
-      contrail_topology: "docker.io/opencontrailnightly/contrail-analytics-topology:latest"
+      contrail_topology: "docker.io/opencontrailnightly/contrail-analytics-snmp-topology:latest"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"
     # Specify imageCredentials
@@ -23,9 +22,18 @@ global:
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
+    ANALYTICSDB_ENABLE: "true"
+    ANALYTICS_ALARM_ENABLE: "true"
+    ANALYTICS_SNMP_ENABLE: "true"
 
 labels:
   analytics:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  analytics_snmp:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  analytics_alarm:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
 
@@ -33,7 +41,12 @@ labels:
 dependencies:
   analytics:
     daemonset:
-    - contrail-analyticsdb
+    - contrail-config
+  analytics_snmp:
+    daemonset:
+    - contrail-config
+  analytics_alarm:
+    daemonset:
     - contrail-config
 
 # Names of secrets used by bootstrap and environmental checks
@@ -109,6 +122,8 @@ manifests:
   configmap_analytics_keystone: true
   configmap_analytics_rabbitmq: true
   daemonset_analytics: true
+  daemonset_analytics_snmp: true
+  daemonset_analytics_alarm: true
   service_analytics_api_server: true
   service_analytics_api_ingress: true
   ingress_analytics_api: true

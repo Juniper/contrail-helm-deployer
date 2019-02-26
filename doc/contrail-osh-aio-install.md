@@ -151,6 +151,18 @@ Edit `${OSH_INFRA_PATH}/tools/gate/devel/local-vars.yaml` if you would want to i
   export CONTRAIL_REG_USERNAME="abc@abc.com"
   export CONTRAIL_REG_PASSWORD="password"
 
+  # [Optional] Install Base Analytics only
+  contrail analytics service consists of Base analytics, snmp and alarm components.
+  To install only the base analytics, need to set the following variables in
+  contrail-analytics/values.yaml file under manifests to false.
+
+```bash
+      manifests:
+        daemonset_analytics_snmp: false
+        daemonset_analytics_alarm: false
+
+ ```
+
   tee /tmp/contrail.yaml << EOF
   global:
     contrail_env:

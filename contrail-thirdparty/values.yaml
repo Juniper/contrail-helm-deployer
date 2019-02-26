@@ -7,6 +7,7 @@ global:
       zookeeper: "docker.io/opencontrailnightly/contrail-external-zookeeper:latest"
       rabbitmq: "docker.io/opencontrailnightly/contrail-external-rabbitmq:latest"
       nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:latest"
+      analytics_query_engine: "docker.io/opencontrailnightly/contrail-analytics-query-engine:latest"
       contrail_status: "docker.io/opencontrailnightly/contrail-status:latest"
       node_init: "docker.io/opencontrailnightly/contrail-node-init:latest"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
@@ -34,9 +35,6 @@ labels:
   analyticsdb:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
-  analytics_zookeeper:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
   config_zookeeper:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
@@ -59,10 +57,9 @@ labels:
 dependencies:
   kafka:
     daemonset:
-    - contrail-analytics-zookeeper
+    - contrail-config-zookeeper
   analyticsdb:
     daemonset:
-    - contrail-analytics-zookeeper
     - contrail-kafka
   configdb:
     daemonset:
@@ -118,10 +115,6 @@ pod:
           enabled: true
           min_ready_seconds: 0
           max_unavailable: 1
-        analytics_zookeeper:
-          enabled: true
-          min_ready_seconds: 0
-          max_unavailable: 1
         config_zookeeper:
           enabled: true
           min_ready_seconds: 0
@@ -156,7 +149,6 @@ service:
   rabbitmq_public_port: ""
 
 manifests:
-  configmap_analytics_zookeeper: true
   configmap_config_zookeeper: true
   configmap_thirdparty_env: true
   configmap_thirdparty_keystone: true
@@ -165,7 +157,6 @@ manifests:
   daemonset_configdb: true
   daemonset_analyticsdb: true
   daemonset_redis: true
-  daemonset_analytics_zookeeper: true
   daemonset_config_zookeeper: true
   daemonset_kafka: true
   daemonset_analyticsdb_nodemgr: true
