@@ -314,6 +314,17 @@ both contrail-controller/values.yaml & contrail-analytics/values.yaml file.
           namespace: contrail
  ```
 
+# [Optional] Install Base Analytics only
+contrail analytics service consists of Base analytics, snmp and alarm components.
+To install only the base analytics, need to set the following variables in
+contrail-analytics/values.yaml file under manifests to false.
+
+```bash
+      manifests:
+        daemonset_analytics_snmp: false
+        daemonset_analytics_alarm: false
+        
+ ```
 
 **Note:** If any other environment variables needs to be added, then you can add it in `values.yaml` file of respective charts
 

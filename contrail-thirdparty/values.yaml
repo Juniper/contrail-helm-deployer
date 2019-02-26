@@ -34,9 +34,6 @@ labels:
   analyticsdb:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
-  analytics_zookeeper:
-    node_selector_key: opencontrail.org/controller
-    node_selector_value: "enabled"
   config_zookeeper:
     node_selector_key: opencontrail.org/controller
     node_selector_value: "enabled"
@@ -57,12 +54,8 @@ labels:
     node_selector_value: "enabled"
 
 dependencies:
-  kafka:
-    daemonset:
-    - contrail-analytics-zookeeper
   analyticsdb:
     daemonset:
-    - contrail-analytics-zookeeper
     - contrail-kafka
   configdb:
     daemonset:
@@ -118,10 +111,6 @@ pod:
           enabled: true
           min_ready_seconds: 0
           max_unavailable: 1
-        analytics_zookeeper:
-          enabled: true
-          min_ready_seconds: 0
-          max_unavailable: 1
         config_zookeeper:
           enabled: true
           min_ready_seconds: 0
@@ -156,7 +145,6 @@ service:
   rabbitmq_public_port: ""
 
 manifests:
-  configmap_analytics_zookeeper: true
   configmap_config_zookeeper: true
   configmap_thirdparty_env: true
   configmap_thirdparty_keystone: true
@@ -165,7 +153,6 @@ manifests:
   daemonset_configdb: true
   daemonset_analyticsdb: true
   daemonset_redis: true
-  daemonset_analytics_zookeeper: true
   daemonset_config_zookeeper: true
   daemonset_kafka: true
   daemonset_analyticsdb_nodemgr: true
