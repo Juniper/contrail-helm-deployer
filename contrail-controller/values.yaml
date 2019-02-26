@@ -27,6 +27,9 @@ global:
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
+    ANALYTICSDB_ENABLE: "true"
+    ANALYTICS_ALARM_ENABLE: "true"
+    ANALYTICS_SNMP_ENABLE: "true"
 
 labels:
   control:

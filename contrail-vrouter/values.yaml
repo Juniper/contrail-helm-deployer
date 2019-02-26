@@ -26,6 +26,9 @@ global:
     LOG_LEVEL: SYS_NOTICE
     CLOUD_ORCHESTRATOR: openstack
     AAA_MODE: cloud-admin
+    ANALYTICSDB_ENABLE: "true"
+    ANALYTICS_ALARM_ENABLE: "true"
+    ANALYTICS_SNMP_ENABLE: "true"
     # this value should be the same as nova/conf.nova.neutron.metadata_proxy_shared_secret
     METADATA_PROXY_SECRET: password
     #VROUTER_GATEWAY: 8.0.0.254
