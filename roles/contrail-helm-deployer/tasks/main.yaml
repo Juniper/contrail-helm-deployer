@@ -35,6 +35,10 @@
   become: True
   become_user: root
 
+- name: Print dummy dbg msg
+  debug:
+    msg: "{{ inventory_hostname }}"
+
   #- name: Fetch local_vars.yaml to executor
   #  synchronize:
   #    src: "{{ repos_dir }}/openstack-helm-infra/tools/gate/devel/local-vars.yaml"
