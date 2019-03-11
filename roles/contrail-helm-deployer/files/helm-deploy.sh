@@ -30,11 +30,15 @@ export OSH_EXTRA_HELM_ARGS_NEUTRON="--set images.tags.opencontrail_neutron_init=
 ./tools/deployment/developer/nfs/080-keystone.sh || true
 ./tools/deployment/developer/nfs/100-horizon.sh || true
 ./tools/deployment/developer/nfs/120-glance.sh || true
+free -h && cat /proc/meminfo
 ./tools/deployment/developer/nfs/151-libvirt-opencontrail.sh || true
+free -h && cat /proc/meminfo
 ./tools/deployment/developer/nfs/161-compute-kit-opencontrail.sh || true
+free -h && cat /proc/meminfo
 
 # Wait for longer time for pods to come up
 ./tools/deployment/common/wait-for-pods.sh openstack 1800
+free -h && cat /proc/meminfo
 
 #Now deploy opencontrail charts
 cd $CHD_PATH
@@ -106,8 +110,12 @@ chmod +x /tmp/pull-images.sh
 helm install --name contrail ${CHD_PATH}/contrail \
 --namespace=contrail --values=/tmp/contrail.yaml
 
+free -h && cat /proc/meminfo
+
 # Wait for contrail pods to come up
 ${OSH_PATH}/tools/deployment/common/wait-for-pods.sh contrail 1200 || true
+
+free -h && cat /proc/meminfo
 
 # Deploying heat charts after contrail charts are deployed as they have dependency on contrail charts
 cd ${OSH_PATH}
