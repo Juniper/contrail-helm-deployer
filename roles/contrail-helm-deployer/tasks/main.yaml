@@ -35,6 +35,20 @@
   become: True
   become_user: root
 
+- name: Change rabbitmq host to ip_addr of local host for controller
+  lineinfile:
+    dest: "{{ repos_dir }}/contrail-helm-deployer/contrail-controller/values.yaml"
+    regexp: "      default: rabbitmq"
+    line: "      default: {{ ansible_default_ipv4.address }}"
+  register: rc
+
+- name: Change rabbitmq host to ip_addr of local host for analytics
+  lineinfile:
+    dest: "{{ repos_dir }}/contrail-helm-deployer/contrail-analytics/values.yaml"
+    regexp: "      default: rabbitmq"
+    line: "      default: {{ ansible_default_ipv4.address }}"
+  register: rc
+
   #- name: Fetch local_vars.yaml to executor
   #  synchronize:
   #    src: "{{ repos_dir }}/openstack-helm-infra/tools/gate/devel/local-vars.yaml"
