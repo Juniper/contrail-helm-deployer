@@ -45,7 +45,7 @@ spec:
         imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
         env:
         - name: NODE_TYPE
-          value: database
+          value: analytics-alarm
         envFrom:
         - configMapRef:
             name: contrail-thirdparty-env
