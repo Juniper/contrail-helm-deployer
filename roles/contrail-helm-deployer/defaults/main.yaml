@@ -2,7 +2,7 @@
 deploy_subnet: "192.168.1.0/24"
 container_tag: >-
   {%- if zuul.change is defined -%}
-    {{ openstack_version }}-{{ zuul.change }}-{{ zuul.patchset }}
+    {{ zuul.change }}-{{ zuul.patchset }}
   {%- else -%}
     {{ contrail_container_tag }}
   {%- endif -%}
