@@ -28,13 +28,12 @@ export OSH_EXTRA_HELM_ARGS_NEUTRON="--set images.tags.opencontrail_neutron_init=
 ./tools/deployment/developer/nfs/060-rabbitmq.sh || true
 ./tools/deployment/developer/nfs/070-memcached.sh || true
 ./tools/deployment/developer/nfs/080-keystone.sh || true
-./tools/deployment/developer/nfs/100-horizon.sh || true
-./tools/deployment/developer/nfs/120-glance.sh || true
-./tools/deployment/developer/nfs/151-libvirt-opencontrail.sh || true
-./tools/deployment/developer/nfs/161-compute-kit-opencontrail.sh || true
-
 # Wait for longer time for pods to come up
 ./tools/deployment/common/wait-for-pods.sh openstack 1800
+# vrouter.ko requires continious block of memory for loadind.
+# This block is not always available in AIO deployemnt.
+# Thus we need to deploy only required charts first, then contrail with vrouter,
+# and then the rest of openstack. 
 
 #Now deploy opencontrail charts
 cd $CHD_PATH
@@ -110,16 +109,26 @@ helm install --name contrail ${CHD_PATH}/contrail \
 --namespace=contrail --values=/tmp/contrail.yaml
 
 # Wait for contrail pods to come up
+date
 ${OSH_PATH}/tools/deployment/common/wait-for-pods.sh contrail 1200 || true
+date
+sleep 60
+sudo contrail-status
+sudo ntpq -p
+
+# Deploy the rest of openstack charts
+cd ${OSH_PATH}
+./tools/deployment/developer/nfs/100-horizon.sh || true
+./tools/deployment/developer/nfs/120-glance.sh || true
+./tools/deployment/developer/nfs/151-libvirt-opencontrail.sh || true
+./tools/deployment/developer/nfs/161-compute-kit-opencontrail.sh || true
+# Wait for longer time for pods to come up
+./tools/deployment/common/wait-for-pods.sh openstack 1800
 
 # Deploying heat charts after contrail charts are deployed as they have dependency on contrail charts
-cd ${OSH_PATH}
 export OSH_EXTRA_HELM_ARGS_HEAT="--set images.tags.opencontrail_heat_init=${CONTRAIL_REGISTRY}/contrail-openstack-heat-init:${CONTAINER_TAG}"
 
 ./tools/deployment/developer/nfs/091-heat-opencontrail.sh
-
-sleep 60
-sudo contrail-status
 
 # Verify creation of VM
 ./tools/deployment/developer/nfs/901-use-it-opencontrail.sh
