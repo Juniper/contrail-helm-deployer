@@ -185,6 +185,24 @@ spec:
           - mountPath: /dev/hugepages
             name: hugepages
 {{- end }}
+{{- if .Values.manifests.job_kubernetes_cni_init }}
+        - name: contrail-kubernetes-cni-init
+          image: {{ .Values.global.images.tags.kubernetes_cni_init | quote }}
+          imagePullPolicy: {{ default "" .Values.global.images.imagePullPolicy | quote }}
+          envFrom:
+          - configMapRef:
+              name: contrail-vrouter
+          volumeMounts:
+          - mountPath: /var/lib/contrail
+            name: var-lib-contrail
+          - mountPath: /host/etc_cni
+            name: etc-cni
+          - mountPath: /host/opt_cni_bin
+            name: opt-cni-bin
+          - mountPath: /host/log_cni
+            name: contrail-log
+            subPath: cni
+{{- end }}
       containers:
 {{- if and $agent_mode ( eq $agent_mode "dpdk" ) }}
         - name: contrail-vrouter-dpdk
@@ -352,6 +370,14 @@ spec:
       - name: host-sysctld-dir
         hostPath:
           path: /etc/sysctl.d
+{{- if .Values.manifests.job_kubernetes_cni_init }}
+      - name: etc-cni
+        hostPath:
+          path: /etc/cni
+      - name: opt-cni-bin
+        hostPath:
+          path: /opt/cni/bin
+{{- end }}
 {{- end }}
 
 {{- if .Values.manifests.daemonset_vrouter_sriov }}
