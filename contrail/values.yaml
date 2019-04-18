@@ -31,6 +31,8 @@ global:
       nodemgr: "docker.io/opencontrailnightly/contrail-nodemgr:latest"
       contrail_status: "docker.io/opencontrailnightly/contrail-status:latest"
       node_init: "docker.io/opencontrailnightly/contrail-node-init:latest"
+      rabbitmq: "docker.io/opencontrailnightly/contrail-external-rabbitmq:latest"
+      vrouter_plugin_mellanox_init: "docker.io/opencontrailnightly/contrail-vrouter-plugin-mellanox-init-ubuntu:latest"
       dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
     imagePullPolicy: "IfNotPresent"
     # Specify imageCredentials

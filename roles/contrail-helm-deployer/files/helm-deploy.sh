@@ -61,6 +61,8 @@ global:
       control_dns: "${CONTRAIL_REGISTRY}/contrail-controller-control-dns:${CONTAINER_TAG}"
       control_named: "${CONTRAIL_REGISTRY}/contrail-controller-control-named:${CONTAINER_TAG}"
       nodemgr: "${CONTRAIL_REGISTRY}/contrail-nodemgr:${CONTAINER_TAG}"
+      contrail_status: "${CONTRAIL_REGISTRY}/contrail-status:${CONTAINER_TAG}"
+      node_init: "${CONTRAIL_REGISTRY}/contrail-node-init:${CONTAINER_TAG}"
       webui_middleware: "${CONTRAIL_REGISTRY}/contrail-controller-webui-job:${CONTAINER_TAG}"
       webui: "${CONTRAIL_REGISTRY}/contrail-controller-webui-web:${CONTAINER_TAG}"
       analytics_alarm_gen: "${CONTRAIL_REGISTRY}/contrail-analytics-alarm-gen:${CONTAINER_TAG}"
@@ -74,6 +76,7 @@ global:
       vrouter_init_kernel: "${CONTRAIL_REGISTRY}/contrail-vrouter-kernel-init:${CONTAINER_TAG}"
       vrouter_dpdk: "${CONTRAIL_REGISTRY}/contrail-vrouter-agent-dpdk:${CONTAINER_TAG}"
       vrouter_init_dpdk: "${CONTRAIL_REGISTRY}/contrail-vrouter-kernel-init-dpdk:${CONTAINER_TAG}"
+      vrouter_plugin_mellanox_init: "${CONTRAIL_REGISTRY}/contrail-vrouter-plugin-mellanox-init-ubuntu:${CONTAINER_TAG}"
   contrail_env:
     CONTROLLER_NODES: $intf_ip_address
     LOG_LEVEL: SYS_DEBUG
