@@ -107,10 +107,8 @@ spec:
             name: lib-modules
           - mountPath: /var/run
             name: var-run
-          - mountPath: /etc/os-release
-            name: os-release
-          - mountPath: /etc/lsb-release
-            name: lsb-release
+          - mountPath: /host/etc/contrail
+            name: host-etc-contrail
           - mountPath: /dev/hugepages
             name: hugepages
           - mountPath: /host/bin
@@ -286,6 +284,9 @@ spec:
       - name: host-bin
         hostPath:
           path: /bin
+      - name: host-etc-contrail
+        hostPath:
+          path: /etc/contrail
       - name: host-usr-bin
         hostPath:
           path: {{ .Values.volumeMounts.host_usr_bin.hostPath }}
