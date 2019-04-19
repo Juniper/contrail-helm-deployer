@@ -51,7 +51,6 @@ spec:
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
-      hostPID: true
       dnsPolicy: ClusterFirstWithHostNet
       imagePullSecrets:
         - name: contrail-vrouter-docker-secret
