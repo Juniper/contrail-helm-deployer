@@ -1,7 +1,9 @@
 ---
 - name: Set variables
   set_fact:
-    repos_dir: "{{ ansible_env.HOME }}/src/{{ zuul.project.canonical_hostname }}/Juniper"
+    src_dir_openstack_helm: "{{ ansible_env.HOME }}/{{ zuul.projects | selectattr('short_name', 'equalto', 'openstack-helm') | map(attribute='src_dir') | list | first }}"
+    src_dir_openstack_helm_infra: "{{ ansible_env.HOME }}/{{ zuul.projects | selectattr('short_name', 'equalto', 'openstack-helm-infra') | map(attribute='src_dir') | list | first }}"
+    src_dir_contrail_helm_deployer: "{{ ansible_env.HOME }}/{{ zuul.projects | selectattr('short_name', 'equalto', 'contrail-helm-deployer') | map(attribute='src_dir') | list | first }}"
 
 - name: (Hack) Drop ansible facts for debugging
   debug:
@@ -10,7 +12,7 @@
 - name: copy local vars template to target machine
   template:
     src: templates/local-vars.yaml.j2
-    dest: "{{ repos_dir }}/openstack-helm-infra/tools/gate/devel/local-vars.yaml"
+    dest: "{{ src_dir_openstack_helm_infra }}/tools/gate/devel/local-vars.yaml"
     mode: 0644
 
 - name: copy deployment script to target machine
@@ -37,7 +39,7 @@
 
   #- name: Fetch local_vars.yaml to executor
   #  synchronize:
-  #    src: "{{ repos_dir }}/openstack-helm-infra/tools/gate/devel/local-vars.yaml"
+  #    src: "{{ src_dir_openstack_helm_infra }}/tools/gate/devel/local-vars.yaml"
   #    dest: "{{ zuul.executor.log_root }}/"
   #  mode: pull
 
@@ -46,9 +48,9 @@
   args:
     chdir: "{{ ansible_env.HOME }}"
   environment:
-    BASE_DIR: "{{ repos_dir }}"
-    OSH_PATH: "{{ repos_dir }}/openstack-helm"
-    OSH_INFRA_PATH: "{{ repos_dir }}/openstack-helm-infra"
-    CHD_PATH: "{{ repos_dir }}/contrail-helm-deployer"
+    BASE_DIR: "{{ src_dir_contrail_helm_deployer }}"  # never used by script?
+    OSH_PATH: "{{ src_dir_openstack_helm }}"
+    OSH_INFRA_PATH: "{{ src_dir_openstack_helm_infra }}"
+    CHD_PATH: "{{ src_dir_contrail_helm_deployer }}"
     CONTRAIL_REGISTRY: "{{ contrail_docker_registry }}"
     CONTAINER_TAG: "{{ container_tag }}"
