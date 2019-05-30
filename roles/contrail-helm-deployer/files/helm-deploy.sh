@@ -5,6 +5,7 @@ set -ex
 sudo service ufw stop
 sudo systemctl disable ufw
 sudo iptables -F
+sudo sysctl -w vm.max_map_count=1048575
 
 cd ${OSH_PATH}
 
