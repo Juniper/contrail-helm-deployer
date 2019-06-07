@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f5c4f37_0c07c584",
+        "filename": "roles/contrail-helm-deployer/tasks/main.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 437
+      },
+      "writtenOn": "2019-06-07T12:38:20Z",
+      "side": 1,
+      "message": "Is it real good idea to introduce zuul specific stuff in the deployers code?",
+      "range": {
+        "startLine": 4,
+        "startChar": 55,
+        "endLine": 4,
+        "endChar": 69
+      },
+      "revId": "b2683cfb4c29b359c78e08bf7927dbff1902eb4e",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
