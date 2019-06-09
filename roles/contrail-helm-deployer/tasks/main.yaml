@@ -25,14 +25,14 @@
     regexp: "^{{ ansible_default_ipv4.address }}"
     line: "{{ ansible_default_ipv4.address }} {% if ansible_domain %}{{ inventory_hostname }}.{{ ansible_domain }}{% endif %} {{ inventory_hostname }}"
   when: ansible_hostname != inventory_hostname
-  become: True
+  become: true
   become_user: root
 
 - name: (Hack) Walkaround to change hostname using ansible
   hostname:
     name: "{{ inventory_hostname }}"
   when: ansible_hostname != inventory_hostname
-  become: True
+  become: true
   become_user: root
 
   #- name: Fetch local_vars.yaml to executor
