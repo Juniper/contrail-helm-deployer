@@ -5,6 +5,7 @@ set -ex
 sudo service ufw stop
 sudo systemctl disable ufw
 sudo iptables -F
+sudo sysctl -w vm.max_map_count=1048575
 
 cd ${OSH_PATH}
 
@@ -85,8 +86,13 @@ global:
     PHYSICAL_INTERFACE: $physical_intf
     VROUTER_GATEWAY:
     CONTROL_DATA_NET_LIST:
-    CONFIG_NODEMGR__DEFAULTS__minimum_diskGB: "5"
+    CONFIG_DATABASE_NODEMGR__DEFAULTS__minimum_diskGB: "5"
     DATABASE_NODEMGR__DEFAULTS__minimum_diskGB: "5"
+    JVM_EXTRA_OPTS: "-Xms1g -Xmx2g"
+    VROUTER_ENCRYPTION: FALSE
+    ANALYTICS_ALARM_ENABLE: TRUE
+    ANALYTICS_SNMP_ENABLE: TRUE
+    ANALYTICSDB_ENABLE: TRUE
   contrail_env_vrouter_kernel:
     AGENT_MODE: kernel
 EOF
