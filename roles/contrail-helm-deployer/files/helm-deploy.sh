@@ -5,6 +5,7 @@ set -ex
 sudo service ufw stop
 sudo systemctl disable ufw
 sudo iptables -F
+sudo sysctl -w vm.max_map_count=1048575
 
 cd ${OSH_PATH}
 
@@ -16,6 +17,7 @@ intf_ip_address="$(ip addr show dev $physical_intf | grep "inet .*/.* brd " | aw
 ./tools/deployment/developer/common/010-deploy-k8s.sh
 
 #Install openstack and heat client
+sudo apt-get remove --purge -y python3-yaml
 ./tools/deployment/developer/common/020-setup-client.sh
 
 #Deploy openstack-helm related charts
@@ -85,8 +87,13 @@ global:
     PHYSICAL_INTERFACE: $physical_intf
     VROUTER_GATEWAY:
     CONTROL_DATA_NET_LIST:
-    CONFIG_NODEMGR__DEFAULTS__minimum_diskGB: "5"
+    CONFIG_DATABASE_NODEMGR__DEFAULTS__minimum_diskGB: "5"
     DATABASE_NODEMGR__DEFAULTS__minimum_diskGB: "5"
+    JVM_EXTRA_OPTS: "-Xms1g -Xmx2g"
+    VROUTER_ENCRYPTION: FALSE
+    ANALYTICS_ALARM_ENABLE: TRUE
+    ANALYTICS_SNMP_ENABLE: TRUE
+    ANALYTICSDB_ENABLE: TRUE
   contrail_env_vrouter_kernel:
     AGENT_MODE: kernel
 EOF
