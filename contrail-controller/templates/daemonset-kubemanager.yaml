@@ -32,12 +32,15 @@ subjects:
     name: {{ $serviceAccountName }}
     namespace: {{ .Release.Namespace }}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: contrail-kube-manager
 spec:
 {{ tuple $context "kube_manager" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
+  selector:
+    matchLabels:
+{{ tuple $context "opencontrail" "contrail-kube-manager" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 6 }}
   template:
     metadata:
       labels:
