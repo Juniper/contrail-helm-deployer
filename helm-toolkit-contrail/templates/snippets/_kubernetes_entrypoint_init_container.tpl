@@ -21,6 +21,9 @@ limitations under the License.
 - name: init
   image: {{ $envAll.Values.images.tags.dep_check }}
   imagePullPolicy: {{ $envAll.Values.images.pull_policy }}
+  command:
+    - kubernetes-entrypoint
+
   env:
     - name: POD_NAME
       valueFrom:
@@ -42,10 +45,10 @@ limitations under the License.
       value: "{{  include "helm-toolkit.utils.joinListWithComma" $deps.daemonset }}"
     - name: DEPENDENCY_CONTAINER
       value: "{{  include "helm-toolkit.utils.joinListWithComma" $deps.container }}"
-    - name: COMMAND
-      value: "echo done"
-  command:
-    - kubernetes-entrypoint
+    - name: DEPENDENCY_POD_JSON
+      value: {{ if $deps.pod }}{{ toJson $deps.pod | quote }}{{ else }}""{{ end }}
+    - name: DEPENDENCY_CUSTOM_RESOURCE
+      value: {{ if $deps.custom_resources }}{{ toJson $deps.custom_resources | quote }}{{ else }}""{{ end }}
   volumeMounts:
 {{ toYaml $mounts | indent 4 }}
 {{- end -}}
