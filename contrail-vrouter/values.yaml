@@ -50,6 +50,11 @@ global:
     #    SRIOV_PHYSICAL_INTERFACE: enp129s0f1
     #    SRIOV_PHYS_NET:  physnet1
 
+  # section of vrouter for xflow configs
+  contrail_env_xflow_configuration:
+    # Set this to the loadbalancer collector vip 
+    # XFLOW_NODE_IP: 10.87.65.248
+
   node:
     host_os: ubuntu
 

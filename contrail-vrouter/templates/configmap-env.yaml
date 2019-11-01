@@ -85,3 +85,14 @@ data:
   KEYSTONE_AUTH_PUBLIC_PORT: {{ .Values.endpoints.keystone.port.api.default | quote }}
   KEYSTONE_AUTH_REGION_NAME: {{ .Values.endpoints.keystone.auth.region_name | quote }}
 {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contrail-xflow-configuration
+data:
+  {{- range $key, $value := .Values.global.contrail_env_xflow_configuration }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
+

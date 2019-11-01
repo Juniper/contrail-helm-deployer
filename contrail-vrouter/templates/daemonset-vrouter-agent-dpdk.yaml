@@ -91,6 +91,8 @@ spec:
               name: contrail-vrouter
           - configMapRef:
               name: contrail-vrouter-dpdk
+          - configMapRef:
+              name: contrail-xflow-configuration
 {{- if .Values.manifests.configmap_vrouter_keystone }}
           - configMapRef:
               name: contrail-vrouter-keystone
@@ -141,6 +143,8 @@ spec:
               name: contrail-vrouter
           - configMapRef:
               name: contrail-vrouter-dpdk
+          - configMapRef:
+              name: contrail-xflow-configuration
 {{- if .Values.manifests.configmap_vrouter_keystone }}
           - configMapRef:
               name: contrail-vrouter-keystone
@@ -180,6 +184,8 @@ spec:
               name: contrail-vrouter
           - configMapRef:
               name: contrail-vrouter-dpdk
+          - configMapRef:
+              name: contrail-xflow-configuration
 {{- if .Values.manifests.configmap_vrouter_keystone }}
           - configMapRef:
               name: contrail-vrouter-keystone
@@ -217,6 +223,8 @@ spec:
               name: contrail-vrouter
           - configMapRef:
               name: contrail-vrouter-dpdk
+          - configMapRef:
+              name: contrail-xflow-configuration
 {{- if .Values.manifests.configmap_vrouter_keystone }}
           - configMapRef:
               name: contrail-vrouter-keystone
