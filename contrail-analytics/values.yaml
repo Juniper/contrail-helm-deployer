@@ -109,8 +109,16 @@ service:
   analytics_api_public_port: ""
 
 # Ingress related inputs are defined here
-ingress:
-  analytics_api_host: "contrail-analytics-api"
+#ingress:
+#  analytics_api:
+#    annotations:
+#      kubernetes.io/ingress.class: nginx
+#      nginx.ingress.kubernetes.io/rewrite-target: /
+#    hosts:
+#      - name: contrail-analytics-api
+#        path: /
+#      - name: contrail-analytics-api.contrail.svc.cluster.local
+#        path: /
 
 # VolumeMounts related inputs are defined here
 volumeMounts:
@@ -126,5 +134,5 @@ manifests:
   daemonset_analytics_alarm: true
   service_analytics_api_server: true
   service_analytics_api_ingress: true
-  ingress_analytics_api: true
+  ingress_analytics_api: false
   secret_analytics_keystone_admin: true

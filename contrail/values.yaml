@@ -76,3 +76,59 @@ contrail-vrouter:
   manifests:
     configmap_vrouter_dpdk: false
     daemonset_dpdk: false
+
+# Example for configuring nginx ingress controller
+contrail-controller:
+  # Ingress related inputs are defined here
+  ingress:
+    config_api:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      hosts:
+      - name: contrail-config-api
+        path: /
+      - name: contrail-config-api.contrail
+        path: /
+      - name: contrail-config-api.contrail.svc.cluster.local
+        path: /
+
+    webui:
+      annotations:
+        kubernetes.io/ingress.class: nginx-cluster
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/rewrite-target: /
+        # tls will be terminated at the pod
+        nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+        # session affinity related annotations
+        nginx.ingress.kubernetes.io/affinity: cookie
+        nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+        nginx.ingress.kubernetes.io/session-cookie-name: route
+      hosts:
+      - name: contrail-webui
+        path: /
+      - name: contrail-webui.contrail
+        path: /
+      - name: contrail-webui.contrail.svc.cluster.local
+        path: /
+
+  manifests:
+    ingress_webui: true
+    ingress_config_api: true
+
+contrail-analytics:
+  ingress:
+    analytics_api:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      hosts:
+        - name: contrail-analytics-api
+          path: /
+        - name: contrail-analytics-api.contrail
+          path: /
+        - name: contrail-analytics-api.contrail.svc.cluster.local
+          path: /
+
+  manifests:
+    ingress_analytics_api: true
