@@ -215,9 +215,34 @@ service:
   config_api_public_port: ""
 
 # Ingress related inputs are defined here
-ingress:
-  config_api_host: "contrail-config-api"
-  webui_host: "contrail-webui"
+#ingress:
+#  config_api:
+#    annotations:
+#      kubernetes.io/ingress.class: nginx
+#      nginx.ingress.kubernetes.io/rewrite-target: /
+#    hosts:
+#      - name: contrail-config-api
+#        path: /
+#      - name: contrail-config-api.contrail.svc.cluster.local
+#        path: /
+
+#  webui:
+#    annotations:
+#      kubernetes.io/ingress.class: nginx-cluster
+#      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+#      nginx.ingress.kubernetes.io/rewrite-target: /
+#      # tls will be terminated at the pod
+#      nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+#      # session affinity related annotations
+#      nginx.ingress.kubernetes.io/affinity: cookie
+#      nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+#      nginx.ingress.kubernetes.io/session-cookie-name: route
+#    hosts:
+#      - name: contrail-config-api
+#        path: /
+#      - name: contrail-config-api.contrail.svc.cluster.local
+#        path: /
+
 
 # VolumeMounts related inputs are defined here
 volumeMounts:
@@ -237,6 +262,6 @@ manifests:
   service_config_ingress: true
   service_web_controller: true
   service_webui_ingress: true
-  ingress_webui: true
-  ingress_config_api: true
+  ingress_webui: false
+  ingress_config_api: false
   secret_controller_keystone_admin: true

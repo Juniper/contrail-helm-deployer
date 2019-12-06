@@ -3,30 +3,19 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    {{- range $key, $val := .Values.ingress.analytics_api.annotations }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end}}
   name: contrail-analytics-api
 spec:
   rules:
-  - host: {{ .Values.ingress.analytics_api_host }}
+  {{- range .Values.ingress.analytics_api.hosts }}
+  - host: {{ .name }}
     http:
       paths:
       - backend:
           serviceName: analytics-api-server
           servicePort: api
-        path: /
-  - host: {{ .Values.ingress.analytics_api_host }}.{{ .Release.Namespace }}
-    http:
-      paths:
-      - backend:
-          serviceName: analytics-api-server
-          servicePort: api
-        path: /
-  - host: {{ .Values.ingress.analytics_api_host }}.{{ .Release.Namespace }}.svc.cluster.local
-    http:
-      paths:
-      - backend:
-          serviceName: analytics-api-server
-          servicePort: api
-        path: /
+        path: {{ .path }}
+  {{- end }}
 {{- end }}
